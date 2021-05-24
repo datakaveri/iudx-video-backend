@@ -34,10 +34,12 @@
         "cors": "^2.8.5",
         "dotenv": "^9.0.2",
         "express": "^4.17.1",
+        "kafkajs": "^1.15.0",
         "pg": "^8.6.0",
         "pg-hstore": "^2.3.3",
         "reflect-metadata": "^0.1.13",
         "sequelize": "^6.6.2",
+        "typedi": "^0.10.0",
         "winston": "^3.3.3"
     }
 }

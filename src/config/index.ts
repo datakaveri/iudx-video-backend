@@ -13,6 +13,11 @@ export default {
 
     databaseURL: process.env.DB_URL,
 
+    kafkaConfig: {
+        clientId: process.env.KAFKA_CLIENT_ID,
+        brokers: process.env.KAFKA_BROKER,
+        consumerGroupId: 'cloud-media-server-consumer'
+    },
     /**
      * Used by winston logger
      */

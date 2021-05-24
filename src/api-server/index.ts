@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 
-import Logger from '../common/logger';
+import Logger from '../common/Logger';
 import routes from './routes';
 import config from '../config';
 

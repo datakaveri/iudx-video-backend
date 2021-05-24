@@ -1,9 +1,9 @@
 import 'reflect-metadata';
 
-import Logger from './common/logger';
+import Logger from './common/Logger';
 import supervisor from './supervisor';
 
-async function startServer() {
+function startServer() {
     supervisor()
         .then(() => {
             Logger.info('Application started');
