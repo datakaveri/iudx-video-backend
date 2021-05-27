@@ -16,7 +16,7 @@ export default {
     kafkaConfig: {
         clientId: process.env.KAFKA_CLIENT_ID,
         brokers: process.env.KAFKA_BROKER,
-        consumerGroupId: 'cloud-media-server-consumer'
+        consumerGroupId: 'cloud-media-server-consumer',
     },
     /**
      * Used by winston logger
@@ -30,5 +30,21 @@ export default {
      */
     api: {
         prefix: '/api',
+    },
+
+    /**
+     * Auth Config
+     */
+    authConfig: {
+        jwtSecret: process.env.JWT_SECRET,
+        jwtTokenExpiry: '1h',
+    },
+
+    /**
+     * Email Config
+     */
+    emailConfig: {
+        username: process.env.EMAIL_ID,
+        password: process.env.EMAIL_PASSWORD,
     },
 };

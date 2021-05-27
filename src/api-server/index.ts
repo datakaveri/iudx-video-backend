@@ -4,6 +4,7 @@ import cors from 'cors';
 import Logger from '../common/Logger';
 import routes from './routes';
 import config from '../config';
+import passport from '../common/Passport';
 
 export default () => {
     const app = express();
@@ -19,6 +20,10 @@ export default () => {
 
     // Middleware that transforms the raw string of req.body into json
     app.use(express.json());
+
+    // Load Passort JS
+    app.use(passport.initialize());
+
     // Load API routes
     app.use(config.api.prefix, routes());
 
