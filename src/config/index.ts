@@ -37,7 +37,10 @@ export default {
      */
     authConfig: {
         jwtSecret: process.env.JWT_SECRET,
+        jwtPrivateKeyPath: process.env.JWT_PRIVATE_KEY_PATH,
+        jwtAlgorithm: 'RS256',
         jwtTokenExpiry: '1h',
+        verificationUrl: 'http://localhost:4000/api/auth/verify?verificationCode='
     },
 
     /**

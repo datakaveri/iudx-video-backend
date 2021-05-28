@@ -1,25 +1,28 @@
-import { Inject } from 'typedi';
+import { Service, Container } from 'typedi';
 import { Request, Response, NextFunction } from 'express';
 import passport from 'passport';
 
 import Logger from '../../common/Logger';
 import AuthService from '../../services/AuthService';
 
-class AuthExpressController {
-    @Inject('AuthService') private authService: AuthService;
+@Service()
+export default class AuthExpressController {
     constructor() {}
 
     async signUp(req: Request, res: Response, next: NextFunction) {
         Logger.debug('Calling Sign-Up endpoint with body: %o', req.body);
         try {
-            passport.authenticate('signup', (err, confirmationCode) => {
+            passport.authenticate('signup', async (err, verificationCode) => {
                 try {
-                    if (err || !confirmationCode) {
+                    if (err) {
+                        return next(err);
+                    } else if(!verificationCode) {
                         const error = new Error('An error occurred.');
                         return next(error);
                     }
-
                     // send mail of confirmation code
+                    const authService: AuthService = Container.get(AuthService);
+                    await authService.signUp({name: req.body.name, email: req.body.email, verificationCode})
 
                     return res.status(201).json({ message: 'User account created, please verify your email' });
                 } catch (error) {
@@ -37,7 +40,9 @@ class AuthExpressController {
         try {
             passport.authenticate('verify', (err, result) => {
                 try {
-                    if (err || !result) {
+                    if (err) {
+                        return next(err);
+                    } else if(!result) {
                         const error = new Error('An error occurred.');
                         return next(error);
                     }
@@ -55,19 +60,42 @@ class AuthExpressController {
         }
     }
 
-    async login(req: Request, res: Response, next: NextFunction) {
-        Logger.debug('Calling Login endpoint with body: %o', req.body);
+    async token(req: Request, res: Response, next: NextFunction) {
+        Logger.debug('Calling Token endpoint with body: %o', req.body);
         try {
-            passport.authenticate('login', (err, user) => {
+            passport.authenticate('token', (err, token, message) => {
                 try {
-                    if (err || !user) {
-                        const error = new Error('An error occurred.');
+                    if (err) {
+                        return next(err);
+                    } else if(!token) {
+                        const error = new Error(message.message);
                         return next(error);
                     }
+                    return res.json(token);
+                } catch (error) {
+                    return next(error);
+                }
+            })(req, res, next);
+        } catch (e) {
+            Logger.error('error: %o', e);
+            return next(e);
+        }
+    }
 
-                    req.login(user, { session: false }, async (error) => {
+    async login(req: Request, res: Response, next: NextFunction) {
+        Logger.debug('Calling Login endpoint');
+        try {
+            passport.authenticate('jwt', (err, user) => {
+                try {
+                    if (err) {
+                        return next(err);
+                    } else if(!user) {
+                        const error = new Error('Invalid token provided');
+                        return next(error);
+                    }
+                    req.login(user, { session: true }, async (error) => {
                         if (error) return next(error);
-                        return res.json({ user });
+                        return res.json(user);
                     });
                 } catch (error) {
                     return next(error);
@@ -83,12 +111,10 @@ class AuthExpressController {
         Logger.debug('Calling Logout endpoint');
         try {
             req.logOut();
-            return res.redirect('/');
+            return res.status(200).send();
         } catch (e) {
             Logger.error('error: %o', e);
             return next(e);
         }
     }
 }
-
-export default AuthExpressController;

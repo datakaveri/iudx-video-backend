@@ -6,8 +6,9 @@ import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 
 import config from '../config';
-import { UserInterface } from '../interfaces/UserInterface';
 import Container from 'typedi';
+import UserRepo from '../repositories/UserRepo';
+import Utility from './Utility';
 
 const generateCode = () => {
     const characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -18,6 +19,9 @@ const generateCode = () => {
     }
     return code;
 };
+
+const UtilityService = Container.get(Utility);
+const privateKey = UtilityService.getPrivateKey();
 
 passport.use(
     'signup',
@@ -30,8 +34,12 @@ passport.use(
         async (req, email, password, done) => {
             try {
                 const verificationCode = generateCode();
-                const UserModel: any = Container.get('UserModel');
-                await UserModel.create({ id: uuidv4(), name: req.body.name, email, password, verificationCode, verified: false, role: req.body.role });
+                const userRepo = Container.get(UserRepo);
+                const found = await userRepo.findUser({ email });
+                if (found) {
+                    return done(new Error('User already exists'));
+                }
+                await userRepo.createUser({ id: uuidv4(), name: req.body.name, email, password, verificationCode, verified: false, role: req.body.role });
                 return done(null, verificationCode);
             } catch (error) {
                 done(error);
@@ -41,7 +49,7 @@ passport.use(
 );
 
 passport.use(
-    'login',
+    'token',
     new LocalStrategy(
         {
             usernameField: 'email',
@@ -49,25 +57,25 @@ passport.use(
         },
         async (email: string, password: string, done) => {
             try {
-                const UserModel: any = Container.get('UserModel');
-                const user = await UserModel.findOne({ where: { email } });
+                const userRepo = Container.get(UserRepo);
+                const user = await userRepo.findUser({ email });
                 if (!user) {
                     return done(null, false, { message: 'User not found' });
                 }
-                const validate = await user.isValidPassword(password);
+                const validate = await userRepo.validatePassword({ email }, password);
 
                 if (!validate) {
                     return done(null, false, { message: 'Wrong Password' });
                 }
-                const userData = user.get({ plain: true });
-                if (!userData.verified) {
+                if (!user.verified) {
                     return done(null, false, { message: 'User is not verified' });
                 }
-                const payload = { name: userData.name, email: userData.email };
-                const token = jwt.sign(payload, config.authConfig.jwtSecret, {
+                const payload = { userId: user.id, name: user.name, email: user.email, role: user.role };
+                const token = jwt.sign(payload, privateKey, {
+                    algorithm: 'RS256',
                     expiresIn: config.authConfig.jwtTokenExpiry,
                 });
-                return done(null, { name: userData.name, email: userData.email, token: token }, { message: 'Logged in Successfully' });
+                return done(null, { token: token }, { message: 'Logged in Successfully' });
             } catch (error) {
                 return done(error);
             }
@@ -80,11 +88,10 @@ passport.use(
     new CustomStrategy(async (req, done) => {
         try {
             const code = req.query.verificationCode;
-            const UserModel: any = Container.get('UserModel');
-            const user = await UserModel.findOne({ where: { verificationCode: code } });
-            const userData: UserInterface = user.get({ plain: true });
-            if (code === userData.verificationCode) {
-                await UserModel.update({ verified: true }, { where: { email: userData.email } });
+            const userRepo = Container.get(UserRepo);
+            const user = await userRepo.findUser({ verificationCode: code });
+            if (code === user.verificationCode) {
+                await userRepo.updateUser({ email: user.email }, { verified: true });
                 return done(null, { success: true, message: 'Verification successful' });
             } else {
                 return done(null, { success: false, message: 'Wrong verification code provided' });
@@ -98,17 +105,26 @@ passport.use(
 passport.use(
     new JWTStrategy(
         {
-            secretOrKey: config.authConfig.jwtSecret,
+            secretOrKey: privateKey,
+            algorithms: ['RS256'],
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
         },
-        async (token, done) => {
+        async (user, done) => {
             try {
-                return done(null, token.user);
+                return done(null, user);
             } catch (error) {
                 done(error);
             }
         }
     )
 );
+
+passport.serializeUser((user, done) => {
+    done(null, user);
+});
+
+passport.deserializeUser((user, done) => {
+    done(null, user);
+});
 
 export default passport;
