@@ -108,9 +108,11 @@ passport.use(
             secretOrKey: privateKey,
             algorithms: ['RS256'],
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+            passReqToCallback: true,
         },
-        async (user, done) => {
+        async (req, user, done) => {
             try {
+                req.user = user;
                 return done(null, user);
             } catch (error) {
                 done(error);
