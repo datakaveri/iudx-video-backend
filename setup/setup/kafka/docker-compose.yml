@@ -1,0 +1,33 @@
+version: "3.7"
+
+networks:
+  vs-net:
+    external: true
+
+volumes:
+  kafkadata:
+
+services:
+
+  kafka:
+    image: confluentinc/cp-kafka:5.5.1
+    hostname: kafka
+    restart: always
+    ports:
+      - "9092:9092"
+      - "19092:19092"
+    expose:
+      - "9092"
+      - "19092"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka:19092,LISTENER_DOCKER_EXTERNAL://127.0.0.1:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
+      KAFKA_ZOOKEEPER_CONNECT: "zook:2181"
+      KAFKA_BROKER_ID: 1
+      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks: 
+      - vs-net
+    volumes:
+      - kafkadata:/var/lib/kafka/data

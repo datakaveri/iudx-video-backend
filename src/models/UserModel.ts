@@ -10,7 +10,7 @@ interface IUserModel extends Model<UserInterface, any> {
 
 export function UserModel(Database: Sequelize) {
     const model = Database.define<IUserModel>(
-        'user',
+        'User',
         {
             id: {
                 allowNull: false,

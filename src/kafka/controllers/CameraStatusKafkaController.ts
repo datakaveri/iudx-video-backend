@@ -3,14 +3,14 @@ import KafkaManager from '../../managers/Kafka';
 
 class CameraStatusKafkaController {
     @Inject('KafkaManager') private kafkaManager: KafkaManager;
-    constructor() {}
+    constructor() { }
 
     async subscribe() {
         this.kafkaManager.subscribe('cameraStatus', this.handleMessage);
     }
 
     private async handleMessage(err, message) {
-        if(err) {
+        if (err) {
             // do something
         }
 

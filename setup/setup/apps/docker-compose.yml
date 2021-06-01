@@ -1,0 +1,20 @@
+version: "3.7"
+
+networks:
+  vs-net:
+    external: true
+
+services:
+
+  kafkainit:
+    build: 
+      dockerfile: ../images/Dockerfile
+      context: .
+    volumes: 
+      - ${TOPICS_FILE}:/usr/share/apps/scripts/topics.json
+    environment:
+      KAFKA_HOST: "kafka"
+      KAFKA_PORT: 19092
+    networks: 
+      - vs-net
+    command: "python3 create_topics.py"
