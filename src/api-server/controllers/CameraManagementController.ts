@@ -6,10 +6,7 @@ import CameraService from '../../services/CameraService';
 
 @Service()
 export default class CameraManagementController {
-
-    @Inject() private cameraService: CameraService;
-
-    constructor() { }
+    constructor(private cameraService: CameraService) { }
 
     async register(req: Request, res: Response, next: NextFunction) {
         const userId: string = req.user['userId'];

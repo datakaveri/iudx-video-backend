@@ -6,12 +6,9 @@ import CameraRepo from '../repositories/CameraRepo';
 
 @Service()
 export default class CameraService {
-
-    @Inject() private utilityService: Utility;
-    @Inject() private cameraRepo: CameraRepo;
+    constructor(private utilityService: Utility, private cameraRepo: CameraRepo) {}
 
     async register(cameraData: string) {
-
         try {
             await this.cameraRepo.registerCamera(cameraData);
         } catch (e) {
@@ -21,7 +18,6 @@ export default class CameraService {
     }
 
     async findOne(userId: string, cameraName: string): Promise<any> {
-
         try {
             return await this.cameraRepo.findCamera(userId, cameraName);
         } catch (e) {
@@ -31,7 +27,6 @@ export default class CameraService {
     }
 
     async findAll(page: number, size: number) {
-
         const { limit, offset } = this.utilityService.getPagination(page, size);
 
         try {
@@ -45,7 +40,6 @@ export default class CameraService {
     }
 
     async update(userId: string, cameraName: string, params: any) {
-
         try {
             await this.cameraRepo.updateCamera(userId, cameraName, params);
         } catch (e) {
@@ -55,7 +49,6 @@ export default class CameraService {
     }
 
     async delete(userId: string, cameraName: string) {
-
         try {
             await this.cameraRepo.deleteCamera(userId, cameraName);
         } catch (e) {
@@ -63,5 +56,4 @@ export default class CameraService {
             throw new Error('Error deleting the data');
         }
     }
-
 }

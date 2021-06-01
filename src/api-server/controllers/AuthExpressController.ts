@@ -7,7 +7,7 @@ import AuthService from '../../services/AuthService';
 
 @Service()
 export default class AuthExpressController {
-    constructor() {}
+    constructor(private authService: AuthService) {}
 
     async signUp(req: Request, res: Response, next: NextFunction) {
         Logger.debug('Calling Sign-Up endpoint with body: %o', req.body);
@@ -21,8 +21,7 @@ export default class AuthExpressController {
                         return next(error);
                     }
                     // send mail of confirmation code
-                    const authService: AuthService = Container.get(AuthService);
-                    await authService.signUp({name: req.body.name, email: req.body.email, verificationCode})
+                    await this.authService.signUp({name: req.body.name, email: req.body.email, verificationCode})
 
                     return res.status(201).json({ message: 'User account created, please verify your email' });
                 } catch (error) {
