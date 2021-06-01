@@ -10,16 +10,6 @@ import Container from 'typedi';
 import UserRepo from '../repositories/UserRepo';
 import Utility from './Utility';
 
-const generateCode = () => {
-    const characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const length = 25;
-    let code = '';
-    for (let i = 0; i < length; i++) {
-        code += characters[Math.floor(Math.random() * characters.length)];
-    }
-    return code;
-};
-
 const UtilityService = Container.get(Utility);
 const privateKey = UtilityService.getPrivateKey();
 
@@ -33,8 +23,8 @@ passport.use(
         },
         async (req, email, password, done) => {
             try {
-                const verificationCode = generateCode();
-                const userRepo = Container.get(UserRepo);
+                const verificationCode = UtilityService.generateCode();
+                const userRepo: UserRepo = Container.get(UserRepo);
                 const found = await userRepo.findUser({ email });
                 if (found) {
                     return done(new Error('User already exists'));
@@ -57,7 +47,7 @@ passport.use(
         },
         async (email: string, password: string, done) => {
             try {
-                const userRepo = Container.get(UserRepo);
+                const userRepo: UserRepo = Container.get(UserRepo);
                 const user = await userRepo.findUser({ email });
                 if (!user) {
                     return done(null, false, { message: 'User not found' });
@@ -88,9 +78,9 @@ passport.use(
     new CustomStrategy(async (req, done) => {
         try {
             const code = req.query.verificationCode;
-            const userRepo = Container.get(UserRepo);
+            const userRepo: UserRepo = Container.get(UserRepo);
             const user = await userRepo.findUser({ verificationCode: code });
-            if (code === user.verificationCode) {
+            if (user && code === user.verificationCode) {
                 await userRepo.updateUser({ email: user.email }, { verified: true });
                 return done(null, { success: true, message: 'Verification successful' });
             } else {

@@ -7,3 +7,5 @@ node_modules
 dist
 
 build
+
+jwtRS256.key

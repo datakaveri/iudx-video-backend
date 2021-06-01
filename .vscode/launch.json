@@ -12,6 +12,16 @@
             "cwd": "${workspaceFolder}",
             "internalConsoleOptions": "openOnSessionStart",
             "skipFiles": ["<node_internals>/**", "node_modules/**"]
+        },
+        {
+            "type": "node",
+            "outputCapture": "std",
+            "request": "launch",
+            "name": "Test IUDX Video Backend",
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "${workspaceRoot}/node_modules/.bin/jest"
+            ]
         }
     ]
 }
