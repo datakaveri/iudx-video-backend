@@ -1,8 +1,9 @@
-import { Service, Inject } from 'typedi';
+import { Service } from 'typedi';
 import Logger from '../common/Logger';
 
 import Utility from '../common/Utility';
 import CameraRepo from '../repositories/CameraRepo';
+import ServiceError from '../common/Error';
 
 @Service()
 export default class CameraService {
@@ -13,7 +14,7 @@ export default class CameraService {
             await this.cameraRepo.registerCamera(cameraData);
         } catch (e) {
             Logger.error(e);
-            throw new Error('Error Registering the data');
+            throw new ServiceError('Error Registering the data');
         }
     }
 
@@ -22,7 +23,7 @@ export default class CameraService {
             return await this.cameraRepo.findCamera(userId, cameraName);
         } catch (e) {
             Logger.error(e);
-            throw new Error('Error fetching the data');
+            throw new ServiceError('Error fetching the data');
         }
     }
 
@@ -35,7 +36,7 @@ export default class CameraService {
             return cameras;
         } catch (e) {
             Logger.error(e);
-            throw new Error('Error fetching the data');
+            throw new ServiceError('Error fetching the data');
         }
     }
 
@@ -44,7 +45,7 @@ export default class CameraService {
             return await this.cameraRepo.updateCamera(userId, cameraName, params);
         } catch (e) {
             Logger.error(e);
-            throw new Error('Error updating the data');
+            throw new ServiceError('Error updating the data');
         }
     }
 
@@ -53,7 +54,7 @@ export default class CameraService {
             return await this.cameraRepo.deleteCamera(userId, cameraName);
         } catch (e) {
             Logger.error(e);
-            throw new Error('Error deleting the data');
+            throw new ServiceError('Error deleting the data');
         }
     }
 }

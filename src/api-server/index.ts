@@ -5,6 +5,7 @@ import Logger from '../common/Logger';
 import routes from './routes';
 import config from '../config';
 import passport from '../common/Passport';
+import ServiceError from '../common/Error';
 
 export default () => {
     const app = express();
@@ -29,8 +30,9 @@ export default () => {
 
     /// catch 404 and forward to error handler
     app.use((req, res, next) => {
-        const err = new Error('Not Found');
+        const err = new ServiceError('Resource Not Found');
         err['status'] = 404;
+        err['title'] = 'Not Found';
         next(err);
     });
 
@@ -45,9 +47,10 @@ export default () => {
         return next(err);
     });
     app.use((err, req, res, next) => {
-        res.status(err.status || 500);
+        res.status(err.status);
         res.json({
-            type: err.status || 500,
+            type: err.status,
+            title: err.title,
             detail: err.message,
         });
     });

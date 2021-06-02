@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { Service, Inject } from 'typedi';
+import { Service } from 'typedi';
 
 import Logger from '../../common/Logger';
 import CameraService from '../../services/CameraService';
@@ -45,7 +45,7 @@ export default class CameraManagementController {
             const response = {
                 type: 200,
                 title: 'Success',
-                result: camera ? camera : 'Camera not found'
+                result: camera ? camera : 'No data found'
             }
             return res.status(200).json(response);
         } catch (e) {
@@ -65,7 +65,7 @@ export default class CameraManagementController {
             const response = {
                 type: 200,
                 title: 'Success',
-                results: result
+                results: result ? result : 'No data found'
             }
             return res.status(200).json(response);
         } catch (e) {
