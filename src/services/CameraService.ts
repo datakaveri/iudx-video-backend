@@ -6,9 +6,9 @@ import CameraRepo from '../repositories/CameraRepo';
 
 @Service()
 export default class CameraService {
-    constructor(private utilityService: Utility, private cameraRepo: CameraRepo) {}
+    constructor(private utilityService: Utility, private cameraRepo: CameraRepo) { }
 
-    async register(cameraData: string) {
+    async register(cameraData: any) {
         try {
             await this.cameraRepo.registerCamera(cameraData);
         } catch (e) {
@@ -41,7 +41,7 @@ export default class CameraService {
 
     async update(userId: string, cameraName: string, params: any) {
         try {
-            await this.cameraRepo.updateCamera(userId, cameraName, params);
+            return await this.cameraRepo.updateCamera(userId, cameraName, params);
         } catch (e) {
             Logger.error(e);
             throw new Error('Error updating the data');
@@ -50,7 +50,7 @@ export default class CameraService {
 
     async delete(userId: string, cameraName: string) {
         try {
-            await this.cameraRepo.deleteCamera(userId, cameraName);
+            return await this.cameraRepo.deleteCamera(userId, cameraName);
         } catch (e) {
             Logger.error(e);
             throw new Error('Error deleting the data');

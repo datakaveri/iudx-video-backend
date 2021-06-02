@@ -4,7 +4,7 @@ import { Service, Inject } from 'typedi';
 export default class CameraRepo {
     @Inject('CameraModel') private cameraModel;
 
-    async registerCamera(cameraData: string) {
+    async registerCamera(cameraData: any) {
         await this.cameraModel.bulkCreate(cameraData);
     }
 
@@ -30,8 +30,8 @@ export default class CameraRepo {
         });
     }
 
-    async updateCamera(userId: string, cameraName: string, params: any) {
-        await this.cameraModel.update(params, {
+    async updateCamera(userId: string, cameraName: string, params: any): Promise<any> {
+        return await this.cameraModel.update(params, {
             where: {
                 userId,
                 cameraName
@@ -39,8 +39,8 @@ export default class CameraRepo {
         });
     }
 
-    async deleteCamera(userId: string, cameraName: string) {
-        await this.cameraModel.destroy({
+    async deleteCamera(userId: string, cameraName: string): Promise<any> {
+        return await this.cameraModel.destroy({
             where: {
                 userId,
                 cameraName
