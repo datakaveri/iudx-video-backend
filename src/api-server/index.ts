@@ -47,10 +47,10 @@ export default () => {
         return next(err);
     });
     app.use((err, req, res, next) => {
-        res.status(err.status);
+        res.status(err.status || 500);
         res.json({
-            type: err.status,
-            title: err.title,
+            type: err.status || 500,
+            title: err.title || 'Internal Server Error',
             detail: err.message,
         });
     });
