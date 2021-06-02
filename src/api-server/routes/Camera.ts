@@ -1,15 +1,14 @@
 import { Router } from 'express';
-import Container from 'typedi';
+import passport from 'passport';
 
 import CameraManagementController from '../controllers/CameraManagementController';
 import { validatePaginationQuery } from '../middlewares/ValidateQuery';
-import passport from 'passport';
 
 const route = Router();
 
 export default (app: Router) => {
 
-    const CameraController = Container.get(CameraManagementController);
+    const CameraController = new CameraManagementController();
 
     app.use('/cameras', passport.authenticate('jwt', { session: true }), route);
 

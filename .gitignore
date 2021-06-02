@@ -9,3 +9,5 @@ dist
 build
 
 jwtRS256.key
+
+coverage

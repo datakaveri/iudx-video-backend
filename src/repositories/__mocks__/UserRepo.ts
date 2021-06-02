@@ -1,37 +1,17 @@
 import { Service } from 'typedi';
 import _ from 'lodash';
-
-const testData = [
-    {
-        id: 1,
-        email: 'swarup@datakaveri.org',
-        name: 'Swarup E',
-        password: 'admin123',
-        verificationCode: 'xkj38jnjnn',
-        verified: true,
-        role: 'user',
-    },
-    {
-        id: 2,
-        email: 'test@datakaveri.org',
-        name: 'Test',
-        password: 'admin123',
-        verificationCode: '12345',
-        verified: false,
-        role: 'user',
-    },
-];
+import { Users } from '../../../test/data/Users';
 
 @Service()
 export default class UserRepo {
-    public findUser: any = jest.fn().mockImplementation((user) => {
-        const userData = _.find(testData, (obj) => {
-            return obj.email === user.email || obj.verificationCode === user.verificationCode;
+    public findUser: any = jest.fn().mockImplementation((query) => {
+        const userData = _.find(Users, (obj) => {
+            return (obj.email === query.email || obj.verificationCode === query.verificationCode);
         });
         if (userData) {
-            return userData;
+            return (userData);
         } else {
-            return null;
+            return (null);
         }
     });
 
@@ -44,7 +24,7 @@ export default class UserRepo {
     });
 
     public validatePassword: any = jest.fn().mockImplementation((query, password) => {
-        const userData = _.find(testData, (obj) => {
+        const userData = _.find(Users, (obj) => {
             return obj.email === query.email;
         });
         if (userData.password === password) {

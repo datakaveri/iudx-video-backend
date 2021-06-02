@@ -6,7 +6,7 @@
     "scripts": {
         "start": "nodemon",
         "inspect": "nodemon --inspect",
-        "test": "jest",
+        "test": "jest --collect-coverage",
         "lint": "npm run lint:js ",
         "lint:eslint": "eslint --ignore-path .gitignore --ext .ts",
         "lint:js": "npm run lint:eslint src/",
