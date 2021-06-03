@@ -18,15 +18,11 @@ describe('Camera Service Testing', () => {
             {
                 cameraNum: 15,
                 cameraName: 'camera_1',
-                streamName: 'test_stream_1',
-                streamUrl: 'rtsp://testurl:777',
                 cameraType: 'DOME',
                 cameraUsage: 'RLVD',
                 cameraOrientation: 'NORTH-EAST',
                 city: 'Bangalore',
                 location: 'lat/long',
-                publishing: false,
-                stable: true,
             },
         ];
 
@@ -52,16 +48,11 @@ describe('Camera Service Testing', () => {
             const expected: any = {
                 cameraNum: expect.any(Number),
                 cameraName: expect.any(String),
-                streamName: expect.any(String),
-                streamUrl: expect.any(String),
                 cameraType: expect.any(String),
                 cameraUsage: expect.any(String),
                 cameraOrientation: expect.any(String),
                 city: expect.any(String),
                 location: expect.any(String),
-                active: expect.any(Boolean),
-                publishing: expect.any(Boolean),
-                stable: expect.any(Boolean)
             };
 
             const userid: string = '1';

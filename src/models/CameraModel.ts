@@ -24,12 +24,6 @@ export function CameraModel(Database: Sequelize) {
                 type: DataTypes.TEXT,
                 allowNull: false,
             },
-            streamName: {
-                type: DataTypes.TEXT,
-            },
-            streamUrl: {
-                type: DataTypes.TEXT,
-            },
             cameraType: {
                 type: DataTypes.TEXT,
             },
@@ -45,18 +39,6 @@ export function CameraModel(Database: Sequelize) {
             location: {
                 type: DataTypes.TEXT,
             },
-            active: {
-                type: DataTypes.BOOLEAN,
-                defaultValue: false,
-            },
-            publishing: {
-                type: DataTypes.BOOLEAN,
-                defaultValue: false,
-            },
-            stable: {
-                type: DataTypes.BOOLEAN,
-                defaultValue: false,
-            }
         },
         {
             timestamps: true,
