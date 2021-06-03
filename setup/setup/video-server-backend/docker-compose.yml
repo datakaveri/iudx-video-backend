@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+    nodeserver:
+        restart: always
+        build:
+            dockerfile: ./setup/setup/video-server-backend/Dockerfile
+            context: ../../../
+        network_mode: host
+        command: "npm start"
+
+

@@ -3,6 +3,6 @@
 docker network rm vs-net
 
 (cd ../setup/postgres/ \
-    && docker-compose down)
+    && docker-compose --env-file ../../../.env down)
 
 

@@ -16,6 +16,7 @@ services:
         ports:
             - "5432:5432"
         environment:
+            TZ: Asia/Kolkata
             POSTGRES_USER: ${POSTGRES_INITDB_USERNAME}
             POSTGRES_PASSWORD: ${POSTGRES_INITDB_PASSWORD}
             POSTGRES_DB: ${POSTGRES_INITDB_DATABASE}

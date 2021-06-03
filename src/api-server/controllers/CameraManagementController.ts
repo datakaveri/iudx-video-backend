@@ -1,12 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
-import { Inject } from 'typedi';
+import Container from 'typedi';
 
 import Logger from '../../common/Logger';
 import CameraService from '../../services/CameraService';
 
 export default class CameraManagementController {
-    @Inject() private cameraService: CameraService;
-    constructor() {}
+    private cameraService: CameraService;
+
+    constructor() {
+        this.cameraService = Container.get(CameraService);
+    }
 
     async register(req: Request, res: Response, next: NextFunction) {
         const userId: string = req.user['userId'];
