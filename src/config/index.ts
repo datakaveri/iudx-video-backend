@@ -50,4 +50,8 @@ export default {
         username: process.env.EMAIL_ID,
         password: process.env.EMAIL_PASSWORD,
     },
+
+    ffmpegConfig: {
+        ffprobeTimeout: 10 // in seconds
+    }
 };

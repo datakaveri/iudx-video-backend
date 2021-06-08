@@ -1,4 +1,4 @@
-import { Inject } from 'typedi';
+import { Container } from 'typedi';
 import { Request, Response, NextFunction } from 'express';
 import passport from 'passport';
 
@@ -6,8 +6,11 @@ import Logger from '../../common/Logger';
 import AuthService from '../../services/AuthService';
 
 export default class AuthExpressController {
-    @Inject() private authService: AuthService;
-    constructor() {}
+    private authService: AuthService;
+
+    constructor() {
+        this.authService = Container.get(AuthService);
+    }
 
     async signUp(req: Request, res: Response, next: NextFunction) {
         Logger.debug('Calling Sign-Up endpoint with body: %o', req.body);
