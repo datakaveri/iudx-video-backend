@@ -27,17 +27,9 @@ describe('Camera Service Testing', () => {
         ];
 
         test('Should register the camera', async () => {
-            mockCameraData[0]['userId'] = '3';
+            const userId: string = '3';
 
-            await expect(cameraService.register(mockCameraData)).resolves;
-        });
-
-        test('Should throw error if user registers duplicate camera', async () => {
-            const expected: string = 'Error Registering the data';
-
-            mockCameraData[0]['userId'] = '1';
-
-            await expect(cameraService.register(mockCameraData)).rejects.toThrowError(expected);
+            await expect(cameraService.register(userId, mockCameraData)).resolves;
         });
 
     });
@@ -46,28 +38,27 @@ describe('Camera Service Testing', () => {
 
         test('Should return the camera data', async () => {
             const expected: any = {
+                cameraId: expect.any(String),
                 cameraNum: expect.any(Number),
                 cameraName: expect.any(String),
                 cameraType: expect.any(String),
                 cameraUsage: expect.any(String),
                 cameraOrientation: expect.any(String),
                 city: expect.any(String),
-                location: expect.any(String),
+                location: expect.any(String)
             };
 
-            const userid: string = '1';
-            const cameraName: string = 'camera_1';
+            const userId: string = '1';
+            const cameraId: string = '1';
 
-            await expect(cameraService.findOne(userid, cameraName)).resolves.toEqual(
-                expect.objectContaining(expected)
-            );
+            await expect(cameraService.findOne(userId, cameraId)).resolves.toStrictEqual(expected);
         });
 
-        test('Should return null if data not found', async () => {
-            const userid: string = '1';
-            const cameraName: string = 'camera_10';
+        test('Should reject if data not found', async () => {
+            const userId: string = '1';
+            const cameraId: string = '10';
 
-            await expect(cameraService.findOne(userid, cameraName)).resolves.toBeNull();
+            await expect(cameraService.findOne(userId, cameraId)).rejects.toThrowError();
         });
 
     });
@@ -113,74 +104,61 @@ describe('Camera Service Testing', () => {
             'cameraUsage': 'SURVEILLANCE'
         };
 
-        test('Should update a camera', async () => {
-            const expected: Array<number> = [1];
+        test('Should resolve promise and updates the camera', async () => {
+            const expected: any = {
+                cameraId: expect.any(String),
+                cameraNum: expect.any(Number),
+                cameraName: expect.any(String),
+                cameraType: expect.any(String),
+                cameraUsage: expect.any(String),
+                cameraOrientation: expect.any(String),
+                city: expect.any(String),
+                location: expect.any(String)
+            };
 
-            const userid: string = '1';
-            const cameraName: string = 'camera_1';
+            const userId: string = '1';
+            const cameraId: string = '1';
 
-            await expect(cameraService.update(userid, cameraName, param)).resolves.toEqual(
-                expect.arrayContaining(expected)
-            );
+            await expect(cameraService.update(userId, cameraId, param)).resolves.toStrictEqual(expected);
         });
 
-        test('Should not update if camera not found', async () => {
-            const expected: Array<number> = [0];
+        test('Should reject if camera not found', async () => {
+            const userId: string = '1';
+            const cameraId: string = '100';
 
-            const userid: string = '1';
-            const cameraName: string = 'camera_100';
-
-            await expect(cameraService.update(userid, cameraName, param)).resolves.toEqual(
-                expect.arrayContaining(expected)
-            );
+            await expect(cameraService.update(userId, cameraId, param)).rejects.toThrowError();
         });
 
-        test('Should not update if it is invalid user', async () => {
-            const expected: Array<number> = [0];
+        test('Should reject if it is invalid user', async () => {
+            const userId: string = '0';
+            const cameraId: string = '1';
 
-            const userid: string = '0';
-            const cameraName: string = 'camera_1';
-
-            await expect(cameraService.update(userid, cameraName, param)).resolves.toEqual(
-                expect.arrayContaining(expected)
-            );
+            await expect(cameraService.update(userId, cameraId, param)).rejects.toThrowError();
         });
 
     });
 
     describe('Delete Camera', () => {
 
-        test('Should delete a camera', async () => {
-            const expected: Array<number> = [1];
+        test('Should reolves promise and delete the camera', async () => {
+            const userId: string = '1';
+            const cameraId: string = '1';
 
-            const userid: string = '1';
-            const cameraName: string = 'camera_1';
-
-            await expect(cameraService.delete(userid, cameraName)).resolves.toEqual(
-                expect.arrayContaining(expected)
-            );
+            await expect(cameraService.delete(userId, cameraId)).resolves;
         });
 
-        test('Should not delete if camera not found', async () => {
-            const expected: Array<number> = [0];
+        test('Should reject if camera not found', async () => {
+            const userId: string = '1';
+            const cameraId: string = '100';
 
-            const userid: string = '1';
-            const cameraName: string = 'camera_100';
-
-            await expect(cameraService.delete(userid, cameraName)).resolves.toEqual(
-                expect.arrayContaining(expected)
-            );
+            await expect(cameraService.delete(userId, cameraId)).rejects.toThrowError();
         });
 
-        test('Should not delete if it is invalid user', async () => {
-            const expected: Array<number> = [0];
+        test('Should reject if it is invalid user', async () => {
+            const userId: string = '0';
+            const cameraId: string = '1';
 
-            const userid: string = '0';
-            const cameraName: string = 'camera_1';
-
-            await expect(cameraService.delete(userid, cameraName)).resolves.toEqual(
-                expect.arrayContaining(expected)
-            );
+            await expect(cameraService.delete(userId, cameraId)).rejects.toThrowError();
         });
     });
 });

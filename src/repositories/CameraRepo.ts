@@ -5,46 +5,75 @@ export default class CameraRepo {
     @Inject('CameraModel') private cameraModel;
 
     async registerCamera(cameraData: any) {
-        await this.cameraModel.bulkCreate(cameraData);
+        const cameras = await this.cameraModel.bulkCreate(cameraData);
+        const data = cameras.map(camera => {
+            return {
+                cameraId: camera.cameraId,
+                cameraNum: camera.cameraNum,
+                cameraName: camera.cameraName,
+                cameraType: camera.cameraType,
+                cameraUsage: camera.cameraUsage,
+                cameraOrientation: camera.cameraOrientation,
+                city: camera.city,
+            }
+        })
+
+        return data;
     }
 
-    async findCamera(userId: string, cameraName: string): Promise<any> {
-        return await this.cameraModel.findOne({
+    async findCamera(userId: string, cameraId: string): Promise<any> {
+        const camera = await this.cameraModel.findOne({
             where: {
                 userId,
-                cameraName
-            },
-            attributes: {
-                exclude: ['cameraId', 'userId', 'createdAt', 'updatedAt']
+                cameraId,
             }
-        });
+        })
+        if (!camera) {
+            throw new Error();
+        }
+
+        return camera;
     }
 
     async listAllCameras(limit: number, offset: number): Promise<any> {
         return await this.cameraModel.findAndCountAll({
             limit,
             offset,
-            attributes: {
-                exclude: ['cameraId', 'userId', 'createdAt', 'updatedAt']
-            }
-        });
+        })
     }
 
-    async updateCamera(userId: string, cameraName: string, params: any): Promise<any> {
-        return await this.cameraModel.update(params, {
+    async updateCamera(userId: string, cameraId: string, params: any): Promise<any> {
+        const [updated, data] = await this.cameraModel.update(params, {
             where: {
                 userId,
-                cameraName
-            }
-        });
+                cameraId,
+            },
+            returning: [
+                'cameraId',
+                'cameraNum',
+                'cameraName',
+                'cameraType',
+                'cameraUsage',
+                'cameraOrientation',
+                'city',
+            ],
+        })
+        if (!updated) {
+            throw new Error();
+        }
+
+        return data;
     }
 
-    async deleteCamera(userId: string, cameraName: string): Promise<any> {
-        return await this.cameraModel.destroy({
+    async deleteCamera(userId: string, cameraId: string): Promise<any> {
+        const deleted = await this.cameraModel.destroy({
             where: {
                 userId,
-                cameraName
+                cameraId,
             }
-        });
+        })
+        if (!deleted) {
+            throw new Error();
+        }
     }
 }

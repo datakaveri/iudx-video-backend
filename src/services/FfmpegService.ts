@@ -8,7 +8,7 @@ import ServiceError from '../common/Error';
 
 @Service()
 export default class FfmpegService {
-    constructor(private utility: Utility) {}
+    constructor(private utility: Utility) { }
 
     public async createProcess(streamInputUrl, streamOutputUrl) {
         try {

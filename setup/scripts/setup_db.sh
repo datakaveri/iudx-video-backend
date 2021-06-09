@@ -1,11 +1,11 @@
 #/bin/bash
 
-PROJECT_ROOT="$PWD/../"
+PROJECT_ROOT="$PWD/../../"
 
-export SCHEMA_FILE="$PROJECT_ROOT/apps/video/postgres/schema.sql"
+export SCHEMA_FILE="$PROJECT_ROOT/setup/apps/video/postgres/schema.sql"
 
 (cd ../setup/postgres/ \
-    && docker-compose --env-file ../../../.env up -d)
+    && docker-compose --env-file $PROJECT_ROOT/.env up -d)
 
 
 

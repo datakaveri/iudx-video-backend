@@ -1,4 +1,4 @@
 #/bin/bash
 
-(cd ../setup/video-server-backend/ \
+(cd ../setup/video-server/ \
     && docker-compose down)

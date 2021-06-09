@@ -1,6 +1,4 @@
 #/bin/bash
 
-docker network create vs-net
-
-(cd ../setup/video-server-backend/ \
+(cd ../setup/video-server/ \
     && docker-compose up -d)

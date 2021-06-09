@@ -1,6 +1,7 @@
 export const Cameras = [
     {
         userId: '1',
+        cameraId: '1',
         cameraNum: 15758,
         cameraName: 'camera_1',
         cameraType: 'DOME',
@@ -11,6 +12,7 @@ export const Cameras = [
     },
     {
         userId: '2',
+        cameraId: '2',
         cameraNum: 68457,
         cameraName: 'camera_2',
         cameraType: 'DOME',
@@ -21,6 +23,7 @@ export const Cameras = [
     },
     {
         userId: '1',
+        cameraId: '3',
         cameraNum: 75667,
         cameraName: 'camera_3',
         cameraType: 'DOME',
@@ -31,6 +34,7 @@ export const Cameras = [
     },
     {
         userId: '2',
+        cameraId: '4',
         cameraNum: 78352,
         cameraName: 'camera_4',
         cameraType: 'DOME',
@@ -41,6 +45,7 @@ export const Cameras = [
     },
     {
         userId: '1',
+        cameraId: '5',
         cameraNum: 45358,
         cameraName: 'camera_5',
         cameraType: 'DOME',
@@ -51,6 +56,7 @@ export const Cameras = [
     },
     {
         userId: '2',
+        cameraId: '6',
         cameraNum: 35438,
         cameraName: 'camera_6',
         cameraType: 'DOME',

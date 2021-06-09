@@ -8,12 +8,11 @@ export function CameraModel(Database: Sequelize) {
         'Camera',
         {
             cameraId: {
-                type: DataTypes.INTEGER,
+                type: DataTypes.UUID,
                 primaryKey: true,
-                autoIncrement: true,
             },
             userId: {
-                type: DataTypes.INTEGER,
+                type: DataTypes.UUID,
                 allowNull: false,
             },
             cameraNum: {
@@ -42,6 +41,11 @@ export function CameraModel(Database: Sequelize) {
         },
         {
             timestamps: true,
+            defaultScope: {
+                attributes: {
+                    exclude: ['userId', 'createdAt', 'updatedAt']
+                }
+            },
         }
     );
 

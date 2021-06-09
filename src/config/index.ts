@@ -9,6 +9,10 @@ if (envFound.error) {
 }
 
 export default {
+    hostName: process.env.HOST_NAME,
+
+    hostType: process.env.HOST_TYPE,
+
     port: parseInt(process.env.PORT, 10),
 
     databaseURL: process.env.DB_URL,

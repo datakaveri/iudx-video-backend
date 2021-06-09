@@ -2,26 +2,26 @@ import { Request, Response, NextFunction } from 'express';
 import Container from 'typedi';
 
 import Logger from '../../common/Logger';
-import CameraService from '../../services/CameraService';
+import StreamService from '../../services/StreamService';
 
-export default class CameraManagementController {
-    private cameraService: CameraService;
+export default class StreamManagementController {
+    private streamService: StreamService;
 
     constructor() {
-        this.cameraService = Container.get(CameraService);
+        this.streamService = Container.get(StreamService);
     }
 
     async register(req: Request, res: Response, next: NextFunction) {
         const userId: string = req.user['userId'];
         let params: any = req.body;
 
-        Logger.debug('Calling Register Camera endpoint with body: %o', params);
+        Logger.debug('Calling Register Stream endpoint with body: %o', params);
         try {
-            const data = await this.cameraService.register(userId, params);
+            const streams = await this.streamService.register(userId, params);
             const response = {
                 type: 201,
                 title: 'Success',
-                results: data
+                results: streams
             }
             return res.status(201).json(response);
         } catch (e) {
@@ -33,15 +33,15 @@ export default class CameraManagementController {
     async findOne(req: Request, res: Response, next: NextFunction) {
 
         const userId: string = req.user['userId'];
-        const cameraId: string = req.params.id;
+        const streamId: string = req.params.id;
 
-        Logger.debug('Calling Find one Camera endpoint');
+        Logger.debug('Calling Find one Stream endpoint');
         try {
-            const camera = await this.cameraService.findOne(userId, cameraId);
+            const stream = await this.streamService.findOne(userId, streamId);
             const response = {
                 type: 200,
                 title: 'Success',
-                result: camera
+                results: stream
             }
             return res.status(200).json(response);
         } catch (e) {
@@ -55,36 +55,15 @@ export default class CameraManagementController {
         const page: number = +req.query.page;
         const size: number = +req.query.size;
 
-        Logger.debug('Calling Find all Camera endpoint');
+        Logger.debug('Calling Find all Stream endpoint');
         try {
-            const result = await this.cameraService.findAll(page, size);
+            const streams = await this.streamService.findAll(page, size);
             const response = {
                 type: 200,
                 title: 'Success',
-                results: result
+                results: streams
             }
             return res.status(200).json(response);
-        } catch (e) {
-            Logger.error('error: %o', e);
-            return next(e);
-        }
-    }
-
-    async update(req: Request, res: Response, next: NextFunction) {
-
-        const userId: string = req.user['userId'];
-        const cameraId: string = req.params.id;
-        const params: any = req.body;
-
-        Logger.debug('Calling Update Camera endpoint with body: %o', params);
-        try {
-            const data = await this.cameraService.update(userId, cameraId, params);
-            const response = {
-                type: 201,
-                title: 'Success',
-                results: data
-            }
-            return res.status(201).json(response);
         } catch (e) {
             Logger.error('error: %o', e);
             return next(e);
@@ -94,15 +73,15 @@ export default class CameraManagementController {
     async delete(req: Request, res: Response, next: NextFunction) {
 
         const userId: string = req.user['userId'];
-        const cameraId: string = req.params.id;
+        const streamId: string = req.params.id;
 
-        Logger.debug('Calling Delete Camera endpoint of camera name: %s', cameraId);
+        Logger.debug('Calling Delete Stream endpoint of stream name: %s', streamId);
         try {
-            await this.cameraService.delete(userId, cameraId);
+            await this.streamService.delete(userId, streamId);
             const response = {
                 type: 200,
                 title: 'Success',
-                detail: 'Camera Deleted'
+                detail: 'Stream Deleted'
             }
             return res.status(200).send(response);
         } catch (e) {

@@ -1,9 +1,7 @@
 #!/bin/bash
 
-PROJECT_ROOT="$PWD/../"
-
 (cd ../setup/apps/ \
     && docker-compose build)
 
-(cd ../setup/video-server-backend/ \
+(cd ../setup/video-server/ \
     && docker-compose build)

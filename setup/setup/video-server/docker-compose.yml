@@ -4,7 +4,7 @@ services:
     nodeserver:
         restart: always
         build:
-            dockerfile: ./setup/setup/video-server-backend/Dockerfile
+            dockerfile: ./setup/setup/video-server/Dockerfile
             context: ../../../
         network_mode: host
         command: "npm start"

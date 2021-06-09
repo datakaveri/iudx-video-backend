@@ -1,9 +1,8 @@
 #/bin/bash
 
-PROJECT_ROOT="$PWD/../"
+PROJECT_ROOT="$PWD/../../"
 
-export TOPICS_FILE="$PROJECT_ROOT/apps/video/kafka/topics.json"
-
+export TOPICS_FILE="$PROJECT_ROOT/setup/apps/video/kafka/topics.json"
 
 docker network create vs-net
 
@@ -11,7 +10,7 @@ docker network create vs-net
     && docker-compose up -d)
 
 (cd ../setup/kafka/ \
-    && docker-compose up -d)
+    && docker-compose --env-file $PROJECT_ROOT/.env up -d)
 
 # TODO: Find alternative.
 sleep 10

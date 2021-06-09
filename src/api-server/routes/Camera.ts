@@ -16,7 +16,7 @@ export default (app: Router) => {
         (req, res, next) => CameraController.register(req, res, next)
     );
 
-    route.get('/:name',
+    route.get('/:id',
         (req, res, next) => CameraController.findOne(req, res, next)
     );
 
@@ -25,11 +25,11 @@ export default (app: Router) => {
         (req, res, next) => CameraController.findAll(req, res, next)
     );
 
-    route.put('/:name',
+    route.put('/:id',
         (req, res, next) => CameraController.update(req, res, next)
     );
 
-    route.delete('/:name',
+    route.delete('/:id',
         (req, res, next) => CameraController.delete(req, res, next)
     );
 }
