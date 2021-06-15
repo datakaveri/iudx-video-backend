@@ -40,6 +40,9 @@ export function StreamModel(Database: Sequelize) {
                 type: DataTypes.TEXT,
                 allowNull: false,
             },
+            type: {
+                type: DataTypes.TEXT,
+            },
             isPublic: {
                 type: DataTypes.BOOLEAN,
             },

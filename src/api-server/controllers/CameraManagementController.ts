@@ -35,7 +35,7 @@ export default class CameraManagementController {
         const userId: string = req.user['userId'];
         const cameraId: string = req.params.id;
 
-        Logger.debug('Calling Find one Camera endpoint');
+        Logger.debug('Calling Find one Camera endpoint of camera id: %s', cameraId);
         try {
             const camera = await this.cameraService.findOne(userId, cameraId);
             const response = {
@@ -96,7 +96,7 @@ export default class CameraManagementController {
         const userId: string = req.user['userId'];
         const cameraId: string = req.params.id;
 
-        Logger.debug('Calling Delete Camera endpoint of camera name: %s', cameraId);
+        Logger.debug('Calling Delete Camera endpoint of camera id: %s', cameraId);
         try {
             await this.cameraService.delete(userId, cameraId);
             const response = {

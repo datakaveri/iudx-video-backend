@@ -69,4 +69,13 @@ export default class StreamService {
             throw new ServiceError('Error deleting the data');
         }
     }
+
+    async getStatus(userId: string, streamId: string) {
+        try {
+            return await this.streamRepo.getStreamStatus(userId, streamId);
+        } catch (e) {
+            Logger.error(e);
+            throw new ServiceError('Error Getting the stream status');
+        }
+    }
 }

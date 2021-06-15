@@ -6,7 +6,11 @@ export const Streams = [
         streamName: 'test_stream_1',
         streamUrl: 'rtsp://testurl:777',
         streamType: 'RTSP',
-        isPublic: false
+        type: 'camera',
+        isPublic: false,
+        isActive: true,
+        isPublishing: false,
+        isStable: true,
     },
     {
         streamId: '2',
@@ -15,7 +19,11 @@ export const Streams = [
         streamName: 'test_stream_2',
         streamUrl: 'rtsp://testurl:777',
         streamType: 'RTSP',
-        isPublic: false
+        type: 'camera',
+        isPublic: false,
+        isActive: true,
+        isPublishing: false,
+        isStable: true,
     },
     {
         streamId: '3',
@@ -24,7 +32,11 @@ export const Streams = [
         streamName: 'test_stream_3',
         streamUrl: 'rtsp://testurl:777',
         streamType: 'RTSP',
-        isPublic: false
+        type: 'camera',
+        isPublic: false,
+        isActive: true,
+        isPublishing: false,
+        isStable: true,
     },
     {
         streamId: '4',
@@ -33,6 +45,23 @@ export const Streams = [
         streamName: 'test_stream_4',
         streamUrl: 'rtsp://testurl:777',
         streamType: 'RTSP',
-        isPublic: false
+        type: 'camera',
+        isPublic: false,
+        isActive: true,
+        isPublishing: false,
+        isStable: true,
+    },
+    {
+        streamId: '5',
+        userId: '1',
+        cameraId: '1',
+        streamName: 'test_stream_1',
+        streamUrl: 'rtsp://testurl1:888',
+        streamType: 'RTSP',
+        type: 'rtsp',
+        isPublic: false,
+        isActive: true,
+        isPublishing: false,
+        isStable: true,
     }
 ];

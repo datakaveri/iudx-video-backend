@@ -59,6 +59,7 @@ CREATE TABLE IF NOT EXISTS "Streams"
   "sourceServerId"        INTEGER,
   "destinationServerId"   INTEGER,
   "processId"             INTEGER,
+  "type"                  TEXT          NOT NULL,
   "streamName"            TEXT          NOT NULL,
   "streamUrl"             TEXT          NOT NULL,
   "streamType"            TEXT          NOT NULL,

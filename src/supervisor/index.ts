@@ -7,6 +7,7 @@ import { Database, ModelDependencyInjector } from '../managers/Database';
 import apiServer from '../api-server';
 import KafkaManager from '../managers/Kafka';
 import config from '../config';
+import SchedulerManager from '../managers/Scheduler';
 
 export default async () => {
     // Initialize Database connection and load model injector
@@ -38,6 +39,7 @@ export default async () => {
         )
     );
 
+    new SchedulerManager().startStatusCheck();
     // Start Express API Server
     apiServer();
 };

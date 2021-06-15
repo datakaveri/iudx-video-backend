@@ -121,4 +121,41 @@ describe('Stream Service Testing', () => {
             await expect(streamService.delete(userId, streamId)).rejects.toThrowError();
         });
     });
+
+    describe('Check Stream Status', () => {
+
+        test('Should resolve and return status object', async () => {
+            const expected: any = {
+                streamId: expect.any(String),
+                cameraId: expect.any(String),
+                streamName: expect.any(String),
+                streamType: expect.any(String),
+                streamUrl: expect.any(String),
+                type: expect.any(String),
+                isPublic: expect.any(Boolean),
+                isActive: expect.any(Boolean),
+                isPublishing: expect.any(Boolean),
+                isStable: expect.any(Boolean),
+            };
+
+            const userId: string = '1';
+            const streamId: string = '1';
+
+            await expect(streamService.getStatus(userId, streamId)).resolves.toContainEqual(expected);
+        });
+
+        test('Should reject if stream not found', async () => {
+            const userId: string = '1';
+            const streamId: string = '10';
+
+            await expect(streamService.delete(userId, streamId)).rejects.toThrowError();
+        });
+
+        test('Should reject if it is invalid user', async () => {
+            const userId: string = '2';
+            const streamId: string = '1';
+
+            await expect(streamService.delete(userId, streamId)).rejects.toThrowError();
+        });
+    });
 });

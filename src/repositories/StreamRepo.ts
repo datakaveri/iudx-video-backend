@@ -1,6 +1,6 @@
 import { Service, Inject } from 'typedi';
-
-
+import sequelize from 'sequelize';
+import { Database } from '../managers/Database';
 
 @Service()
 export default class StreamRepo {
@@ -15,6 +15,7 @@ export default class StreamRepo {
                 streamName: stream.streamName,
                 streamUrl: stream.streamUrl,
                 streamType: stream.streamType,
+                type: stream.type,
                 isPublic: stream.isPublic,
             }
         })
@@ -35,6 +36,7 @@ export default class StreamRepo {
                 'streamType',
                 'streamUrl',
                 'streamType',
+                'type',
                 'isPublic'
             ],
         })
@@ -53,7 +55,7 @@ export default class StreamRepo {
         })
     }
 
-    async deleteStream(userId: string, streamId: string): Promise<any> {
+    async deleteStream(userId: string, streamId: string) {
         const deleted = await this.streamModel.destroy({
             where: {
                 userId,
@@ -63,5 +65,52 @@ export default class StreamRepo {
         if (!deleted) {
             throw new Error();
         }
+    }
+
+    async getStreamStatus(userId: string, streamId: string): Promise<any> {
+        const query = `
+            SELECT * 
+            FROM "Streams"
+            WHERE ("cameraId", "streamName") IN 
+                    ( 
+                        SELECT "cameraId", "streamName" 
+                        FROM "Streams" 
+                        WHERE 
+                            "userId" = '${userId}' 
+                            AND
+                            "streamId" = '${streamId}'
+                        LIMIT 1
+                    ) 
+        `;
+        let streams: any = await Database.query(query, { type: sequelize.QueryTypes.SELECT, raw: true });
+
+        if (!streams || streams.length == 0) {
+            throw new Error();
+        }
+
+        streams = streams.map(stream => {
+            return {
+                streamId: stream.streamId,
+                cameraId: stream.cameraId,
+                streamName: stream.streamName,
+                streamUrl: stream.streamUrl,
+                streamType: stream.streamType,
+                type: stream.type,
+                isPublic: stream.isPublic,
+                isActive: stream.isActive,
+                isStable: stream.isStable,
+            }
+        })
+
+        return streams;
+    }
+
+    async getStreamsForStatusCheck(): Promise<any> {
+        return await this.streamModel.findAll({
+            where: {
+
+            },
+            raw: true,
+        })
     }
 }

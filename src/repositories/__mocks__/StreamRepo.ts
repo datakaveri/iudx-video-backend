@@ -24,8 +24,16 @@ export default class StreamRepo {
         if (!streamData) {
             throw new Error();
         }
+        const streams = _.pick(streamData, [
+            'cameraId',
+            'streamId',
+            'streamName',
+            'streamType',
+            'streamUrl',
+            'isPublic'
+        ]);
 
-        return _.omit(streamData, ['userId']);
+        return streams;
     });
 
     public listAllStreams: any = jest.fn().mockImplementation((limit: number, offset: number) => {
@@ -46,5 +54,23 @@ export default class StreamRepo {
         if (!streamData) {
             throw new Error();
         }
+    });
+
+    public getStreamStatus: any = jest.fn().mockImplementation((userId: string, streamId: string) => {
+        const { cameraId, streamName } = _.find(Streams, (obj) => {
+            return obj.userId === userId && obj.streamId === streamId;
+        });
+
+        const streams = _.map(_.filter(Streams, (obj => {
+            return obj.cameraId === cameraId && obj.streamName === streamName;
+        })), stream => {
+            return _.omit(stream, ['userId']);
+        });
+
+        if (streams.length == 0) {
+            throw new Error();
+        }
+
+        return streams;
     });
 }

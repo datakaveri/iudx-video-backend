@@ -41,7 +41,9 @@
         "typescript": "^4.2.4"
     },
     "dependencies": {
+        "@ladjs/graceful": "^1.0.5",
         "bcrypt": "^5.0.1",
+        "bree": "^6.2.0",
         "cors": "^2.8.5",
         "dotenv": "^9.0.2",
         "express": "^4.17.1",

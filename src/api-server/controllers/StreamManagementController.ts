@@ -35,7 +35,7 @@ export default class StreamManagementController {
         const userId: string = req.user['userId'];
         const streamId: string = req.params.id;
 
-        Logger.debug('Calling Find one Stream endpoint');
+        Logger.debug('Calling Find one Stream endpoint of stream id: %s', streamId);
         try {
             const stream = await this.streamService.findOne(userId, streamId);
             const response = {
@@ -75,7 +75,7 @@ export default class StreamManagementController {
         const userId: string = req.user['userId'];
         const streamId: string = req.params.id;
 
-        Logger.debug('Calling Delete Stream endpoint of stream name: %s', streamId);
+        Logger.debug('Calling Delete Stream endpoint of stream id: %s', streamId);
         try {
             await this.streamService.delete(userId, streamId);
             const response = {
@@ -90,4 +90,23 @@ export default class StreamManagementController {
         }
     }
 
+    async getStatus(req: Request, res: Response, next: NextFunction) {
+
+        const userId: string = req.user['userId'];
+        const streamId: string = req.params.id;
+
+        Logger.debug('Calling Stream status endpoint of stream id: %s', streamId);
+        try {
+            const status = await this.streamService.getStatus(userId, streamId);
+            const response = {
+                type: 200,
+                title: 'Success',
+                results: status
+            }
+            return res.status(200).send(response);
+        } catch (e) {
+            Logger.error('error: %o', e);
+            return next(e);
+        }
+    }
 }
