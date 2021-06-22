@@ -9,9 +9,10 @@ if (envFound.error) {
 }
 
 export default {
-    hostName: process.env.HOST_NAME,
-
-    hostType: process.env.HOST_TYPE,
+    host: {
+        name: process.env.HOST_NAME,
+        type: process.env.HOST_TYPE
+    },
 
     port: parseInt(process.env.PORT, 10),
 
@@ -57,5 +58,18 @@ export default {
 
     ffmpegConfig: {
         ffprobeTimeout: 10 // in seconds
+    },
+
+    schedulers: {
+        statusCheck: {
+            enable: process.env.ENABLE_STATUS_CHECK === 'true' || false,
+            lastActiveInterval: 5, // in minutes
+        }
+    },
+
+    streamServer: {
+        rtmp: {
+            statPort: process.env.RTMP_SERVER_STAT_PORT
+        }
     }
 };

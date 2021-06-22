@@ -1,29 +1,41 @@
-import Bree from 'bree';
-import Logger from '../common/Logger';
-import Graceful from '@ladjs/graceful';
+import Container from 'typedi';
+import { CronJob } from 'cron';
 
+import Logger from '../common/Logger';
 import StreamStatusService from '../services/StreamStatusService';
 
+
 export default class SchedulerManager {
+    private streamStatusService: StreamStatusService;
+    private checkStatusJob: CronJob;
 
-    constructor() { }
+    constructor() {
+        this.streamStatusService = Container.get(StreamStatusService);
+    }
 
-    public startStatusCheck() {
+    // TODO: - Consider running status check in a seperate thread   
 
-        const bree = new Bree({
-            logger: console,
-            root: false,
-            jobs: [
-                {
-                    name: 'statusCheck',
-                    interval: '1s',
-                    path: StreamStatusService.checkStatus
+    public async startStatusCheck() {
+        this.checkStatusJob = new CronJob(
+            "*/3 * * * *", // Every 3 minutes 
+            async () => {
+                try {
+                    await this.streamStatusService.checkStatus();
+                } catch (err) {
+                    Logger.error(err);
+                    console.log(err)
                 }
-            ]
-        });
-        const graceful = new Graceful({ brees: [bree] });
-        graceful.listen();
+            },
+            null,
+            true,
+            "Asia/Kolkata"
+        );
+        this.checkStatusJob.start();
+    }
 
-        bree.start();
+    public async stopStatusCheck() {
+        if (this.checkStatusJob) {
+            this.checkStatusJob.stop();
+        }
     }
 }

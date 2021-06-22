@@ -16,7 +16,7 @@ export default class CameraService {
 
     async register(userId: string, cameraData: any) {
         try {
-            const namespace: string = config.hostType + 'Camera';
+            const namespace: string = config.host.type + 'Camera';
 
             cameraData = cameraData.map(camera => {
                 const cameraId: string = new UUID().generateUUIDv5(namespace);

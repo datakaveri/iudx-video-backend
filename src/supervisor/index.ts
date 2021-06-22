@@ -39,7 +39,12 @@ export default async () => {
         )
     );
 
-    new SchedulerManager().startStatusCheck();
+    // Start status check scheduler if enabled
+    if (config.schedulers.statusCheck.enable) {
+        const schedulerManager: SchedulerManager = new SchedulerManager();
+        schedulerManager.startStatusCheck();
+    }
+
     // Start Express API Server
     apiServer();
 };

@@ -1,24 +1,86 @@
+import sequelize from 'sequelize';
+import { Service } from 'typedi';
+import got from 'got';
 
-// import Logger from '../common/Logger';
-
-// import Utility from '../common/Utility';
-import { Container } from 'typedi';
+import Logger from '../common/Logger';
+import config from '../config';
+import Utility from '../common/Utility';
 import StreamRepo from '../repositories/StreamRepo';
+import FfmpegService from './FfmpegService';
+import ServiceError from '../common/Error';
 
-// import ServiceError from '../common/Error';
-// import config from '../config';
-// const { parentPort } = require('worker_threads');
+@Service()
+export default class StreamStatusService {
+    constructor(
+        private ffmpegService: FfmpegService,
+        private streamRepo: StreamRepo,
+        private utilityService: Utility,
+    ) { }
 
-const checkStatus = async () => {
-    try {
-        const streamRepo: StreamRepo = Container.get(StreamRepo);
-
+    async getStatus(userId: string, streamId: string) {
+        try {
+            return await this.streamRepo.getStreamStatus(userId, streamId);
+        } catch (e) {
+            Logger.error(e);
+            throw new ServiceError('Error Getting the stream status');
+        }
     }
-    catch (e) {
-        console.log(e);
+
+    async updateStatus(streamId: string, isActive: boolean) {
+        try {
+            return await this.streamRepo.updateStreamStatus(
+                streamId,
+                {
+                    isActive,
+                    ...isActive && { lastActive: sequelize.fn('NOW') }
+                });
+        } catch (e) {
+            Logger.error(e);
+            throw new ServiceError('Error Updating the stream status');
+        }
+    }
+
+    async getNginxRtmpStat() {
+        try {
+            const url: string = `https://${config.host.name}:${config.streamServer.rtmp.statPort}/stat`;
+            const response: any = await got.get(url);
+            const streamsStats = await this.utilityService.parseNginxRtmpStat(response);
+            return streamsStats;
+        } catch (err) {
+            Logger.error(err);
+            throw new Error(err);
+        }
+    };
+
+    public async checkStatus() {
+        try {
+            const streams = await this.streamRepo.getStreamsForStatusCheck();
+            const nginxStreams = await this.getNginxRtmpStat();
+
+            for (const stream of streams) {
+                let isActive: boolean = false;
+
+                switch (stream.type) {
+                    case 'camera':
+                        isActive = await this.ffmpegService.isStreamActive(stream.streamUrl);
+                        break;
+                    case 'rtmp':
+                        isActive = Array.isArray(nginxStreams) &&
+                            nginxStreams.some(streamData => streamData.streamName === stream.streamName);
+                        break;
+                    default:
+                        break;
+                }
+
+                await this.updateStatus(stream.streamId, isActive);
+            }
+        }
+        catch (err) {
+            Logger.error(err);
+            throw new ServiceError('Error checking stream status');
+        }
     }
 }
 
-export default {
-    checkStatus
-}
+
+

@@ -1,6 +1,7 @@
 import { Service, Inject } from 'typedi';
-import sequelize from 'sequelize';
+import { Op, QueryTypes } from 'sequelize';
 import { Database } from '../managers/Database';
+import config from '../config';
 
 @Service()
 export default class StreamRepo {
@@ -82,7 +83,7 @@ export default class StreamRepo {
                         LIMIT 1
                     ) 
         `;
-        let streams: any = await Database.query(query, { type: sequelize.QueryTypes.SELECT, raw: true });
+        let streams: any = await Database.query(query, { type: QueryTypes.SELECT, raw: true });
 
         if (!streams || streams.length == 0) {
             throw new Error();
@@ -94,22 +95,54 @@ export default class StreamRepo {
                 cameraId: stream.cameraId,
                 streamName: stream.streamName,
                 streamUrl: stream.streamUrl,
-                streamType: stream.streamType,
                 type: stream.type,
-                isPublic: stream.isPublic,
                 isActive: stream.isActive,
-                isStable: stream.isStable,
             }
         })
 
         return streams;
     }
 
+    async updateStreamStatus(streamId: string, params: any): Promise<any> {
+        const [updated, data] = await this.streamModel.update(params, {
+            where: {
+                streamId
+            },
+            returning: [
+                'streamId',
+                'cameraId',
+                'streamName',
+                'streamUrl',
+                'type',
+                'isActive',
+            ],
+        })
+        if (!updated) {
+            throw new Error();
+        }
+
+        return data;
+    }
+
     async getStreamsForStatusCheck(): Promise<any> {
+        const lastActiveInterval: number = config.schedulers.statusCheck.lastActiveInterval;
+
         return await this.streamModel.findAll({
             where: {
-
+                [Op.or]: [
+                    {
+                        lastActive: {
+                            [Op.is]: null
+                        }
+                    },
+                    {
+                        lastActive: {
+                            [Op.lt]: new Date(Date.now() - 60000 * lastActiveInterval)
+                        }
+                    }
+                ]
             },
+            attributes: ['streamId', 'streamName', 'streamUrl', 'type'],
             raw: true,
         })
     }
