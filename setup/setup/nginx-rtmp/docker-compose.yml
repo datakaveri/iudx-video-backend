@@ -1,0 +1,13 @@
+version: '3'
+services: 
+    rtmp_server:
+        restart: always
+        build:
+            dockerfile: Dockerfile
+            context: ./
+        volumes: 
+            - ../certificates:/certificates
+            - ./record:/record
+        ports:
+            - '6001:1935'
+            - '6002:8080'
