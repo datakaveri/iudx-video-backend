@@ -55,7 +55,17 @@ export default class StreamStatusService {
     public async checkStatus() {
         try {
             const streams = await this.streamRepo.getStreamsForStatusCheck();
-            const nginxStreams = await this.getNginxRtmpStat();
+
+            if (!Array.isArray(streams) || streams.length === 0) {
+                return;
+            }
+
+            const containsRtmpStream = streams.some(stream => stream.type === 'rtmp');
+            let nginxStreams;
+
+            if (containsRtmpStream) {
+                nginxStreams = await this.getNginxRtmpStat();
+            }
 
             for (const stream of streams) {
                 let isActive: boolean = false;
