@@ -1,13 +1,16 @@
-version: '3'
+version: "3.8"
+
 services: 
-    rtmp_server:
+    nginxrtmp:
         restart: always
         build:
-            dockerfile: Dockerfile
-            context: ./
+            dockerfile: ${PROJECT_ROOT}/setup/setup/nginx-rtmp/Dockerfile
+            context: ${PROJECT_ROOT}/setup/setup/nginx-rtmp/
+        image: iudx_vs/nginx-rtmp
+        container_name: nginxrtmp
         volumes: 
-            - ../certificates:/certificates
-            - ./record:/record
+            - ${PROJECT_ROOT}/setup/certificates:/certificates
+            - ${PROJECT_ROOT}/setup/setup/nginx-rtmp/record:/record
         ports:
-            - '6001:1935'
-            - '6002:8080'
+            - "6001:1935"
+            - "6002:8080"

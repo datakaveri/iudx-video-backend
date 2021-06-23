@@ -1,10 +1,11 @@
 import { Service } from 'typedi';
 import fs from 'fs';
 import config from '../config';
+import { parseString } from 'xml2js';
 
 @Service()
 export default class Utility {
-    constructor() {}
+    constructor() { }
 
     public getPrivateKey(): Buffer {
         return fs.readFileSync(config.authConfig.jwtPrivateKeyPath);
@@ -49,5 +50,24 @@ export default class Utility {
             return true;
         }
         return false;
+    }
+
+    public parseNginxRtmpStat(response) {
+        return new Promise(async (resolve, reject) => {
+            parseString(response.body, function (err, result) {
+                const stat = err !== null ? result : result.rtmp;
+                let streams = stat.server[0].application[0].live[0].stream;
+
+                if (streams) {
+                    streams = streams.map((stream) => {
+                        return {
+                            streamName: stream.name[0],
+                            nclients: stream.nclients[0] - 1,
+                        };
+                    });
+                }
+                return resolve(streams);
+            });
+        })
     }
 }

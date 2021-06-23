@@ -8,6 +8,7 @@ export interface StreamInterface {
     streamName: string;
     streamUrl: string;
     streamType: string;
+    type: string;
     isPublic: boolean;
     isActive: boolean;
     isPublishing: boolean;

@@ -1,4 +1,4 @@
-version: "3.7"
+version: "3.8"
 
 networks:
   vs-net:
@@ -11,6 +11,7 @@ volumes:
 services:
   zook:
     image: zookeeper:3.4.9
+    container_name: zookeeper
     hostname: zook
     restart: always
     ports:

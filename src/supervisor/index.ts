@@ -9,6 +9,7 @@ import KafkaManager from '../managers/Kafka';
 import config from '../config';
 import Queue from '../managers/Queue';
 import ProcessService from '../services/ProcessService';
+import SchedulerManager from '../managers/Scheduler';
 
 export default async () => {
     // Initialize Database connection and load model injector
@@ -47,6 +48,11 @@ export default async () => {
     if(config.streamProcessConfig.initializeStreams) {
         let processService = Container.get(ProcessService);
         await processService.initializeStreamProcess();
+    }
+    // Start status check scheduler if enabled
+    if (config.schedulers.statusCheck.enable) {
+        const schedulerManager: SchedulerManager = new SchedulerManager();
+        schedulerManager.startStatusCheck();
     }
 
     // Start Express API Server

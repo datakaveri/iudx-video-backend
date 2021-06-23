@@ -65,7 +65,7 @@ export default class CameraRepo {
         return data;
     }
 
-    async deleteCamera(userId: string, cameraId: string): Promise<any> {
+    async deleteCamera(userId: string, cameraId: string) {
         const deleted = await this.cameraModel.destroy({
             where: {
                 userId,

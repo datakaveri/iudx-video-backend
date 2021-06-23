@@ -29,6 +29,8 @@ Backend Application for IUDX Video Server.
     EMAIL_PASSWORD=user@123
     JWT_SECRET=NO_SECRET
     JWT_PRIVATE_KEY_PATH=/path/to/file/sample.key
+    RTMP_SERVER_STAT_PORT=6002
+    ENABLE_STATUS_CHECK=false
     ```
 
 ### Setup

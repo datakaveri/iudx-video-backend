@@ -28,4 +28,8 @@ export default (app: Router) => {
     route.delete('/:id',
         (req, res, next) => StreamController.delete(req, res, next)
     );
+
+    route.get('/status/:id',
+        (req, res, next) => StreamController.getStatus(req, res, next)
+    );
 }

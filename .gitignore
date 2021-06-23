@@ -11,3 +11,5 @@ build
 jwtRS256.key
 
 coverage
+
+setup/certificates

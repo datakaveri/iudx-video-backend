@@ -27,7 +27,7 @@ export default class StreamService {
                     throw new Error();
                 }
 
-                const namespace: string = config.hostType + 'Stream';
+                const namespace: string = config.host.type + 'Stream';
                 const streamId: string = new UUID().generateUUIDv5(namespace);
                 this.processService.addStreamProcess(streamId, stream.streamUrl, `${config.rtmpServerConfig.serverUrl}/${stream.streamName}?password=${config.rtmpServerConfig.password}`);
                 return { streamId, userId, ...stream };

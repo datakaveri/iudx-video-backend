@@ -1,12 +1,16 @@
 version: '3.8'
 
 services:
-    nodeserver:
+    videoserver:
         restart: always
         build:
-            dockerfile: ./setup/setup/video-server/Dockerfile
-            context: ../../../
+            dockerfile: ${PROJECT_ROOT}/setup/setup/video-server/Dockerfile
+            context: ${PROJECT_ROOT}
+        image: iudx_vs/backend-server
+        container_name: videoserver
         network_mode: host
+        depends_on:
+            - postgres
         command: "npm start"
 
 
