@@ -24,7 +24,7 @@ export default class AuthExpressController {
                         return next(error);
                     }
                     // send mail of confirmation code
-                    await this.authService.signUp({name: req.body.name, email: req.body.email, verificationCode})
+                    // await this.authService.signUp({name: req.body.name, email: req.body.email, verificationCode})
 
                     return res.status(201).json({ message: 'User account created, please verify your email' });
                 } catch (error) {

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-docker build -t stream-server ../setup/testimage/Dockerfile
+docker build -t stream-server ../setup/testimage
 
 email='test@datakaveri.org'
 password='test'
@@ -61,32 +61,37 @@ EOF
 }
 
 # Register the user
-curl --location --request POST 'http://localhost:4000/api/auth/signup' --header 'Content-Type: application/json' --data-raw '$(getUserData)'
+printf "Registering test user\n"
+curl -sS --location --request POST 'http://localhost:4000/api/auth/signup' --header 'Content-Type: application/json' --data-raw "$(getUserData)"
 
 sleep 2
+printf "\n\nRegistered test user\n"
 
 # Verify the user
+printf "\nVerifying test user\n"
 code=$(psql -t postgresql://user:user%40123@localhost:5432/vs_db -c 'SELECT "verificationCode" FROM public."Users" WHERE email=$$test@datakaveri.org$$')
 
 updated_code=$(echo "${code}" | xargs)
 
-echo "http://localhost:4000/api/auth/verify?verificationCode=${updated_code}"
-
-curl --location --request GET "http://localhost:4000/api/auth/verify?verificationCode=${updated_code}"
+curl -sS --location --request GET "http://localhost:4000/api/auth/verify?verificationCode=${updated_code}"
 sleep 2
+printf "\n\nVerified test user\n"
 
 # Get Token
+printf "\nGenerating Token\n"
 token=$(
-    curl --location --request POST 'http://localhost:4000/api/auth/token' \
+    curl -sS --location --request POST 'http://localhost:4000/api/auth/token' \
         --header 'Content-Type: application/json' --data-raw "$(getTokenData)" | python3 -c \
         "import sys, json; print(json.load(sys.stdin)['token'])"
 )
 
 sleep 1
+printf "\n\nGenerated Token\n"
 
 # Register Camera
+printf "\nRegistering a camera\n"
 camera_id=$(
-    curl --location --request POST 'http://localhost:4000/api/cameras' \
+    curl -sS --location --request POST 'http://localhost:4000/api/cameras' \
         --header "Authorization: Bearer ${token}" \
         --header 'Content-Type: application/json' \
         --data-raw "$(getCameraData)" | python3 -c \
@@ -94,43 +99,57 @@ camera_id=$(
 )
 
 sleep 1
+printf "\n\nRegistered test camera\n"
 
+printf "\nCreating test streaming server\n"
 docker run --name stream-test -d -p 8554:8554 stream-server
 
 sleep 5
+printf "\nCreated test streaming server\n"
 
+# Registering a stream
+printf "\nRegistering a stream\n"
 stream_id=$(
-    curl --location --request POST 'http://localhost:4000/api/streams' \
+    curl -sS --location --request POST 'http://localhost:4000/api/streams' \
         --header "Authorization: Bearer ${token}" \
         --header 'Content-Type: application/json' \
         --data-raw "$(getStreamData)" | python3 -c \
         "import sys, json; print(json.load(sys.stdin)['results'][0]['streamId'])"
 )
-sleep 5
+sleep 10
+printf "\n\nRegistered the stream\n"
 
 # Check stream status
+printf "\nChecking status of the stream\n"
 stream_status=$(
-    curl --location --request GET "http://localhost:4000/api/streams/status/${stream_id}" \
+    curl -sS --location --request GET "http://localhost:4000/api/streams/status/${stream_id}" \
         --header "Authorization: Bearer ${token}" | python3 -c \
         "import sys, json; print(json.load(sys.stdin)['results'][0]['isActive'])"
 )
 sleep 1
 
+# cleanup
+
 # Delete stream
-curl --location --request DELETE "http://localhost:4000/api/streams/${stream_id}" \
+curl -sS --location --request DELETE "http://localhost:4000/api/streams/${stream_id}" \
     --header "Authorization: Bearer ${token}"
 sleep 1
 
 # Delete Camera
-curl --location --request DELETE "http://localhost:4000/api/cameras/${stream_id}" \
+curl -sS --location --request DELETE "http://localhost:4000/api/cameras/${camera_id}" \
     --header "Authorization: Bearer ${token}"
 sleep 1
 
 # Delete the user
 psql -t postgresql://user:user%40123@localhost:5432/vs_db -c 'DELETE FROM public."Users" WHERE "email"=$$test@datakaveri.org$$'
 
-docker container stop stream-server
-docker rm stream-server
+docker container stop stream-test
+docker rm stream-test
 
+# Show test result
 
-echo "Successfully passed: ${stream_status}"
+if [ "$stream_status" == "True" ]; then
+    printf "\n\n\n\u2714 \033[0;Stream creation flow passed\033[0m \n"
+else
+    printf "\n\n\n\u274c \033[0;31mStream creation failed\033[0m \n"
+fi
