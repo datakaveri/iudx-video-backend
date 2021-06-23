@@ -1,4 +1,4 @@
-version: "3.7"
+version: "3.8"
 
 networks:
   vs-net:
@@ -11,6 +11,7 @@ services:
 
   kafka:
     image: confluentinc/cp-kafka:5.5.1
+    container_name: kafka
     hostname: kafka
     restart: always
     ports:
@@ -19,6 +20,8 @@ services:
     expose:
       - "9092"
       - "19092"
+    depends_on:
+        - zook
     environment:
       KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka:19092,LISTENER_DOCKER_EXTERNAL://${HOST_NAME}:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
