@@ -1,4 +1,4 @@
-import { Service } from 'typedi';
+import { Inject, Service } from 'typedi';
 import Logger from '../common/Logger';
 
 import Utility from '../common/Utility';
@@ -7,13 +7,15 @@ import ServiceError from '../common/Error';
 import CameraRepo from '../repositories/CameraRepo';
 import UUID from '../common/UUID';
 import config from '../config';
+import ProcessService from './ProcessService';
 
 @Service()
 export default class StreamService {
     constructor(
         private utilityService: Utility,
         private streamRepo: StreamRepo,
-        private cameraRepo: CameraRepo
+        private cameraRepo: CameraRepo,
+        private processService: ProcessService,
     ) { }
 
     async register(userId: string, streamData: any) {
@@ -27,7 +29,7 @@ export default class StreamService {
 
                 const namespace: string = config.hostType + 'Stream';
                 const streamId: string = new UUID().generateUUIDv5(namespace);
-
+                this.processService.addStreamProcess(streamId, stream.streamUrl, `${config.rtmpServerConfig.serverUrl}/${stream.streamName}?password=${config.rtmpServerConfig.password}`);
                 return { streamId, userId, ...stream };
             }));
 

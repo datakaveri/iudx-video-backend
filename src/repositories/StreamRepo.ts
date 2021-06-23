@@ -1,6 +1,5 @@
 import { Service, Inject } from 'typedi';
-
-
+import { StreamInterface } from '../interfaces/StreamInterface';
 
 @Service()
 export default class StreamRepo {
@@ -8,7 +7,7 @@ export default class StreamRepo {
 
     async registerStream(streamData: any) {
         const streams = await this.streamModel.bulkCreate(streamData);
-        const data = streams.map(stream => {
+        const data = streams.map((stream) => {
             return {
                 streamId: stream.streamId,
                 cameraId: stream.cameraId,
@@ -16,8 +15,8 @@ export default class StreamRepo {
                 streamUrl: stream.streamUrl,
                 streamType: stream.streamType,
                 isPublic: stream.isPublic,
-            }
-        })
+            };
+        });
 
         return data;
     }
@@ -28,16 +27,8 @@ export default class StreamRepo {
                 userId,
                 streamId,
             },
-            attributes: [
-                'streamId',
-                'cameraId',
-                'streamName',
-                'streamType',
-                'streamUrl',
-                'streamType',
-                'isPublic'
-            ],
-        })
+            attributes: ['streamId', 'cameraId', 'streamName', 'streamType', 'streamUrl', 'streamType', 'isPublic'],
+        });
         if (!stream) {
             throw new Error();
         }
@@ -50,7 +41,7 @@ export default class StreamRepo {
             limit,
             offset,
             raw: true,
-        })
+        });
     }
 
     async deleteStream(userId: string, streamId: string): Promise<any> {
@@ -58,10 +49,18 @@ export default class StreamRepo {
             where: {
                 userId,
                 streamId,
-            }
-        })
+            },
+        });
         if (!deleted) {
             throw new Error();
         }
+    }
+
+    public async updateStream(streamId, updateData) {
+        await this.streamModel.update(updateData, { where: { streamId } });
+    }
+
+    public async findAllStreams(): Promise<[StreamInterface]> {
+        return await this.streamModel.findAll({ raw: true });
     }
 }

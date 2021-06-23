@@ -44,7 +44,7 @@ export default {
         jwtPrivateKeyPath: process.env.JWT_PRIVATE_KEY_PATH,
         jwtAlgorithm: 'RS256',
         jwtTokenExpiry: '1h',
-        verificationUrl: 'http://localhost:4000/api/auth/verify?verificationCode='
+        verificationUrl: 'http://localhost:4000/api/auth/verify?verificationCode=',
     },
 
     /**
@@ -56,6 +56,15 @@ export default {
     },
 
     ffmpegConfig: {
-        ffprobeTimeout: 10 // in seconds
-    }
+        ffprobeTimeout: 20, // in seconds
+    },
+
+    rtmpServerConfig: {
+        serverUrl: process.env.RTMP_SERVER,
+        password: process.env.RTMP_SERVER_PUBLISH_PASSWORD,
+    },
+
+    streamProcessConfig: {
+        initializeStreams: process.env.INITIALIZE_STREAMS === 'true' ? true : false,
+    },
 };

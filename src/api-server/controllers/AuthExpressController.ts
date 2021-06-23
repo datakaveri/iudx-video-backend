@@ -49,9 +49,9 @@ export default class AuthExpressController {
                         return next(error);
                     }
                     if (!result.success) {
-                        res.status(400).json(result);
+                        return res.status(400).json(result);
                     }
-                    res.status(200).json(result);
+                    return res.status(200).json(result);
                 } catch (error) {
                     return next(error);
                 }

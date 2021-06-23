@@ -7,6 +7,8 @@ import { Database, ModelDependencyInjector } from '../managers/Database';
 import apiServer from '../api-server';
 import KafkaManager from '../managers/Kafka';
 import config from '../config';
+import Queue from '../managers/Queue';
+import ProcessService from '../services/ProcessService';
 
 export default async () => {
     // Initialize Database connection and load model injector
@@ -37,6 +39,15 @@ export default async () => {
             })
         )
     );
+
+    // Initialize queue Manager
+    Container.set('queue', Queue);
+
+    // Restart all the streams
+    if(config.streamProcessConfig.initializeStreams) {
+        let processService = Container.get(ProcessService);
+        await processService.initializeStreamProcess();
+    }
 
     // Start Express API Server
     apiServer();
