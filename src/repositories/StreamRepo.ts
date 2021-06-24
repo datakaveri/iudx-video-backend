@@ -69,6 +69,21 @@ export default class StreamRepo {
         }
     }
 
+    async getStreamPid(userId: string, streamId: string): Promise<any> {
+        const stream = await this.streamModel.findOne({
+            where: {
+                userId,
+                streamId,
+            },
+            attributes: ['processId'],
+        })
+        if (!stream) {
+            throw new Error();
+        }
+
+        return stream.processId;
+    }
+
     public async updateStream(streamId, updateData) {
         await this.streamModel.update(updateData, { where: { streamId } });
     }
@@ -76,7 +91,7 @@ export default class StreamRepo {
     public async findAllStreams(): Promise<[StreamInterface]> {
         return await this.streamModel.findAll({ raw: true });
     }
-    
+
     async getStreamStatus(userId: string, streamId: string): Promise<any> {
         const query = `
             SELECT * 
