@@ -60,25 +60,27 @@ getStreamData() {
 EOF
 }
 
+printf "\n\n\n"
+
 # Register the user
-printf "Registering test user\n"
+printf " \u2022 Registering test user\n"
 curl -sS --location --request POST 'http://localhost:4000/api/auth/signup' --header 'Content-Type: application/json' --data-raw "$(getUserData)"
 
 sleep 2
-printf "\n\nRegistered test user\n"
+printf "\n\n \u2714 \033[0;32m Registered test user\033[0m\n"
 
 # Verify the user
-printf "\nVerifying test user\n"
+printf "\n\n \u2022 Verifying test user\n"
 code=$(psql -t postgresql://user:user%40123@localhost:5432/vs_db -c 'SELECT "verificationCode" FROM public."Users" WHERE email=$$test@datakaveri.org$$')
 
 updated_code=$(echo "${code}" | xargs)
 
 curl -sS --location --request GET "http://localhost:4000/api/auth/verify?verificationCode=${updated_code}"
 sleep 2
-printf "\n\nVerified test user\n"
+printf "\n\n \u2714 \033[0;32m Verified test user\033[0m\n"
 
 # Get Token
-printf "\nGenerating Token\n"
+printf "\n\n \u2022 Generating Token\n"
 token=$(
     curl -sS --location --request POST 'http://localhost:4000/api/auth/token' \
         --header 'Content-Type: application/json' --data-raw "$(getTokenData)" | python3 -c \
@@ -86,10 +88,10 @@ token=$(
 )
 
 sleep 1
-printf "\n\nGenerated Token\n"
+printf " \u2714 \033[0;32m Token Generated Successfully \033[0m\n\n"
 
 # Register Camera
-printf "\nRegistering a camera\n"
+printf "\n \u2022 Registering a camera\n"
 camera_id=$(
     curl -sS --location --request POST 'http://localhost:4000/api/cameras' \
         --header "Authorization: Bearer ${token}" \
@@ -99,16 +101,23 @@ camera_id=$(
 )
 
 sleep 1
-printf "\n\nRegistered test camera\n"
+printf " \u2714 \033[0;32m Successfully registered a test camera\033[0m\n"
 
-printf "\nCreating test streaming server\n"
+
+# Camera List API
+printf "\n \u2022 Camera List\n"
+curl -sS --location --request GET 'http://localhost:4000/api/cameras?size=8&page=1' --header "Authorization: Bearer ${token}" | python3 -m json.tool
+
+
+
+printf "\n \u2022 Creating test streaming server\n"
 docker run --name stream-test -d -p 8554:8554 stream-server
 
 sleep 5
-printf "\nCreated test streaming server\n"
+printf " \u2714 \033[0;32m Streaming server created successfully\033[0m\n"
 
 # Registering a stream
-printf "\nRegistering a stream\n"
+printf "\n \u2022 Registering a stream\n"
 stream_id=$(
     curl -sS --location --request POST 'http://localhost:4000/api/streams' \
         --header "Authorization: Bearer ${token}" \
@@ -116,40 +125,75 @@ stream_id=$(
         --data-raw "$(getStreamData)" | python3 -c \
         "import sys, json; print(json.load(sys.stdin)['results'][0]['streamId'])"
 )
-sleep 10
-printf "\n\nRegistered the stream\n"
+printf " \u2714 \033[0;32m Registered the stream\033[0m\n"
+
+printf "\n \u2022 Stream List\n"
+curl -sS --location --request GET 'http://localhost:4000/api/streams?size=7&page=1' --header "Authorization: Bearer ${token}" | python3 -m json.tool
+
+sleep 2
 
 # Check stream status
-printf "\nChecking status of the stream\n"
-stream_status=$(
-    curl -sS --location --request GET "http://localhost:4000/api/streams/status/${stream_id}" \
-        --header "Authorization: Bearer ${token}" | python3 -c \
-        "import sys, json; print(json.load(sys.stdin)['results'][0]['isActive'])"
-)
-sleep 1
+printf "\n \u2022 Checking status of the stream\n"
+
+counter=0
+max_counter=30
+
+stream_status=''
+while [ $counter -lt $max_counter ]
+do
+    stream_res=$(
+        curl -sS --location --request GET "http://localhost:4000/api/streams/status/${stream_id}" \
+            --header "Authorization: Bearer ${token}"
+    )
+
+    echo $stream_res | python3 -m json.tool
+    stream_status=$(echo $stream_res | python3 -c "import sys, json; print(json.load(sys.stdin)['results'][0]['isActive'])")
+    sleep 1
+    if [ "$stream_status" == "True" ]; then
+        printf "\n\n\n \u2714 \033[0;32m Stream published successfully\033[0m \n"
+        break
+    # else
+    #     printf "\n\n\n \u274c \033[0;31m Stream failed to publish\033[0m \n"
+    fi
+    counter=`expr $counter + 1`
+    printf "\n"
+done
+
+if [ "$stream_status" == "True" ]; then
+    printf "\n\n\n \u2714 \033[0;32m Stream published successfully\033[0m \n"
+    break
+else
+    printf "\n\n\n \u274c \033[0;31m Stream failed to publish\033[0m \n"
+fi
 
 # cleanup
 
+printf "\n \u2022 Cleaning...\n"
 # Delete stream
 curl -sS --location --request DELETE "http://localhost:4000/api/streams/${stream_id}" \
     --header "Authorization: Bearer ${token}"
 sleep 1
+
+printf "\n"
 
 # Delete Camera
 curl -sS --location --request DELETE "http://localhost:4000/api/cameras/${camera_id}" \
     --header "Authorization: Bearer ${token}"
 sleep 1
 
+printf "\n"
 # Delete the user
 psql -t postgresql://user:user%40123@localhost:5432/vs_db -c 'DELETE FROM public."Users" WHERE "email"=$$test@datakaveri.org$$'
 
 docker container stop stream-test
 docker rm stream-test
 
+
+printf "\n \u2714 \033[0;32m Cleaning Completed"
 # Show test result
 
 if [ "$stream_status" == "True" ]; then
-    printf "\n\n\n\u2714 \033[0;Stream creation flow passed\033[0m \n"
+    printf "\n\n\n \u2714 \033[0;32m Stream creation flow passed\033[0m \n"
 else
-    printf "\n\n\n\u274c \033[0;31mStream creation failed\033[0m \n"
+    printf "\n\n\n \u274c \033[0;31m Stream creation failed\033[0m \n"
 fi
