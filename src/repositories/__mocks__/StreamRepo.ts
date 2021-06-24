@@ -56,6 +56,18 @@ export default class StreamRepo {
         }
     });
 
+    public getStreamPid: any = jest.fn().mockImplementation((userId: string, streamId: string) => {
+        const streamData = _.find(Streams, (obj) => {
+            return obj.userId === userId && obj.streamId === streamId;
+        });
+
+        if (!streamData) {
+            throw new Error();
+        }
+
+        return _.pick(streamData, ['processId']);
+    });
+
     public getStreamStatus: any = jest.fn().mockImplementation((userId: string, streamId: string) => {
         const { cameraId, streamName } = _.find(Streams, (obj) => {
             return obj.userId === userId && obj.streamId === streamId;

@@ -8,6 +8,7 @@ import CameraRepo from '../repositories/CameraRepo';
 import UUID from '../common/UUID';
 import config from '../config';
 import ProcessService from './ProcessService';
+import FfmpegService from './FfmpegService';
 
 @Service()
 export default class StreamService {
@@ -16,6 +17,7 @@ export default class StreamService {
         private streamRepo: StreamRepo,
         private cameraRepo: CameraRepo,
         private processService: ProcessService,
+        private ffmpegService: FfmpegService,
     ) { }
 
     async register(userId: string, streamData: any) {
@@ -65,6 +67,11 @@ export default class StreamService {
 
     async delete(userId: string, streamId: string) {
         try {
+            const processId = await this.streamRepo.getStreamPid(userId, streamId);
+            const isProcessRunning = await this.ffmpegService.isProcessRunning(processId);
+            if (isProcessRunning) {
+                await this.ffmpegService.killProcess(processId);
+            }
             await this.streamRepo.deleteStream(userId, streamId);
         } catch (e) {
             Logger.error(e);
