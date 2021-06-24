@@ -7,6 +7,7 @@ import StreamService from '../../src/services/StreamService';
 
 jest.mock('../../src/repositories/StreamRepo');
 jest.mock('../../src/repositories/CameraRepo');
+jest.mock('../../src/services/ProcessService');
 
 const streamService = Container.get(StreamService);
 
