@@ -7,8 +7,8 @@ import FfmpegService from '../../src/services/FfmpegService';
 const ffmpegService = Container.get(FfmpegService);
 
 const mockInputData = {
-    streamInputUrl: 'rtsp://admin:admin123@video-server.iudx.io:8554/Agartala_AbhoyNagarBridge_Surv_Fixed_Cam1',
-    streamOutputUrl: 'rtmp://localhost:1935/live/stream1',
+    streamInputUrl: 'rtsp://localhost:8554/stream1',
+    streamOutputUrl: 'rtmp://localhost:6001/live/stream1',
     pid: null,
     filepath: './temp.mp4',
     duration: 20,
@@ -113,7 +113,7 @@ describe('Ffmpeg Service Test', () => {
 afterAll(async () => {
     await ffmpegService.killProcess(mockInputData.pid);
     await ffmpegService.killProcess(mockInputData.recordPid);
-    setTimeout(() => {
+    if(fs.existsSync(mockInputData.filepath)) {
         fs.rmSync(mockInputData.filepath);
-    }, 10 * 1000);
+    }
 });
