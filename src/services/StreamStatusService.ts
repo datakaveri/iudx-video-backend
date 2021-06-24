@@ -42,8 +42,7 @@ export default class StreamStatusService {
 
     async getNginxRtmpStat() {
         try {
-            const url: string = `https://${config.host.name}:${config.streamServer.rtmp.statPort}/stat`;
-            const response: any = await got.get(url);
+            const response: any = await got.get(config.rtmpServerConfig.statUrl);
             const streamsStats = await this.utilityService.parseNginxRtmpStat(response);
             return streamsStats;
         } catch (err) {

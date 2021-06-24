@@ -63,6 +63,7 @@ export default {
     rtmpServerConfig: {
         serverUrl: process.env.RTMP_SERVER,
         password: process.env.RTMP_SERVER_PUBLISH_PASSWORD,
+        statUrl: process.env.RTMP_STAT_URL,
     },
 
     streamProcessConfig: {
@@ -75,10 +76,4 @@ export default {
             lastActiveInterval: 5, // in minutes
         }
     },
-
-    streamServer: {
-        rtmp: {
-            statPort: process.env.RTMP_SERVER_STAT_PORT
-        }
-    }
 };
