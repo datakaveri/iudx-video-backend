@@ -68,23 +68,27 @@ export default class StreamRepo {
         return _.pick(streamData, ['processId']);
     });
 
-    public getStreamStatus: any = jest.fn().mockImplementation((userId: string, streamId: string) => {
-        const { cameraId, streamName } = _.find(Streams, (obj) => {
-            return obj.userId === userId && obj.streamId === streamId;
+    public updateStream: any = jest.fn().mockImplementation((streamId, updateData) => {
+        const streamData = _.find(Streams, (obj) => {
+            return obj.streamId === streamId;
         });
+        if (!streamData) {
+            throw new Error();
+        }
+        return true;
+    });
 
-        const streams = _.map(_.filter(Streams, (obj => {
-            return obj.cameraId === cameraId && obj.streamName === streamName;
-        })), stream => {
-            return _.pick(stream, [
-                'streamId',
-                'cameraId',
-                'streamName',
-                'streamUrl',
-                'type',
-                'isActive'
-            ]);
+    public findAllStreams: any = jest.fn().mockImplementation((param: any = {}) => {
+        return Streams;
+    });
+
+    public getAllAssociatedStreams: any = jest.fn().mockImplementation((streamId: string) => {
+        const { cameraId, streamName } = _.find(Streams, (obj) => {
+            return obj.streamId === streamId;
         });
+        const streams = _.filter(Streams, (obj => {
+            return obj.cameraId === cameraId && obj.streamName === streamName;
+        }));
 
         if (streams.length == 0) {
             throw new Error();
@@ -93,31 +97,7 @@ export default class StreamRepo {
         return streams;
     });
 
-    public updateStreamStatus: any = jest.fn().mockImplementation((streamId: string, params: any) => {
-        const streamData = _.find(Streams, { streamId });
-
-        if (!streamData) {
-            throw new Error();
-        }
-
-        return _.pick(streamData, [
-            'streamId',
-            'cameraId',
-            'streamName',
-            'streamUrl',
-            'type',
-            'isActive'
-        ]);
-    });
-
     public getStreamsForStatusCheck: any = jest.fn().mockImplementation(() => {
-        return _.map(Streams, stream => {
-            return _.pick(stream, [
-                'streamId',
-                'streamName',
-                'streamUrl',
-                'type',
-            ]);
-        });
+        return Streams;
     });
 }

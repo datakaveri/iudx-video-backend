@@ -4,7 +4,7 @@ PROJECT_ROOT="$PWD/../../"
 
 export PROJECT_ROOT=$PROJECT_ROOT
 export TOPICS_FILE="$PROJECT_ROOT/setup/apps/video/kafka/topics.json"
-export SCHEMA_FILE="$PROJECT_ROOT/setup/apps/video/postgres/schema.sql"
+export SCHEMA_FILE="$PROJECT_ROOT/setup/apps/video/postgres/cms-schema.sql"
 
 docker network create vs-net
 

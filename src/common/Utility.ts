@@ -63,6 +63,7 @@ export default class Utility {
                         return {
                             streamName: stream.name[0],
                             nclients: stream.nclients[0] - 1,
+                            active: stream.hasOwnProperty('active'),
                         };
                     });
                 }

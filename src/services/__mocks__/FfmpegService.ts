@@ -14,4 +14,21 @@ export default class FfmpegService {
         }
         return true;
     });
+
+    public isProcessRunning: any = jest.fn().mockImplementation((pid: any) => {
+        if (!pid) {
+            throw new Error();
+        }
+        if (pid === 42 || pid === 43) {
+            return false;
+        }
+        return true;
+    });
+
+    public killProcess: any = jest.fn().mockImplementation((pid: any) => {
+        if (!pid) {
+            throw new Error();
+        }
+        return true;
+    });
 }

@@ -8,6 +8,7 @@ import StreamService from '../../src/services/StreamService';
 jest.mock('../../src/repositories/StreamRepo');
 jest.mock('../../src/repositories/CameraRepo');
 jest.mock('../../src/services/ProcessService');
+jest.mock('../../src/services/FfmpegService.ts');
 
 const streamService = Container.get(StreamService);
 
@@ -21,6 +22,7 @@ describe('Stream Service Testing', () => {
                 streamName: 'test_stream_3',
                 streamUrl: 'rtsp://testurl:777',
                 streamType: 'RTSP',
+                type: 'camera',
                 isPublic: false,
             },
         ];

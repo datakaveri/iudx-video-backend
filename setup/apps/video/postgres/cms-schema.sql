@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS "Users"
 
 CREATE TABLE IF NOT EXISTS "Servers" 
 (
-  "serverId"          SERIAL,
+  "serverId"          UUID,
   "serverName"        TEXT        NOT NULL,
   "serverType"        TEXT        NOT NULL,
   "serverUrl"         TEXT        NOT NULL,
@@ -56,8 +56,8 @@ CREATE TABLE IF NOT EXISTS "Streams"
   "streamId"              UUID,
   "userId"                UUID          NOT NULL,
   "cameraId"              UUID          NOT NULL,
-  "sourceServerId"        INTEGER,
-  "destinationServerId"   INTEGER,
+  "sourceServerId"        UUID          NOT NULL,
+  "destinationServerId"   UUID          NOT NULL,
   "processId"             INTEGER,
   "type"                  TEXT          NOT NULL,
   "streamName"            TEXT          NOT NULL,

@@ -6,6 +6,7 @@ import got from 'got';
 
 jest.mock('../../src/repositories/StreamRepo');
 jest.mock('../../src/services/FfmpegService.ts');
+jest.mock('../../src/services/ProcessService');
 jest.mock('got');
 
 const streamStatusService = Container.get(StreamStatusService);
@@ -36,38 +37,26 @@ describe('Stream Status Service Testing', () => {
 
             await expect(streamStatusService.getStatus(userId, streamId)).rejects.toThrowError();
         });
-
-        test('Should reject if it is invalid user', async () => {
-            const userId: string = '2';
-            const streamId: string = '1';
-
-            await expect(streamStatusService.getStatus(userId, streamId)).rejects.toThrowError();
-        });
     });
 
     describe('Update Stream Status', () => {
 
         test('Should resolve and update stream status', async () => {
-            const expected: any = {
-                streamId: expect.any(String),
-                cameraId: expect.any(String),
-                streamName: expect.any(String),
-                streamUrl: expect.any(String),
-                type: expect.any(String),
-                isActive: expect.any(Boolean),
-            };
-
             const streamId: string = '1';
             const isActive: boolean = true;
+            const isStable: boolean = true;
+            const isPublishing: boolean = true;
 
-            await expect(streamStatusService.updateStatus(streamId, isActive)).resolves.toStrictEqual(expected);
+            await expect(streamStatusService.updateStatus(streamId, isActive, isStable, isPublishing)).resolves;
         });
 
         test('Should reject if stream not found', async () => {
             const streamId: string = '10';
             const isActive: boolean = true;
+            const isStable: boolean = true;
+            const isPublishing: boolean = true;
 
-            await expect(streamStatusService.updateStatus(streamId, isActive)).rejects.toThrowError();
+            await expect(streamStatusService.updateStatus(streamId, isActive, isStable, isPublishing)).rejects.toThrowError();
         });
     });
 
@@ -94,7 +83,7 @@ describe('Stream Status Service Testing', () => {
                 <name>live</name>
                 <live>
                 <stream>
-                <name>stream1</name>
+                <name>5</name>
                 <time>20488789</time><bw_in>554176</bw_in>
                 <bytes_in>2461500373</bytes_in>
                 <bw_out>0</bw_out>

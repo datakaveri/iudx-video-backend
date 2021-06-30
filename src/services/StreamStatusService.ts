@@ -8,6 +8,7 @@ import Utility from '../common/Utility';
 import StreamRepo from '../repositories/StreamRepo';
 import FfmpegService from './FfmpegService';
 import ServiceError from '../common/Error';
+import StreamReviveService from './StreamReviveService';
 
 @Service()
 export default class StreamStatusService {
@@ -15,24 +16,38 @@ export default class StreamStatusService {
         private ffmpegService: FfmpegService,
         private streamRepo: StreamRepo,
         private utilityService: Utility,
+        private streamReviveService: StreamReviveService,
     ) { }
 
     async getStatus(userId: string, streamId: string) {
         try {
-            return await this.streamRepo.getStreamStatus(userId, streamId);
+            let streams = await this.streamRepo.getAllAssociatedStreams(streamId);
+            streams = streams.map(stream => {
+                return {
+                    streamId: stream.streamId,
+                    cameraId: stream.cameraId,
+                    streamName: stream.streamName,
+                    streamUrl: stream.streamUrl,
+                    type: stream.type,
+                    isActive: stream.isActive,
+                }
+            });
+            return streams;
         } catch (e) {
             Logger.error(e);
             throw new ServiceError('Error Getting the stream status');
         }
     }
 
-    async updateStatus(streamId: string, isActive: boolean) {
+    async updateStatus(streamId: string, isActive: boolean, isStable: boolean, isPublishing: boolean) {
         try {
-            return await this.streamRepo.updateStreamStatus(
+            await this.streamRepo.updateStream(
                 streamId,
                 {
                     isActive,
-                    ...isActive && { lastActive: sequelize.fn('NOW') }
+                    isStable,
+                    ...!isPublishing && { processId: null },
+                    ...isActive && { lastActive: sequelize.fn('NOW') },
                 });
         } catch (e) {
             Logger.error(e);
@@ -68,6 +83,7 @@ export default class StreamStatusService {
 
             for (const stream of streams) {
                 let isActive: boolean = false;
+                let isProcessActive: any = false;
 
                 switch (stream.type) {
                     case 'camera':
@@ -75,13 +91,27 @@ export default class StreamStatusService {
                         break;
                     case 'rtmp':
                         isActive = Array.isArray(nginxStreams) &&
-                            nginxStreams.some(streamData => streamData.streamName === stream.streamName);
+                            nginxStreams.some(streamData => streamData.streamName === stream.streamId &&
+                                streamData.active);
                         break;
                     default:
-                        break;
+                        throw new Error();
                 }
 
-                await this.updateStatus(stream.streamId, isActive);
+                if (stream.processId) {
+                    isProcessActive = await this.ffmpegService.isProcessRunning(stream.processId);
+                }
+
+                if (isActive) {
+                    await this.updateStatus(stream.streamId, isActive, true, isProcessActive);
+                }
+                else if (isActive !== stream.isActive) {
+                    await this.updateStatus(stream.streamId, isActive, false, isProcessActive);
+                }
+
+                if (isActive && stream.isPublishing && !isProcessActive) {
+                    await this.streamReviveService.reviveStream(stream);
+                }
             }
         }
         catch (err) {

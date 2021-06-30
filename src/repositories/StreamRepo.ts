@@ -88,11 +88,11 @@ export default class StreamRepo {
         await this.streamModel.update(updateData, { where: { streamId } });
     }
 
-    public async findAllStreams(): Promise<[StreamInterface]> {
-        return await this.streamModel.findAll({ raw: true });
+    public async findAllStreams(query: any = {}): Promise<[StreamInterface]> {
+        return await this.streamModel.findAll({ where: query, raw: true });
     }
 
-    async getStreamStatus(userId: string, streamId: string): Promise<any> {
+    async getAllAssociatedStreams(streamId: string): Promise<any> {
         const query = `
             SELECT * 
             FROM "Streams"
@@ -100,52 +100,17 @@ export default class StreamRepo {
                     ( 
                         SELECT "cameraId", "streamName" 
                         FROM "Streams" 
-                        WHERE 
-                            "userId" = '${userId}' 
-                            AND
-                            "streamId" = '${streamId}'
+                        WHERE "streamId" = '${streamId}'
                         LIMIT 1
                     ) 
         `;
-        let streams: any = await Database.query(query, { type: QueryTypes.SELECT, raw: true });
+        const streams: Array<any> = await Database.query(query, { type: QueryTypes.SELECT, raw: true });
 
         if (!streams || streams.length == 0) {
             throw new Error();
         }
 
-        streams = streams.map(stream => {
-            return {
-                streamId: stream.streamId,
-                cameraId: stream.cameraId,
-                streamName: stream.streamName,
-                streamUrl: stream.streamUrl,
-                type: stream.type,
-                isActive: stream.isActive,
-            }
-        })
-
         return streams;
-    }
-
-    async updateStreamStatus(streamId: string, params: any): Promise<any> {
-        const [updated, data] = await this.streamModel.update(params, {
-            where: {
-                streamId
-            },
-            returning: [
-                'streamId',
-                'cameraId',
-                'streamName',
-                'streamUrl',
-                'type',
-                'isActive',
-            ],
-        })
-        if (!updated) {
-            throw new Error();
-        }
-
-        return data;
     }
 
     async getStreamsForStatusCheck(): Promise<any> {
@@ -166,7 +131,6 @@ export default class StreamRepo {
                     }
                 ]
             },
-            attributes: ['streamId', 'streamName', 'streamUrl', 'type'],
             raw: true,
         })
     }

@@ -16,6 +16,8 @@ export default {
 
     port: parseInt(process.env.PORT, 10),
 
+    serverId: process.env.SERVER_ID,
+
     databaseURL: process.env.DB_URL,
 
     kafkaConfig: {

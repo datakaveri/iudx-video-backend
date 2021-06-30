@@ -1,4 +1,4 @@
-import { Inject, Service } from 'typedi';
+import { Service } from 'typedi';
 import Logger from '../common/Logger';
 
 import Utility from '../common/Utility';
@@ -20,22 +20,50 @@ export default class StreamService {
         private ffmpegService: FfmpegService,
     ) { }
 
-    async register(userId: string, streamData: any) {
+    async publishRegisteredStreams(streamData: Array<any>) {
+        const rtmpStreamData = streamData.map(stream => {
+            const namespace: string = config.host.type + 'Stream';
+            const streamId: string = new UUID().generateUUIDv5(namespace);
+            const rtmpStreamUrl = `${config.rtmpServerConfig.serverUrl}/${streamId}?password=${config.rtmpServerConfig.password}`;
+
+            this.processService.addStreamProcess(stream.streamId, stream.streamUrl, rtmpStreamUrl);
+            return {
+                streamId: streamId,
+                cameraId: stream.cameraId,
+                userId: stream.userId,
+                sourceServerId: config.serverId,
+                destinationServerId: config.serverId,
+                streamName: stream.streamName,
+                streamUrl: rtmpStreamUrl,
+                streamType: 'RTMP',
+                type: 'rtmp',
+                isPublic: stream.isPublic,
+            }
+        });
+
+        await this.streamRepo.registerStream(rtmpStreamData);
+    }
+
+    async register(userId: string, streamData: Array<any>) {
         try {
             streamData = await Promise.all(streamData.map(async (stream) => {
-                const camera = await this.cameraRepo.findCamera(userId, stream.cameraId);
-
-                if (!camera) {
-                    throw new Error();
-                }
-
                 const namespace: string = config.host.type + 'Stream';
                 const streamId: string = new UUID().generateUUIDv5(namespace);
-                this.processService.addStreamProcess(streamId, stream.streamUrl, `${config.rtmpServerConfig.serverUrl}/${stream.streamName}?password=${config.rtmpServerConfig.password}`);
-                return { streamId, userId, ...stream };
+
+                await this.cameraRepo.findCamera(userId, stream.cameraId);
+
+                return {
+                    streamId,
+                    userId,
+                    sourceServerId: config.serverId,
+                    destinationServerId: config.serverId,
+                    ...stream
+                };
             }));
 
-            return await this.streamRepo.registerStream(streamData);
+            const result = await this.streamRepo.registerStream(streamData);
+            await this.publishRegisteredStreams(streamData);
+            return result;
         } catch (e) {
             Logger.error(e);
             throw new ServiceError('Error Registering the data');
@@ -57,7 +85,6 @@ export default class StreamService {
         try {
             const streams = await this.streamRepo.listAllStreams(limit, offset);
             const response = this.utilityService.getPagingData(streams, page, limit);
-
             return response;
         } catch (e) {
             Logger.error(e);
