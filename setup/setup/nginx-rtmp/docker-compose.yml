@@ -12,5 +12,5 @@ services:
             - ${PROJECT_ROOT}/setup/certificates:/certificates
             - ${PROJECT_ROOT}/setup/setup/nginx-rtmp/record:/record
         ports:
-            - "6001:1935"
-            - "6002:8080"
+            - "1935:1935"
+            - "8080:8080"

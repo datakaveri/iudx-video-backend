@@ -62,7 +62,7 @@ passport.use(
                 }
                 const payload = { userId: user.id, name: user.name, email: user.email, role: user.role };
                 const token = jwt.sign(payload, privateKey, {
-                    algorithm: 'RS256',
+                    algorithm: 'ES256',
                     expiresIn: config.authConfig.jwtTokenExpiry,
                 });
                 return done(null, { token: token }, { message: 'Logged in Successfully' });
@@ -96,7 +96,7 @@ passport.use(
     new JWTStrategy(
         {
             secretOrKey: privateKey,
-            algorithms: ['RS256'],
+            algorithms: ['ES256'],
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             passReqToCallback: true,
         },

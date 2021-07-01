@@ -39,7 +39,8 @@ export default class StreamRepo {
                 'streamUrl',
                 'streamType',
                 'type',
-                'isPublic'
+                'isPublic',
+                'isActive'
             ],
         })
         if (!stream) {

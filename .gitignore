@@ -13,3 +13,8 @@ jwtRS256.key
 coverage
 
 setup/certificates
+
+record/
+
+privateECDSASHA256.pem
+pubECDSASHA256.pem

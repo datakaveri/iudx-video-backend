@@ -119,4 +119,27 @@ export default class AuthExpressController {
             return next(e);
         }
     }
+
+    async rtmpTokenValidate(req: Request, res: Response, next: NextFunction) {
+        Logger.debug('Calling rtmp token validate endpoint');
+        try {
+            passport.authenticate('jwt', (err, user) => {
+                try {
+                    if (err) {
+                        return next(err);
+                    } else if(!user) {
+                        const error = new Error('Invalid token provided');
+                        return next(error);
+                    }
+                    
+                    return res.status(201).send();
+                } catch (error) {
+                    return next(error);
+                }
+            })(req, res, next);
+        } catch(e) {
+            Logger.error('error: %o', e);
+            return next(e);
+        }
+    }
 }

@@ -13,4 +13,5 @@ export default (app: Router) => {
     route.post('/token', AuthController.token);
     route.get('/login', AuthController.login);
     route.get('/logout', AuthController.logout);
+    route.get('/rtmp-token-verify', AuthController.rtmpTokenValidate);
 };

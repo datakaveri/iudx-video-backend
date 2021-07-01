@@ -32,4 +32,8 @@ export default (app: Router) => {
     route.get('/status/:id',
         (req, res, next) => StreamController.getStatus(req, res, next)
     );
+
+    route.get('/playback/:id',
+        (req, res, next) => StreamController.playBackUrl(req, res, next)
+    );
 }

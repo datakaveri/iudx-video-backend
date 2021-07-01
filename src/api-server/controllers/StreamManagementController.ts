@@ -3,15 +3,12 @@ import Container from 'typedi';
 
 import Logger from '../../common/Logger';
 import StreamService from '../../services/StreamService';
-import StreamStatusService from '../../services/StreamStatusService';
 
 export default class StreamManagementController {
     private streamService: StreamService;
-    private streamStatusService: StreamStatusService;
 
     constructor() {
         this.streamService = Container.get(StreamService);
-        this.streamStatusService = Container.get(StreamStatusService);
     }
 
     async register(req: Request, res: Response, next: NextFunction) {
@@ -100,11 +97,31 @@ export default class StreamManagementController {
 
         Logger.debug('Calling Stream status endpoint of stream id: %s', streamId);
         try {
-            const status = await this.streamStatusService.getStatus(userId, streamId);
+            const status = await this.streamService.getStatus(userId, streamId);
             const response = {
                 type: 200,
                 title: 'Success',
                 results: status
+            }
+            return res.status(200).send(response);
+        } catch (e) {
+            Logger.error('error: %o', e);
+            return next(e);
+        }
+    }
+
+    async playBackUrl(req: Request, res: Response, next: NextFunction) {
+
+        const userId: string = req.user['userId'];
+        const streamId: string = req.params.id;
+
+        Logger.debug('Calling Playback endpoint of stream id: %s', streamId);
+        try {
+            const data = await this.streamService.playBackUrl(userId, streamId);
+            const response = {
+                type: 200,
+                title: 'Success',
+                data
             }
             return res.status(200).send(response);
         } catch (e) {

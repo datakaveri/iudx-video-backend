@@ -27,7 +27,7 @@ export default class ProcessService {
             try {
                 const isRunning = await this.ffmpegService.isProcessRunning(stream.processId);
                 if (!isRunning) {
-                    this.addStreamProcess(stream.streamId, stream.streamUrl, `${config.rtmpServerConfig.serverUrl}/${stream.streamName}?password=${config.rtmpServerConfig.password}`);
+                    this.addStreamProcess(stream.streamId, stream.streamUrl, `${config.rtmpServerConfig.serverUrl}/${stream.streamId}?token=${config.rtmpServerConfig.password}`);
                 }
             } catch (err) {
                 console.log(err);

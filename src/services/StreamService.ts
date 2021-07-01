@@ -9,6 +9,7 @@ import UUID from '../common/UUID';
 import config from '../config';
 import ProcessService from './ProcessService';
 import FfmpegService from './FfmpegService';
+import StreamStatusService from './StreamStatusService';
 
 @Service()
 export default class StreamService {
@@ -18,6 +19,7 @@ export default class StreamService {
         private cameraRepo: CameraRepo,
         private processService: ProcessService,
         private ffmpegService: FfmpegService,
+        private streamStatusService: StreamStatusService,
     ) { }
 
     async register(userId: string, streamData: any) {
@@ -31,7 +33,7 @@ export default class StreamService {
 
                 const namespace: string = config.host.type + 'Stream';
                 const streamId: string = new UUID().generateUUIDv5(namespace);
-                this.processService.addStreamProcess(streamId, stream.streamUrl, `${config.rtmpServerConfig.serverUrl}/${stream.streamName}?password=${config.rtmpServerConfig.password}`);
+                this.processService.addStreamProcess(streamId, stream.streamUrl, `${config.rtmpServerConfig.serverUrl}/${streamId}?token=${config.rtmpServerConfig.password}`);
                 return { streamId, userId, ...stream };
             }));
 
@@ -76,6 +78,37 @@ export default class StreamService {
         } catch (e) {
             Logger.error(e);
             throw new ServiceError('Error deleting the data');
+        }
+    }
+
+    async getStatus(userId, streamId) {
+        try {
+            const status = await this.streamStatusService.getStatus(userId, streamId);
+            return status;
+        } catch(e) {
+            Logger.error(e);
+            throw new ServiceError('Error fetching status');
+        }
+    }
+
+    async playBackUrl(userId, streamId) {
+        try {
+            const stream = await this.streamRepo.findStream(userId, streamId);
+            if (stream.isActive) {
+                return {
+                    urlTemplate: `${config.rtmpServerConfig.serverUrl}/${streamId}?token=<TOKEN>`,
+                    isActive: true
+                }
+            } else {
+                return {
+                    isActive: false,
+                    message: 'Stream will be available shortly, please check status API to know the status',
+                    urlTemplate: `${config.rtmpServerConfig.serverUrl}/${streamId}}?token=<TOKEN>`
+                }
+            }
+        } catch(e) {
+            Logger.error(e);
+            throw new ServiceError('Error getting playback url');
         }
     }
 }
