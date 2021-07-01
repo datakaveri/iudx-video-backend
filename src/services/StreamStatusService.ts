@@ -55,6 +55,31 @@ export default class StreamStatusService {
         }
     }
 
+    async updateStats(streamsStat: any) {
+        try {
+            if (!Array.isArray(streamsStat)) return;
+
+            for (const stream of streamsStat) {
+                await this.streamRepo.updateStream(stream.streamId, {
+                    totalClients: stream.nClients,
+                    activeTime: parseInt(stream.time),
+                    bandwidthIn: BigInt(stream.bwIn),
+                    bandwidthOut: BigInt(stream.bwOut),
+                    bytesIn: BigInt(stream.bytesIn),
+                    bytesOut: BigInt(stream.bytesOut),
+                    ...stream.active && {
+                        codec: `${stream.metaVideo.codec} ${stream.metaVideo.profile} ${stream.metaVideo.level}`,
+                        resolution: `${stream.metaVideo.width}x${stream.metaVideo.height}`,
+                        frameRate: parseInt(stream.metaVideo.frameRate),
+                    }
+                });
+            }
+        } catch (e) {
+            Logger.error(e);
+            throw new ServiceError('Error Updating the stream stats');
+        }
+    }
+
     async getNginxRtmpStat() {
         try {
             const response: any = await got.get(config.rtmpServerConfig.statUrl);
@@ -79,6 +104,7 @@ export default class StreamStatusService {
 
             if (containsRtmpStream) {
                 nginxStreams = await this.getNginxRtmpStat();
+                this.updateStats(nginxStreams);
             }
 
             for (const stream of streams) {
@@ -91,7 +117,7 @@ export default class StreamStatusService {
                         break;
                     case 'rtmp':
                         isActive = Array.isArray(nginxStreams) &&
-                            nginxStreams.some(streamData => streamData.streamName === stream.streamId &&
+                            nginxStreams.some(streamData => streamData.streamId === stream.streamId &&
                                 streamData.active);
                         break;
                     default:

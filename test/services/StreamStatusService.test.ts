@@ -60,6 +60,43 @@ describe('Stream Status Service Testing', () => {
         });
     });
 
+    describe('Update RTMP Stream Stats', () => {
+
+        const streamsStat: any = [{
+            streamId: '1',
+            nClients: '1',
+            active: true,
+            bwIn: '879879',
+            bwOut: '546546',
+            bytesIn: '54645',
+            bytesOut: '645646',
+            time: '846546',
+            metaVideo: {
+                codec: 'h264',
+                profile: 'main',
+                level: '3.1',
+                width: '720',
+                height: '1280',
+                frameRate: '25',
+            }
+        }];
+
+        test('Should resolve and update stream stats', async () => {
+            await expect(streamStatusService.updateStats(streamsStat)).resolves;
+        });
+
+        test('Should return if data is empty', async () => {
+            const streamsStat = null;
+            await expect(streamStatusService.updateStats(streamsStat)).resolves;
+        });
+
+        test('Should reject if stream not found', async () => {
+            streamsStat[0].streamId = 10;
+
+            await expect(streamStatusService.updateStats(streamsStat)).rejects.toThrowError();
+        });
+    });
+
     describe('check status for streams', () => {
 
         test('Should return streams stats', async () => {
@@ -106,6 +143,12 @@ describe('Stream Status Service Testing', () => {
             await expect(streamStatusService.checkStatus()).resolves;
         });
 
+        test('Should reject if wrong response from Nginx rtmp', async () => {
+            const mockResponse = null;
+
+            await got.get.mockResolvedValue({ body: mockResponse })
+            await expect(streamStatusService.checkStatus()).rejects.toThrowError();
+        });
     });
 
 });

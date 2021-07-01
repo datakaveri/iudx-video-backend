@@ -58,6 +58,30 @@ export function StreamModel(Database: Sequelize) {
             totalClients: {
                 type: DataTypes.INTEGER,
             },
+            codec: {
+                type: DataTypes.TEXT,
+            },
+            resolution: {
+                type: DataTypes.TEXT,
+            },
+            frameRate: {
+                type: DataTypes.INTEGER,
+            },
+            bandwidthIn: {
+                type: DataTypes.BIGINT,
+            },
+            bandwidthOut: {
+                type: DataTypes.BIGINT,
+            },
+            bytesIn: {
+                type: DataTypes.BIGINT,
+            },
+            bytesOut: {
+                type: DataTypes.BIGINT,
+            },
+            activeTime: {
+                type: DataTypes.INTEGER,
+            },
             lastActive: {
                 type: DataTypes.DATE,
             }
