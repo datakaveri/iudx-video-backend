@@ -50,13 +50,15 @@ describe('Stream Status Service Testing', () => {
             await expect(streamStatusService.updateStatus(streamId, isActive, isStable, isPublishing)).resolves;
         });
 
-        test('Should reject if stream not found', async () => {
+        test('Should resolve an return 0 if stream not found', async () => {
+            const expected: Array<number> = [0];
+
             const streamId: string = '10';
             const isActive: boolean = true;
             const isStable: boolean = true;
             const isPublishing: boolean = true;
 
-            await expect(streamStatusService.updateStatus(streamId, isActive, isStable, isPublishing)).rejects.toThrowError();
+            await expect(streamStatusService.updateStatus(streamId, isActive, isStable, isPublishing)).resolves.toEqual(expected);
         });
     });
 
@@ -88,12 +90,6 @@ describe('Stream Status Service Testing', () => {
         test('Should return if data is empty', async () => {
             const streamsStat = null;
             await expect(streamStatusService.updateStats(streamsStat)).resolves;
-        });
-
-        test('Should reject if stream not found', async () => {
-            streamsStat[0].streamId = 10;
-
-            await expect(streamStatusService.updateStats(streamsStat)).rejects.toThrowError();
         });
     });
 
@@ -150,5 +146,4 @@ describe('Stream Status Service Testing', () => {
             await expect(streamStatusService.checkStatus()).rejects.toThrowError();
         });
     });
-
 });

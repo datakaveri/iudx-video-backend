@@ -46,23 +46,42 @@ export default class StreamService {
 
     async register(userId: string, streamData: Array<any>) {
         try {
-            streamData = await Promise.all(streamData.map(async (stream) => {
+            const streams: Array<any> = [];
+
+            for (const stream of streamData) {
                 const namespace: string = config.host.type + 'Stream';
                 const streamId: string = new UUID().generateUUIDv5(namespace);
 
-                await this.cameraRepo.findCamera(userId, stream.cameraId);
+                const camera = await this.cameraRepo.findCamera({ userId, cameraId: stream.cameraId });
 
-                return {
+                if (!camera) {
+                    return null;
+                }
+
+                streams.push({
                     streamId,
                     userId,
                     sourceServerId: config.serverId,
                     destinationServerId: config.serverId,
                     ...stream
-                };
-            }));
+                });
+            }
 
-            const result = await this.streamRepo.registerStream(streamData);
-            await this.publishRegisteredStreams(streamData);
+            let result = await this.streamRepo.registerStream(streams);
+
+            result = result.map((stream) => {
+                return {
+                    streamId: stream.streamId,
+                    cameraId: stream.cameraId,
+                    streamName: stream.streamName,
+                    streamUrl: stream.streamUrl,
+                    streamType: stream.streamType,
+                    type: stream.type,
+                    isPublic: stream.isPublic,
+                };
+            });
+            await this.publishRegisteredStreams(streams);
+
             return result;
         } catch (e) {
             Logger.error(e);
@@ -72,7 +91,18 @@ export default class StreamService {
 
     async findOne(userId: string, streamId: string): Promise<any> {
         try {
-            return await this.streamRepo.findStream(userId, streamId);
+            const fields = [
+                'streamId',
+                'cameraId',
+                'streamName',
+                'streamType',
+                'streamUrl',
+                'streamType',
+                'type',
+                'isPublic',
+            ];
+
+            return await this.streamRepo.findStream({ userId, streamId }, fields);
         } catch (e) {
             Logger.error(e);
             throw new ServiceError('Error fetching the data');
@@ -94,12 +124,27 @@ export default class StreamService {
 
     async delete(userId: string, streamId: string) {
         try {
-            const processId = await this.streamRepo.getStreamPid(userId, streamId);
-            const isProcessRunning = await this.ffmpegService.isProcessRunning(processId);
-            if (isProcessRunning) {
-                await this.ffmpegService.killProcess(processId);
+            const streamData = await this.streamRepo.findStream({ userId, streamId });
+
+            if (!streamData || streamData.type !== 'camera') {
+                return 0;
             }
-            await this.streamRepo.deleteStream(userId, streamId);
+
+            const streams = await this.streamRepo.getAllAssociatedStreams(streamId);
+
+            for (const stream of streams) {
+                if (!stream.processId) continue;
+                const isProcessRunning = await this.ffmpegService.isProcessRunning(stream.processId);
+
+                if (isProcessRunning) {
+                    await this.ffmpegService.killProcess(stream.processId);
+                }
+            }
+
+            return await this.streamRepo.deleteStream({
+                cameraId: streamData.cameraId,
+                streamName: streamData.streamName
+            });
         } catch (e) {
             Logger.error(e);
             throw new ServiceError('Error deleting the data');

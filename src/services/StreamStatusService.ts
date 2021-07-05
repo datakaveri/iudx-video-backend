@@ -22,6 +22,7 @@ export default class StreamStatusService {
     async getStatus(userId: string, streamId: string) {
         try {
             let streams = await this.streamRepo.getAllAssociatedStreams(streamId);
+
             streams = streams.map(stream => {
                 return {
                     streamId: stream.streamId,
@@ -32,6 +33,7 @@ export default class StreamStatusService {
                     isActive: stream.isActive,
                 }
             });
+
             return streams;
         } catch (e) {
             Logger.error(e);
@@ -41,8 +43,8 @@ export default class StreamStatusService {
 
     async updateStatus(streamId: string, isActive: boolean, isStable: boolean, isPublishing: boolean) {
         try {
-            await this.streamRepo.updateStream(
-                streamId,
+            return await this.streamRepo.updateStream(
+                { streamId },
                 {
                     isActive,
                     isStable,
@@ -60,19 +62,21 @@ export default class StreamStatusService {
             if (!Array.isArray(streamsStat)) return;
 
             for (const stream of streamsStat) {
-                await this.streamRepo.updateStream(stream.streamId, {
-                    totalClients: stream.nClients,
-                    activeTime: parseInt(stream.time),
-                    bandwidthIn: BigInt(stream.bwIn),
-                    bandwidthOut: BigInt(stream.bwOut),
-                    bytesIn: BigInt(stream.bytesIn),
-                    bytesOut: BigInt(stream.bytesOut),
-                    ...stream.active && {
-                        codec: `${stream.metaVideo.codec} ${stream.metaVideo.profile} ${stream.metaVideo.level}`,
-                        resolution: `${stream.metaVideo.width}x${stream.metaVideo.height}`,
-                        frameRate: parseInt(stream.metaVideo.frameRate),
-                    }
-                });
+                await this.streamRepo.updateStream(
+                    { streamId: stream.streamId },
+                    {
+                        totalClients: stream.nClients,
+                        activeTime: parseInt(stream.time),
+                        bandwidthIn: BigInt(stream.bwIn),
+                        bandwidthOut: BigInt(stream.bwOut),
+                        bytesIn: BigInt(stream.bytesIn),
+                        bytesOut: BigInt(stream.bytesOut),
+                        ...stream.active && {
+                            codec: `${stream.metaVideo.codec} ${stream.metaVideo.profile} ${stream.metaVideo.level}`,
+                            resolution: `${stream.metaVideo.width}x${stream.metaVideo.height}`,
+                            frameRate: parseInt(stream.metaVideo.frameRate),
+                        }
+                    });
             }
         } catch (e) {
             Logger.error(e);
@@ -95,8 +99,8 @@ export default class StreamStatusService {
         try {
             const streams = await this.streamRepo.getStreamsForStatusCheck();
 
-            if (!Array.isArray(streams) || streams.length === 0) {
-                return;
+            if (streams.length === 0) {
+                return null;
             }
 
             const containsRtmpStream = streams.some(stream => stream.type === 'rtmp');

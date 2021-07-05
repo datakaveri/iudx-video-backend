@@ -33,11 +33,11 @@ describe('Stream Service Testing', () => {
             await expect(streamService.register(userId, mockStreamData)).resolves;
         });
 
-        test('Should reject if camera not registered for a stream', async () => {
+        test('Should resolve and return null if camera not registered', async () => {
             const userId: string = '1';
             mockStreamData[0]['cameraId'] = '10';
 
-            await expect(streamService.register(userId, mockStreamData)).rejects.toThrowError();
+            await expect(streamService.register(userId, mockStreamData)).resolves;
         });
 
     });
@@ -51,6 +51,7 @@ describe('Stream Service Testing', () => {
                 streamName: expect.any(String),
                 streamType: expect.any(String),
                 streamUrl: expect.any(String),
+                type: expect.any(String),
                 isPublic: expect.any(Boolean),
             };
 
@@ -60,11 +61,11 @@ describe('Stream Service Testing', () => {
             await expect(streamService.findOne(userId, streamId)).resolves.toStrictEqual(expected);
         });
 
-        test('Should reject if data not found', async () => {
+        test('Should resolve and return not found if stream not available', async () => {
             const userId: string = '1';
             const streamId: string = '10';
 
-            await expect(streamService.findOne(userId, streamId)).rejects.toThrowError();
+            await expect(streamService.findOne(userId, streamId)).resolves;
         });
 
     });
@@ -103,25 +104,31 @@ describe('Stream Service Testing', () => {
 
     describe('Delete Stream', () => {
 
-        test('Should delete a stream', async () => {
-            const userId: string = '1';
-            const streamId: string = '1';
+        test('Should delete a stream and return 1', async () => {
+            const expected: number = 1;
 
-            await expect(streamService.delete(userId, streamId)).resolves;
+            const userId: string = '1';
+            const streamId: string = '2';
+
+            await expect(streamService.delete(userId, streamId)).resolves.toEqual(expected);
         });
 
-        test('Should reject if stream not found', async () => {
+        test('Should resolve and return 0 if stream not available', async () => {
+            const expected: number = 0;
+
             const userId: string = '1';
             const streamId: string = '10';
 
-            await expect(streamService.delete(userId, streamId)).rejects.toThrowError();
+            await expect(streamService.delete(userId, streamId)).resolves.toEqual(expected);
         });
 
-        test('Should reject if it is invalid user', async () => {
+        test('Should resolve and return 0 if it is invalid user', async () => {
+            const expected: number = 0;
+
             const userId: string = '2';
             const streamId: string = '1';
 
-            await expect(streamService.delete(userId, streamId)).rejects.toThrowError();
+            await expect(streamService.delete(userId, streamId)).resolves.toEqual(expected);
         });
     });
 });

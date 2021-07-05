@@ -20,13 +20,13 @@ export default class StreamManagementController {
 
         Logger.debug('Calling Register Stream endpoint with body: %o', params);
         try {
-            const streams = await this.streamService.register(userId, params);
+            const result = await this.streamService.register(userId, params);
             const response = {
-                type: 201,
-                title: 'Success',
-                results: streams
+                type: result ? 201 : 404,
+                title: result ? 'Success' : 'Not Found',
+                results: result ? result : 'Camera Not Registered',
             }
-            return res.status(201).json(response);
+            return res.status(response.type).json(response);
         } catch (e) {
             Logger.error('error: %o', e);
             return next(e);
@@ -40,13 +40,13 @@ export default class StreamManagementController {
 
         Logger.debug('Calling Find one Stream endpoint of stream id: %s', streamId);
         try {
-            const stream = await this.streamService.findOne(userId, streamId);
+            const result = await this.streamService.findOne(userId, streamId);
             const response = {
-                type: 200,
-                title: 'Success',
-                results: stream
+                type: result ? 200 : 404,
+                title: result ? 'Success' : 'Not Found',
+                result: result ? result : 'Stream Not Found',
             }
-            return res.status(200).json(response);
+            return res.status(response.type).json(response);
         } catch (e) {
             Logger.error('error: %o', e);
             return next(e);
@@ -60,13 +60,13 @@ export default class StreamManagementController {
 
         Logger.debug('Calling Find all Stream endpoint');
         try {
-            const streams = await this.streamService.findAll(page, size);
+            const result = await this.streamService.findAll(page, size);
             const response = {
                 type: 200,
                 title: 'Success',
-                results: streams
+                results: result
             }
-            return res.status(200).json(response);
+            return res.status(response.type).json(response);
         } catch (e) {
             Logger.error('error: %o', e);
             return next(e);
@@ -80,13 +80,13 @@ export default class StreamManagementController {
 
         Logger.debug('Calling Delete Stream endpoint of stream id: %s', streamId);
         try {
-            await this.streamService.delete(userId, streamId);
+            const result = await this.streamService.delete(userId, streamId);
             const response = {
-                type: 200,
-                title: 'Success',
-                detail: 'Stream Deleted'
+                type: result ? 200 : 404,
+                title: result ? 'Success' : 'Not Found',
+                detail: result ? 'Stream deleted' : 'Stream Not Found',
             }
-            return res.status(200).send(response);
+            return res.status(response.type).send(response);
         } catch (e) {
             Logger.error('error: %o', e);
             return next(e);
@@ -100,13 +100,13 @@ export default class StreamManagementController {
 
         Logger.debug('Calling Stream status endpoint of stream id: %s', streamId);
         try {
-            const status = await this.streamStatusService.getStatus(userId, streamId);
+            const result = await this.streamStatusService.getStatus(userId, streamId);
             const response = {
                 type: 200,
                 title: 'Success',
-                results: status
+                results: result
             }
-            return res.status(200).send(response);
+            return res.status(response.type).send(response);
         } catch (e) {
             Logger.error('error: %o', e);
             return next(e);

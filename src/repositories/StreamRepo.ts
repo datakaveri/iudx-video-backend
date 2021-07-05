@@ -8,84 +8,24 @@ import config from '../config';
 export default class StreamRepo {
     @Inject('StreamModel') private streamModel;
 
-    async registerStream(streamData: any) {
-        const streams = await this.streamModel.bulkCreate(streamData);
-        const data = streams.map((stream) => {
-            return {
-                streamId: stream.streamId,
-                cameraId: stream.cameraId,
-                streamName: stream.streamName,
-                streamUrl: stream.streamUrl,
-                streamType: stream.streamType,
-                type: stream.type,
-                isPublic: stream.isPublic,
-            };
-        });
-
-        return data;
+    async registerStream(streamData: Array<any>) {
+        return await this.streamModel.bulkCreate(streamData);
     }
 
-    async findStream(userId: string, streamId: string): Promise<any> {
-        const stream = await this.streamModel.findOne({
-            where: {
-                userId,
-                streamId,
-            },
-            attributes: [
-                'streamId',
-                'cameraId',
-                'streamName',
-                'streamType',
-                'streamUrl',
-                'streamType',
-                'type',
-                'isPublic'
-            ],
-        })
-        if (!stream) {
-            throw new Error();
-        }
-
-        return stream;
+    async findStream(query: any, columns: Array<string> = null): Promise<any> {
+        return await this.streamModel.findOne({ where: query, attributes: columns });
     }
 
     async listAllStreams(limit: number, offset: number): Promise<any> {
-        return await this.streamModel.findAndCountAll({
-            limit,
-            offset,
-            raw: true,
-        });
+        return await this.streamModel.findAndCountAll({ limit, offset });
     }
 
-    async deleteStream(userId: string, streamId: string) {
-        const deleted = await this.streamModel.destroy({
-            where: {
-                userId,
-                streamId,
-            },
-        });
-        if (!deleted) {
-            throw new Error();
-        }
+    async deleteStream(query: any) {
+        return await this.streamModel.destroy({ where: query });
     }
 
-    async getStreamPid(userId: string, streamId: string): Promise<any> {
-        const stream = await this.streamModel.findOne({
-            where: {
-                userId,
-                streamId,
-            },
-            attributes: ['processId'],
-        })
-        if (!stream) {
-            throw new Error();
-        }
-
-        return stream.processId;
-    }
-
-    public async updateStream(streamId, updateData) {
-        await this.streamModel.update(updateData, { where: { streamId } });
+    public async updateStream(query: any, updateData: any) {
+        return await this.streamModel.update(updateData, { where: query });
     }
 
     public async findAllStreams(query: any = {}): Promise<[StreamInterface]> {
@@ -104,13 +44,8 @@ export default class StreamRepo {
                         LIMIT 1
                     ) 
         `;
-        const streams: Array<any> = await Database.query(query, { type: QueryTypes.SELECT, raw: true });
 
-        if (!streams || streams.length == 0) {
-            throw new Error();
-        }
-
-        return streams;
+        return await Database.query(query, { type: QueryTypes.SELECT, raw: true });
     }
 
     async getStreamsForStatusCheck(): Promise<any> {

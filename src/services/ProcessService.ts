@@ -14,10 +14,11 @@ export default class ProcessService {
         Logger.debug(`Adding stream creation process to the queue for the stream ${streamId}`);
         this.queue.add(async () => {
             const isActiveStream = await this.ffmpegService.isStreamActive(streamInputUrl);
+            let processId = null;
             if (isActiveStream) {
-                const processId = await this.ffmpegService.createProcess(streamInputUrl, streamOutputUrl);
-                this.streamRepo.updateStream(streamId, { processId, isActive: true, isPublishing: true, isStable: true });
+                processId = await this.ffmpegService.createProcess(streamInputUrl, streamOutputUrl);
             }
+            this.streamRepo.updateStream({ streamId }, { processId, isActive: isActiveStream, isPublishing: true, isStable: isActiveStream });
         });
     }
 
