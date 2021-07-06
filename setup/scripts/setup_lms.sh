@@ -3,7 +3,7 @@
 PROJECT_ROOT="$PWD/../../"
 
 export PROJECT_ROOT=$PROJECT_ROOT
-export SCHEMA_FILE="$PROJECT_ROOT/setup/apps/video/postgres/schema.sql"
+export SCHEMA_FILE="$PROJECT_ROOT/setup/apps/video/postgres/lms-schema.sql"
 
 
 docker-compose \

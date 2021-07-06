@@ -2,6 +2,7 @@ export interface StreamInterface {
     streamId: string,
     userId: string,
     cameraId: string;
+    provenanceStreamId: string,
     sourceServerId: number;
     destinationServerId: number;
     processId: number;
@@ -14,5 +15,13 @@ export interface StreamInterface {
     isPublishing: boolean;
     isStable: boolean;
     totalClients: number;
+    codec: string,
+    resolution: string,
+    frameRate: number,
+    bandwidthIn: number,
+    bandwidthOut: number,
+    bytesIn: number,
+    bytesOut: number,
+    activeTime: number,
     lastActive: Date;
 }

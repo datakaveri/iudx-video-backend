@@ -17,13 +17,13 @@ export default class CameraManagementController {
 
         Logger.debug('Calling Register Camera endpoint with body: %o', params);
         try {
-            const data = await this.cameraService.register(userId, params);
+            const result = await this.cameraService.register(userId, params);
             const response = {
                 type: 201,
                 title: 'Success',
-                results: data
+                results: result
             }
-            return res.status(201).json(response);
+            return res.status(response.type).json(response);
         } catch (e) {
             Logger.error('error: %o', e);
             return next(e);
@@ -37,13 +37,13 @@ export default class CameraManagementController {
 
         Logger.debug('Calling Find one Camera endpoint of camera id: %s', cameraId);
         try {
-            const camera = await this.cameraService.findOne(userId, cameraId);
+            const result = await this.cameraService.findOne(userId, cameraId);
             const response = {
-                type: 200,
-                title: 'Success',
-                result: camera
+                type: result ? 200 : 404,
+                title: result ? 'Success' : 'Not Found',
+                result: result ? result : 'Camera Not Found',
             }
-            return res.status(200).json(response);
+            return res.status(response.type).json(response);
         } catch (e) {
             Logger.error('error: %o', e);
             return next(e);
@@ -63,7 +63,7 @@ export default class CameraManagementController {
                 title: 'Success',
                 results: result
             }
-            return res.status(200).json(response);
+            return res.status(response.type).json(response);
         } catch (e) {
             Logger.error('error: %o', e);
             return next(e);
@@ -78,13 +78,13 @@ export default class CameraManagementController {
 
         Logger.debug('Calling Update Camera endpoint with body: %o', params);
         try {
-            const data = await this.cameraService.update(userId, cameraId, params);
+            const result = await this.cameraService.update(userId, cameraId, params);
             const response = {
-                type: 201,
-                title: 'Success',
-                results: data
+                type: result ? 201 : 404,
+                title: result ? 'Success' : 'No Found',
+                results: result ? result : 'Camera Not Found',
             }
-            return res.status(201).json(response);
+            return res.status(response.type).json(response);
         } catch (e) {
             Logger.error('error: %o', e);
             return next(e);
@@ -98,11 +98,11 @@ export default class CameraManagementController {
 
         Logger.debug('Calling Delete Camera endpoint of camera id: %s', cameraId);
         try {
-            await this.cameraService.delete(userId, cameraId);
+            const result = await this.cameraService.delete(userId, cameraId);
             const response = {
-                type: 200,
-                title: 'Success',
-                detail: 'Camera Deleted'
+                type: result ? 200 : 404,
+                title: result ? 'Success' : 'Not Found',
+                detail: result ? 'Camera deleted' : 'Camera Not Found',
             }
             return res.status(200).send(response);
         } catch (e) {

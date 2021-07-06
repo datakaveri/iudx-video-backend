@@ -6,118 +6,72 @@ import { Streams } from '../../../test/data/Streams';
 @Service()
 export default class StreamRepo {
     public registerStream: any = jest.fn().mockImplementation((streamData: any) => {
-        for (const data of streamData) {
-            const isDuplicate = _.find(Streams, { streamId: data.streamId });
-            if (isDuplicate) {
-                throw new Error();
-            }
-        }
-
-        return true;
+        return streamData;
     });
 
-    public findStream: any = jest.fn().mockImplementation((userId: string, streamId: string) => {
-        const streamData = _.find(Streams, (obj) => {
-            return obj.userId === userId && obj.streamId === streamId;
+    public findStream: any = jest.fn().mockImplementation((query: any, columns: Array<string> = null) => {
+        const stream = _.find(Streams, (obj) => {
+            return (query.userId ? obj.userId === query.userId : true) &&
+                (query.streamId ? obj.streamId === query.streamId : true);
         });
 
-        if (!streamData) {
-            throw new Error();
+        if (!stream) {
+            return null;
         }
-        const streams = _.pick(streamData, [
-            'cameraId',
-            'streamId',
-            'streamName',
-            'streamType',
-            'streamUrl',
-            'isPublic'
-        ]);
 
-        return streams;
+        return columns ? _.pick(stream, columns) : stream;
     });
 
     public listAllStreams: any = jest.fn().mockImplementation((limit: number, offset: number) => {
-        const data = Streams.slice(offset, limit);
-
         return {
             count: Streams.length,
-            rows: data
+            rows: Streams.slice(offset, limit),
         }
     });
 
-
-    public deleteStream: any = jest.fn().mockImplementation((userId: string, streamId: string) => {
-        const streamData = _.find(Streams, (obj) => {
-            return obj.userId === userId && obj.streamId === streamId;
+    public deleteStream: any = jest.fn().mockImplementation((query: any) => {
+        const result = _.find(Streams, (obj) => {
+            return (query.userId ? obj.userId === query.userId : true) &&
+                (query.streamId ? obj.streamId === query.streamId : true) &&
+                (query.cameraId ? obj.cameraId === query.cameraId : true) &&
+                (query.streamName ? obj.streamName === query.streamName : true);
         });
 
-        if (!streamData) {
-            throw new Error();
+        if (!result) {
+            return 0;
         }
+
+        return 1;
     });
 
-    public getStreamPid: any = jest.fn().mockImplementation((userId: string, streamId: string) => {
-        const streamData = _.find(Streams, (obj) => {
-            return obj.userId === userId && obj.streamId === streamId;
+    public updateStream: any = jest.fn().mockImplementation((query: any, updateData: any) => {
+        const result = _.find(Streams, (obj) => {
+            return (query.streamId ? obj.streamId === query.streamId : true);
         });
 
-        if (!streamData) {
-            throw new Error();
+        if (!result) {
+            return [0];
         }
 
-        return _.pick(streamData, ['processId']);
+        return [1, result];
     });
 
-    public getStreamStatus: any = jest.fn().mockImplementation((userId: string, streamId: string) => {
+    public findAllStreams: any = jest.fn().mockImplementation((query: any = {}) => {
+        return Streams;
+    });
+
+    public getAllAssociatedStreams: any = jest.fn().mockImplementation((streamId: string) => {
         const { cameraId, streamName } = _.find(Streams, (obj) => {
-            return obj.userId === userId && obj.streamId === streamId;
+            return obj.streamId === streamId;
         });
-
-        const streams = _.map(_.filter(Streams, (obj => {
+        const streams = _.filter(Streams, (obj => {
             return obj.cameraId === cameraId && obj.streamName === streamName;
-        })), stream => {
-            return _.pick(stream, [
-                'streamId',
-                'cameraId',
-                'streamName',
-                'streamUrl',
-                'type',
-                'isActive'
-            ]);
-        });
-
-        if (streams.length == 0) {
-            throw new Error();
-        }
+        }));
 
         return streams;
     });
 
-    public updateStreamStatus: any = jest.fn().mockImplementation((streamId: string, params: any) => {
-        const streamData = _.find(Streams, { streamId });
-
-        if (!streamData) {
-            throw new Error();
-        }
-
-        return _.pick(streamData, [
-            'streamId',
-            'cameraId',
-            'streamName',
-            'streamUrl',
-            'type',
-            'isActive'
-        ]);
-    });
-
     public getStreamsForStatusCheck: any = jest.fn().mockImplementation(() => {
-        return _.map(Streams, stream => {
-            return _.pick(stream, [
-                'streamId',
-                'streamName',
-                'streamUrl',
-                'type',
-            ]);
-        });
+        return Streams;
     });
 }

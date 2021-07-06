@@ -29,8 +29,12 @@ Backend Application for IUDX Video Server.
     EMAIL_PASSWORD=user@123
     JWT_SECRET=NO_SECRET
     JWT_PRIVATE_KEY_PATH=/path/to/file/sample.key
-    RTMP_SERVER_STAT_PORT=6002
-    ENABLE_STATUS_CHECK=false
+    RTMP_SERVER=rtmp://localhost:6001/live
+    RTMP_SERVER_PUBLISH_PASSWORD=user123
+    RTMP_STAT_URL=http://localhost:6002/stat
+    ENABLE_STATUS_CHECK=true
+    INITIALIZE_STREAMS=false
+    SERVER_ID=54d6f331-6a8f-5362-9932-00609b42902f # UUID
     ```
 
 ### Setup
@@ -46,53 +50,43 @@ Backend Application for IUDX Video Server.
     ./build_all.sh
     ```
 
-### Kafka setup
+### Local Media Server (LMS) setup
 
-This setup takes care of setting up Zookeeper and Kafka.
+This setup takes care of setting up Nginx RTMP server, Postgresql and Video server.
 
-1. Execute the Kafka script. This brings up kafka and zookeeper.
-
-    ```sh
-    # Change path to scripts directory
-    cd ./setup/scipts/
-
-    # Run Kafka script
-    ./setup_kafka.sh
-    ```
-
-To bring down kafka, run `./stop_kafka.sh`.
-
-### Postgres setup
-
-This setup takes care of setting up Postgresql database.
-
-1. Execute the db script. This brings up postgres service.
+1. Execute the LMS script.
 
     ```sh
     # Change path to scripts directory
     cd ./setup/scipts/
 
-    # Run Postregsql script
-    ./setup_db.sh
+    # Run LMS script
+    ./setup_lms.sh
     ```
 
-To bring down postgres, run `./stop_db.sh`.
+To bring down LMS, run `./stop_lms.sh`.
+
+### Cloud Media Server (CMS) setup
+
+This setup takes care of setting up Zookeeper, Kafka, Nginx RTMP server, Postgresql and Video server.
+
+1. Execute the CMS script.
+
+    ```sh
+    # Change path to scripts directory
+    cd ./setup/scipts/
+
+    # Run CMS script
+    ./setup_cms.sh
+    ```
+
+To bring down CMS, run `./stop_cms.sh`.
 
 ### Starting backend server in Development/Deployment environment
 
 #### Docker
 
-1. Execute the server script. This brings up backend server.
-
-    ```sh
-    # Change path to scripts directory
-    cd ./setup/scipts/
-
-    # Run server script
-    ./setup_server.sh
-    ```
-
-To bring down server, run `./stop_server.sh`.
+Setting up `LMS/CMS` will bring up the backend server.
 
 #### local
 

@@ -19,6 +19,10 @@ export function StreamModel(Database: Sequelize) {
                 type: DataTypes.UUID,
                 allowNull: false,
             },
+            provenanceStreamId: {
+                type: DataTypes.UUID,
+                allowNull: false,
+            },
             sourceServerId: {
                 type: DataTypes.INTEGER
             },
@@ -56,6 +60,30 @@ export function StreamModel(Database: Sequelize) {
                 type: DataTypes.BOOLEAN,
             },
             totalClients: {
+                type: DataTypes.INTEGER,
+            },
+            codec: {
+                type: DataTypes.TEXT,
+            },
+            resolution: {
+                type: DataTypes.TEXT,
+            },
+            frameRate: {
+                type: DataTypes.INTEGER,
+            },
+            bandwidthIn: {
+                type: DataTypes.BIGINT,
+            },
+            bandwidthOut: {
+                type: DataTypes.BIGINT,
+            },
+            bytesIn: {
+                type: DataTypes.BIGINT,
+            },
+            bytesOut: {
+                type: DataTypes.BIGINT,
+            },
+            activeTime: {
                 type: DataTypes.INTEGER,
             },
             lastActive: {

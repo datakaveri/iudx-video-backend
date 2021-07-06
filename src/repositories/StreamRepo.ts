@@ -8,145 +8,45 @@ import config from '../config';
 export default class StreamRepo {
     @Inject('StreamModel') private streamModel;
 
-    async registerStream(streamData: any) {
-        const streams = await this.streamModel.bulkCreate(streamData);
-        const data = streams.map((stream) => {
-            return {
-                streamId: stream.streamId,
-                cameraId: stream.cameraId,
-                streamName: stream.streamName,
-                streamUrl: stream.streamUrl,
-                streamType: stream.streamType,
-                type: stream.type,
-                isPublic: stream.isPublic,
-            };
-        });
-
-        return data;
+    async registerStream(streamData: Array<any>) {
+        return await this.streamModel.bulkCreate(streamData);
     }
 
-    async findStream(userId: string, streamId: string): Promise<any> {
-        const stream = await this.streamModel.findOne({
-            where: {
-                userId,
-                streamId,
-            },
-            attributes: [
-                'streamId',
-                'cameraId',
-                'streamName',
-                'streamType',
-                'streamUrl',
-                'streamType',
-                'type',
-                'isPublic',
-                'isActive'
-            ],
-        })
-        if (!stream) {
-            throw new Error();
-        }
-
-        return stream;
+    async findStream(query: any, columns: Array<string> = null): Promise<any> {
+        return await this.streamModel.findOne({ where: query, attributes: columns });
     }
 
     async listAllStreams(limit: number, offset: number): Promise<any> {
-        return await this.streamModel.findAndCountAll({
-            limit,
-            offset,
-            raw: true,
-        });
+        return await this.streamModel.findAndCountAll({ limit, offset });
     }
 
-    async deleteStream(userId: string, streamId: string) {
-        const deleted = await this.streamModel.destroy({
-            where: {
-                userId,
-                streamId,
-            },
-        });
-        if (!deleted) {
-            throw new Error();
-        }
+    async deleteStream(query: any) {
+        return await this.streamModel.destroy({ where: query });
     }
 
-    async getStreamPid(userId: string, streamId: string): Promise<any> {
-        const stream = await this.streamModel.findOne({
-            where: {
-                userId,
-                streamId,
-            },
-            attributes: ['processId'],
-        })
-        if (!stream) {
-            throw new Error();
-        }
-
-        return stream.processId;
+    public async updateStream(query: any, updateData: any) {
+        return await this.streamModel.update(updateData, { where: query });
     }
 
-    public async updateStream(streamId, updateData) {
-        await this.streamModel.update(updateData, { where: { streamId } });
+    public async findAllStreams(query: any = {}): Promise<[StreamInterface]> {
+        return await this.streamModel.findAll({ where: query, raw: true });
     }
 
-    public async findAllStreams(): Promise<[StreamInterface]> {
-        return await this.streamModel.findAll({ raw: true });
-    }
-
-    async getStreamStatus(userId: string, streamId: string): Promise<any> {
+    async getAllAssociatedStreams(streamId: string): Promise<any> {
         const query = `
-            SELECT * 
-            FROM "Streams"
-            WHERE ("cameraId", "streamName") IN 
-                    ( 
-                        SELECT "cameraId", "streamName" 
-                        FROM "Streams" 
-                        WHERE 
-                            "userId" = '${userId}' 
-                            AND
-                            "streamId" = '${streamId}'
-                        LIMIT 1
-                    ) 
+            WITH RECURSIVE streamhierarchy AS (
+                SELECT *
+                FROM "Streams"
+                WHERE "streamId" = '${streamId}'
+                UNION
+                    SELECT s.*
+                    FROM "Streams" s
+                    INNER JOIN streamhierarchy h ON h."streamId" = s."provenanceStreamId"
+            ) 
+            SELECT * FROM streamhierarchy; 
         `;
-        let streams: any = await Database.query(query, { type: QueryTypes.SELECT, raw: true });
 
-        if (!streams || streams.length == 0) {
-            throw new Error();
-        }
-
-        streams = streams.map(stream => {
-            return {
-                streamId: stream.streamId,
-                cameraId: stream.cameraId,
-                streamName: stream.streamName,
-                streamUrl: stream.streamUrl,
-                type: stream.type,
-                isActive: stream.isActive,
-            }
-        })
-
-        return streams;
-    }
-
-    async updateStreamStatus(streamId: string, params: any): Promise<any> {
-        const [updated, data] = await this.streamModel.update(params, {
-            where: {
-                streamId
-            },
-            returning: [
-                'streamId',
-                'cameraId',
-                'streamName',
-                'streamUrl',
-                'type',
-                'isActive',
-            ],
-        })
-        if (!updated) {
-            throw new Error();
-        }
-
-        return data;
+        return await Database.query(query, { type: QueryTypes.SELECT, raw: true });
     }
 
     async getStreamsForStatusCheck(): Promise<any> {
@@ -167,7 +67,6 @@ export default class StreamRepo {
                     }
                 ]
             },
-            attributes: ['streamId', 'streamName', 'streamUrl', 'type'],
             raw: true,
         })
     }

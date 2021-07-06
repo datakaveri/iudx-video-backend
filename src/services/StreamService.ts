@@ -1,4 +1,4 @@
-import { Inject, Service } from 'typedi';
+import { Service } from 'typedi';
 import Logger from '../common/Logger';
 
 import Utility from '../common/Utility';
@@ -22,44 +22,116 @@ export default class StreamService {
         private streamStatusService: StreamStatusService,
     ) { }
 
-    async register(userId: string, streamData: any) {
+    public async publishRegisteredStreams(streamData: Array<any>) {
+        let streamsToPublish: Array<any> = [];
+
+        const rtmpStreamData = streamData.map(stream => {
+            const namespace: string = config.host.type + 'Stream';
+            const streamId: string = new UUID().generateUUIDv5(namespace);
+            const rtmpStreamUrl = `${config.rtmpServerConfig.serverUrl}/${streamId}?password=${config.rtmpServerConfig.password}`;
+
+            streamsToPublish.push({
+                inputStreamId: stream.streamId,
+                outputStreamId: streamId,
+                inputStreamUrl: stream.streamUrl,
+                outputStreamUrl: rtmpStreamUrl,
+            });
+
+            return {
+                streamId: streamId,
+                cameraId: stream.cameraId,
+                userId: stream.userId,
+                provenanceStreamId: stream.streamId,
+                sourceServerId: config.serverId,
+                destinationServerId: config.serverId,
+                streamName: stream.streamName,
+                streamUrl: rtmpStreamUrl,
+                streamType: 'RTMP',
+                type: 'rtmp',
+                isPublic: stream.isPublic,
+            }
+        });
+
+        await this.streamRepo.registerStream(rtmpStreamData);
+
+        streamsToPublish.map(stream => {
+            this.processService.addStreamProcess(stream.inputStreamId, stream.outputStreamId,
+                stream.inputStreamUrl, stream.outputStreamUrl);
+        });
+    }
+
+    public async register(userId: string, streamData: Array<any>) {
         try {
-            streamData = await Promise.all(streamData.map(async (stream) => {
-                const camera = await this.cameraRepo.findCamera(userId, stream.cameraId);
+            const streams: Array<any> = [];
 
-                if (!camera) {
-                    throw new Error();
-                }
-
+            for (const stream of streamData) {
                 const namespace: string = config.host.type + 'Stream';
                 const streamId: string = new UUID().generateUUIDv5(namespace);
-                this.processService.addStreamProcess(streamId, stream.streamUrl, `${config.rtmpServerConfig.serverUrl}/${streamId}?token=${config.rtmpServerConfig.password}`);
-                return { streamId, userId, ...stream };
-            }));
 
-            return await this.streamRepo.registerStream(streamData);
+                const camera = await this.cameraRepo.findCamera({ userId, cameraId: stream.cameraId });
+
+                if (!camera) {
+                    return null;
+                }
+
+                streams.push({
+                    streamId,
+                    userId,
+                    provenanceStreamId: streamId,
+                    sourceServerId: config.serverId,
+                    destinationServerId: config.serverId,
+                    ...stream
+                });
+            }
+
+            let result = await this.streamRepo.registerStream(streams);
+
+            result = result.map((stream) => {
+                return {
+                    streamId: stream.streamId,
+                    cameraId: stream.cameraId,
+                    streamName: stream.streamName,
+                    streamUrl: stream.streamUrl,
+                    streamType: stream.streamType,
+                    type: stream.type,
+                    isPublic: stream.isPublic,
+                };
+            });
+            await this.publishRegisteredStreams(streams);
+
+            return result;
         } catch (e) {
             Logger.error(e);
             throw new ServiceError('Error Registering the data');
         }
     }
 
-    async findOne(userId: string, streamId: string): Promise<any> {
+    public async findOne(userId: string, streamId: string): Promise<any> {
         try {
-            return await this.streamRepo.findStream(userId, streamId);
+            const fields = [
+                'streamId',
+                'cameraId',
+                'streamName',
+                'streamType',
+                'streamUrl',
+                'streamType',
+                'type',
+                'isPublic',
+            ];
+
+            return await this.streamRepo.findStream({ userId, streamId }, fields);
         } catch (e) {
             Logger.error(e);
             throw new ServiceError('Error fetching the data');
         }
     }
 
-    async findAll(page: number, size: number) {
+    public async findAll(page: number, size: number) {
         const { limit, offset } = this.utilityService.getPagination(page, size);
 
         try {
             const streams = await this.streamRepo.listAllStreams(limit, offset);
             const response = this.utilityService.getPagingData(streams, page, limit);
-
             return response;
         } catch (e) {
             Logger.error(e);
@@ -67,31 +139,45 @@ export default class StreamService {
         }
     }
 
-    async delete(userId: string, streamId: string) {
+    public async delete(userId: string, streamId: string) {
         try {
-            const processId = await this.streamRepo.getStreamPid(userId, streamId);
-            const isProcessRunning = await this.ffmpegService.isProcessRunning(processId);
-            if (isProcessRunning) {
-                await this.ffmpegService.killProcess(processId);
+            const streamData = await this.streamRepo.findStream({ userId, streamId, type: 'camera' });
+
+            if (!streamData) {
+                return 0;
             }
-            await this.streamRepo.deleteStream(userId, streamId);
+
+            const streams = await this.streamRepo.getAllAssociatedStreams(streamId);
+
+            for (const stream of streams) {
+                if (!stream.processId) continue;
+                const isProcessRunning = await this.ffmpegService.isProcessRunning(stream.processId);
+
+                if (isProcessRunning) {
+                    await this.ffmpegService.killProcess(stream.processId);
+                }
+
+                await this.streamRepo.deleteStream({ streamId: stream.streamId });
+            }
+
+            return 1;
         } catch (e) {
             Logger.error(e);
             throw new ServiceError('Error deleting the data');
         }
     }
 
-    async getStatus(userId, streamId) {
+    public async getStatus(userId, streamId) {
         try {
             const status = await this.streamStatusService.getStatus(userId, streamId);
             return status;
-        } catch(e) {
+        } catch (e) {
             Logger.error(e);
             throw new ServiceError('Error fetching status');
         }
     }
 
-    async playBackUrl(userId, streamId) {
+    public async playBackUrl(userId, streamId) {
         try {
             const stream = await this.streamRepo.findStream(userId, streamId);
             if (stream.isActive) {
@@ -106,7 +192,7 @@ export default class StreamService {
                     urlTemplate: `${config.rtmpServerConfig.serverUrl}/${streamId}}?token=<TOKEN>`
                 }
             }
-        } catch(e) {
+        } catch (e) {
             Logger.error(e);
             throw new ServiceError('Error getting playback url');
         }

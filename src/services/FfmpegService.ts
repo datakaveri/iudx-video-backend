@@ -36,7 +36,7 @@ export default class FfmpegService {
             ps.lookup({ pid }, (err, processList) => {
                 if (err) return reject(err);
                 const process = processList[0];
-                if (process) {
+                if (process && (process.command === 'ffmpeg' || process.command === 'ffprobe')) {
                     return resolve(true);
                 } else {
                     return resolve(false);
