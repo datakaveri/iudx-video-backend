@@ -18,7 +18,7 @@ export default class CameraService {
         private ffmpegService: FfmpegService,
     ) { }
 
-    async register(userId: string, cameraData: any) {
+    public async register(userId: string, cameraData: any) {
         try {
             const namespace: string = config.host.type + 'Camera';
 
@@ -48,7 +48,7 @@ export default class CameraService {
         }
     }
 
-    async findOne(userId: string, cameraId: string): Promise<any> {
+    public async findOne(userId: string, cameraId: string): Promise<any> {
         try {
             return await this.cameraRepo.findCamera({ userId, cameraId });
         } catch (e) {
@@ -57,7 +57,7 @@ export default class CameraService {
         }
     }
 
-    async findAll(page: number, size: number) {
+    public async findAll(page: number, size: number) {
         const { limit, offset } = this.utilityService.getPagination(page, size);
 
         try {
@@ -70,7 +70,7 @@ export default class CameraService {
         }
     }
 
-    async update(userId: string, cameraId: string, params: any) {
+    public async update(userId: string, cameraId: string, params: any) {
         try {
             const fields = [
                 'cameraId',
@@ -94,7 +94,7 @@ export default class CameraService {
         }
     }
 
-    async delete(userId: string, cameraId: string) {
+    public async delete(userId: string, cameraId: string) {
         try {
             const streams: Array<any> = await this.streamRepo.findAllStreams({ userId, cameraId });
 

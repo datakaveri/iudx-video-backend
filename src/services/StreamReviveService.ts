@@ -13,24 +13,12 @@ export default class StreamReviveService {
 
     public async reviveStream(stream: any) {
         try {
-            const streams = await this.streamRepo.getAllAssociatedStreams(stream.streamId);
-            let outputStream: any;
-
-            switch (stream.type) {
-                case 'camera':
-                    outputStream = streams.find(stream => stream.type === 'rtmp' &&
-                        stream.sourceServerId === stream.destinationServerId);
-                    break;
-                case 'rtmp':
-                    outputStream = streams.find(stream => stream.type === 'rtmp' &&
-                        stream.sourceServerId !== stream.destinationServerId);
-                    break;
-                default:
-                    throw new Error();
-            }
-
-            if (outputStream) {
-                this.processService.addStreamProcess(stream.streamId, stream.streamUrl, outputStream.streamUrl);
+            const provenanceStream = await this.streamRepo.findStream(
+                { streamId: stream.provenanceStreamId }
+            );
+            if (provenanceStream.isActive) {
+                this.processService.addStreamProcess(provenanceStream.streamId, stream.streamId,
+                    provenanceStream.streamUrl, stream.streamUrl);
             }
         }
         catch (err) {
@@ -39,6 +27,3 @@ export default class StreamReviveService {
         }
     }
 }
-
-
-

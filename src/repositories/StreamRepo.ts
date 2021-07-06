@@ -34,15 +34,16 @@ export default class StreamRepo {
 
     async getAllAssociatedStreams(streamId: string): Promise<any> {
         const query = `
-            SELECT * 
-            FROM "Streams"
-            WHERE ("cameraId", "streamName") IN 
-                    ( 
-                        SELECT "cameraId", "streamName" 
-                        FROM "Streams" 
-                        WHERE "streamId" = '${streamId}'
-                        LIMIT 1
-                    ) 
+            WITH RECURSIVE streamhierarchy AS (
+                SELECT *
+                FROM "Streams"
+                WHERE "streamId" = '${streamId}'
+                UNION
+                    SELECT s.*
+                    FROM "Streams" s
+                    INNER JOIN streamhierarchy h ON h."streamId" = s."provenanceStreamId"
+            ) 
+            SELECT * FROM streamhierarchy; 
         `;
 
         return await Database.query(query, { type: QueryTypes.SELECT, raw: true });

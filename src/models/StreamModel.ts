@@ -19,6 +19,10 @@ export function StreamModel(Database: Sequelize) {
                 type: DataTypes.UUID,
                 allowNull: false,
             },
+            provenanceStreamId: {
+                type: DataTypes.UUID,
+                allowNull: false,
+            },
             sourceServerId: {
                 type: DataTypes.INTEGER
             },

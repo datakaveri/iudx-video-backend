@@ -2,6 +2,7 @@ export interface StreamInterface {
     streamId: string,
     userId: string,
     cameraId: string;
+    provenanceStreamId: string,
     sourceServerId: number;
     destinationServerId: number;
     processId: number;

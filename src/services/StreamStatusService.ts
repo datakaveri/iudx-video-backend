@@ -19,7 +19,7 @@ export default class StreamStatusService {
         private streamReviveService: StreamReviveService,
     ) { }
 
-    async getStatus(userId: string, streamId: string) {
+    public async getStatus(userId: string, streamId: string) {
         try {
             let streams = await this.streamRepo.getAllAssociatedStreams(streamId);
 
@@ -27,6 +27,7 @@ export default class StreamStatusService {
                 return {
                     streamId: stream.streamId,
                     cameraId: stream.cameraId,
+                    provenanceStreamId: stream.provenanceStreamId,
                     streamName: stream.streamName,
                     streamUrl: stream.streamUrl,
                     type: stream.type,
@@ -41,7 +42,7 @@ export default class StreamStatusService {
         }
     }
 
-    async updateStatus(streamId: string, isActive: boolean, isStable: boolean, isPublishing: boolean) {
+    public async updateStatus(streamId: string, isActive: boolean, isStable: boolean, isPublishing: boolean) {
         try {
             return await this.streamRepo.updateStream(
                 { streamId },
@@ -57,7 +58,7 @@ export default class StreamStatusService {
         }
     }
 
-    async updateStats(streamsStat: any) {
+    public async updateStats(streamsStat: any) {
         try {
             if (!Array.isArray(streamsStat)) return;
 
@@ -84,7 +85,7 @@ export default class StreamStatusService {
         }
     }
 
-    async getNginxRtmpStat() {
+    public async getNginxRtmpStat() {
         try {
             const response: any = await got.get(config.rtmpServerConfig.statUrl);
             const streamsStats = await this.utilityService.parseNginxRtmpStat(response);
@@ -139,7 +140,7 @@ export default class StreamStatusService {
                     await this.updateStatus(stream.streamId, isActive, false, isProcessActive);
                 }
 
-                if (isActive && stream.isPublishing && !isProcessActive) {
+                if (stream.streamId !== stream.provenanceStreamId && !isProcessActive) {
                     await this.streamReviveService.reviveStream(stream);
                 }
             }

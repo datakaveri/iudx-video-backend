@@ -21,16 +21,25 @@ export default class StreamService {
     ) { }
 
     async publishRegisteredStreams(streamData: Array<any>) {
+        let streamsToPublish: Array<any> = [];
+
         const rtmpStreamData = streamData.map(stream => {
             const namespace: string = config.host.type + 'Stream';
             const streamId: string = new UUID().generateUUIDv5(namespace);
             const rtmpStreamUrl = `${config.rtmpServerConfig.serverUrl}/${streamId}?password=${config.rtmpServerConfig.password}`;
 
-            this.processService.addStreamProcess(stream.streamId, stream.streamUrl, rtmpStreamUrl);
+            streamsToPublish.push({
+                inputStreamId: stream.streamId,
+                outputStreamId: streamId,
+                inputStreamUrl: stream.streamUrl,
+                outputStreamUrl: rtmpStreamUrl,
+            });
+
             return {
                 streamId: streamId,
                 cameraId: stream.cameraId,
                 userId: stream.userId,
+                provenanceStreamId: stream.streamId,
                 sourceServerId: config.serverId,
                 destinationServerId: config.serverId,
                 streamName: stream.streamName,
@@ -42,6 +51,11 @@ export default class StreamService {
         });
 
         await this.streamRepo.registerStream(rtmpStreamData);
+
+        streamsToPublish.map(stream => {
+            this.processService.addStreamProcess(stream.inputStreamId, stream.outputStreamId,
+                stream.inputStreamUrl, stream.outputStreamUrl);
+        });
     }
 
     async register(userId: string, streamData: Array<any>) {
@@ -61,6 +75,7 @@ export default class StreamService {
                 streams.push({
                     streamId,
                     userId,
+                    provenanceStreamId: streamId,
                     sourceServerId: config.serverId,
                     destinationServerId: config.serverId,
                     ...stream
@@ -124,9 +139,9 @@ export default class StreamService {
 
     async delete(userId: string, streamId: string) {
         try {
-            const streamData = await this.streamRepo.findStream({ userId, streamId });
+            const streamData = await this.streamRepo.findStream({ userId, streamId, type: 'camera' });
 
-            if (!streamData || streamData.type !== 'camera') {
+            if (!streamData) {
                 return 0;
             }
 
@@ -139,12 +154,11 @@ export default class StreamService {
                 if (isProcessRunning) {
                     await this.ffmpegService.killProcess(stream.processId);
                 }
+
+                await this.streamRepo.deleteStream({ streamId: stream.streamId });
             }
 
-            return await this.streamRepo.deleteStream({
-                cameraId: streamData.cameraId,
-                streamName: streamData.streamName
-            });
+            return 1;
         } catch (e) {
             Logger.error(e);
             throw new ServiceError('Error deleting the data');

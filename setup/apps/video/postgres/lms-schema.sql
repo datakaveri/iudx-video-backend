@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS "Streams"
   "streamId"              UUID,
   "userId"                UUID          NOT NULL,
   "cameraId"              UUID          NOT NULL,
+  "provenanceStreamId"    UUID          NOT NULL,
   "sourceServerId"        UUID          NOT NULL,
   "destinationServerId"   UUID          NOT NULL,
   "processId"             INTEGER,
