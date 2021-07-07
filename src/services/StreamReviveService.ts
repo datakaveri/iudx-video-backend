@@ -12,6 +12,7 @@ export default class StreamReviveService {
     ) { }
 
     public async reviveStream(stream: any) {
+        Logger.debug(`Initiating stream revival for the stream ${stream.streamId}`);
         try {
             const provenanceStream = await this.streamRepo.findStream(
                 { streamId: stream.provenanceStreamId }

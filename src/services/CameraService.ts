@@ -21,14 +21,20 @@ export default class CameraService {
     public async register(userId: string, cameraData: any) {
         try {
             const namespace: string = config.host.type + 'Camera';
+            const cameras: Array<any> = [];
 
-            cameraData = cameraData.map(camera => {
+            for (const camera of cameraData) {
                 const cameraId: string = new UUID().generateUUIDv5(namespace);
+                const isDuplicateCamera: any = await this.cameraRepo.findCamera(camera);
 
-                return { cameraId, userId, ...camera }
-            })
+                if (isDuplicateCamera) {
+                    return null;
+                }
 
-            let result = await this.cameraRepo.registerCamera(cameraData);
+                cameras.push({ cameraId, userId, ...camera });
+            }
+
+            let result = await this.cameraRepo.registerCamera(cameras);
             result = result.map(camera => {
                 return {
                     cameraId: camera.cameraId,

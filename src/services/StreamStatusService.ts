@@ -97,6 +97,7 @@ export default class StreamStatusService {
     };
 
     public async checkStatus() {
+        Logger.debug(`Starting status check for all the available streams`);
         try {
             const streams = await this.streamRepo.getStreamsForStatusCheck();
 

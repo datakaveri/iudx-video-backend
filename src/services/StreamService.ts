@@ -28,7 +28,7 @@ export default class StreamService {
         const rtmpStreamData = streamData.map(stream => {
             const namespace: string = config.host.type + 'Stream';
             const streamId: string = new UUID().generateUUIDv5(namespace);
-            const rtmpStreamUrl = `${config.rtmpServerConfig.serverUrl}/${streamId}?password=${config.rtmpServerConfig.password}`;
+            const rtmpStreamUrl = `${config.rtmpServerConfig.serverUrl}/${streamId}?token=${config.rtmpServerConfig.password}`;
 
             streamsToPublish.push({
                 inputStreamId: stream.streamId,
@@ -68,9 +68,10 @@ export default class StreamService {
                 const namespace: string = config.host.type + 'Stream';
                 const streamId: string = new UUID().generateUUIDv5(namespace);
 
+                const isDuplicateStream = await this.streamRepo.findStream(stream);
                 const camera = await this.cameraRepo.findCamera({ userId, cameraId: stream.cameraId });
 
-                if (!camera) {
+                if (!camera || isDuplicateStream) {
                     return null;
                 }
 
@@ -179,7 +180,7 @@ export default class StreamService {
 
     public async playBackUrl(userId, streamId) {
         try {
-            const stream = await this.streamRepo.findStream(userId, streamId);
+            const stream = await this.streamRepo.findStream({ userId, streamId });
             if (stream.isActive) {
                 return {
                     urlTemplate: `${config.rtmpServerConfig.serverUrl}/${streamId}?token=<TOKEN>`,

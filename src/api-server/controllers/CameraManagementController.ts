@@ -19,9 +19,9 @@ export default class CameraManagementController {
         try {
             const result = await this.cameraService.register(userId, params);
             const response = {
-                type: 201,
-                title: 'Success',
-                results: result
+                type: result ? 201 : 400,
+                title: result ? 'Success' : 'Bad Request',
+                results: result ? result : 'Camera Already Registered',
             }
             return res.status(response.type).json(response);
         } catch (e) {

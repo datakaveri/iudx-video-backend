@@ -19,9 +19,9 @@ export default class StreamManagementController {
         try {
             const result = await this.streamService.register(userId, params);
             const response = {
-                type: result ? 201 : 404,
-                title: result ? 'Success' : 'Not Found',
-                results: result ? result : 'Camera Not Registered',
+                type: result ? 201 : 400,
+                title: result ? 'Success' : 'Bad Request',
+                results: result ? result : 'Camera Not Registered | Stream Already Registered',
             }
             return res.status(response.type).json(response);
         } catch (e) {
