@@ -20,6 +20,10 @@ export default (app: Router) => {
         (req, res, next) => CameraController.findOne(req, res, next)
     );
 
+    route.get('/:id/streams',
+        (req, res, next) => CameraController.findAssociatedStreams(req, res, next)
+    );
+
     route.get('/',
         validatePaginationQuery(['page', 'size']),
         (req, res, next) => CameraController.findAll(req, res, next)

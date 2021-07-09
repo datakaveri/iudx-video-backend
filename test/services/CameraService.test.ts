@@ -34,6 +34,12 @@ describe('Camera Service Testing', () => {
             await expect(cameraService.register(userId, mockCameraData)).resolves;
         });
 
+        test('Should resolve and return null if the camera already registered', async () => {
+            const userId: string = '3';
+            mockCameraData[0].cameraNum = 15758;
+
+            await expect(cameraService.register(userId, mockCameraData)).resolves.toBeNull();
+        });
     });
 
     describe('Find a camera', () => {
@@ -61,6 +67,34 @@ describe('Camera Service Testing', () => {
             const cameraId: string = '10';
 
             await expect(cameraService.findOne(userId, cameraId)).resolves.toBeNull();
+        });
+
+    });
+
+    describe('List all associated streams', () => {
+
+        test('Should return the streams data', async () => {
+            const expected: any = {
+                streamId: expect.any(String),
+                provenanceStreamId: expect.any(String),
+                streamName: expect.any(String),
+                streamUrl: expect.any(String),
+                streamType: expect.any(String),
+                type: expect.any(String),
+                isPublic: expect.any(Boolean),
+            };
+
+            const userId: string = '2';
+            const cameraId: string = '4';
+
+            await expect(cameraService.listAssociatedStreams(userId, cameraId)).resolves.toContainEqual(expected);
+        });
+
+        test('Should resolve and return null if camera not found', async () => {
+            const userId: string = '1';
+            const cameraId: string = '10';
+
+            await expect(cameraService.listAssociatedStreams(userId, cameraId)).resolves.toBeNull();
         });
 
     });
@@ -142,11 +176,11 @@ describe('Camera Service Testing', () => {
 
     describe('Delete Camera', () => {
 
-        test('Should reolves promise and delete the camera', async () => {
+        test('Should resolve and return 1 if camera is deleted', async () => {
             const expected: number = 1;
 
-            const userId: string = '1';
-            const cameraId: string = '1';
+            const userId: string = '2';
+            const cameraId: string = '4';
 
             await expect(cameraService.delete(userId, cameraId)).resolves.toEqual(expected);
         });

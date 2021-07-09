@@ -16,8 +16,8 @@ export default class StreamRepo {
         return await this.streamModel.findOne({ where: query, attributes: columns });
     }
 
-    async listAllStreams(limit: number, offset: number): Promise<any> {
-        return await this.streamModel.findAndCountAll({ limit, offset });
+    async listAllStreams(limit: number, offset: number, columns: Array<string> = null): Promise<any> {
+        return await this.streamModel.findAndCountAll({ limit, offset, attributes: columns });
     }
 
     async deleteStream(query: any) {
@@ -28,8 +28,8 @@ export default class StreamRepo {
         return await this.streamModel.update(updateData, { where: query });
     }
 
-    public async findAllStreams(query: any = {}): Promise<[StreamInterface]> {
-        return await this.streamModel.findAll({ where: query, raw: true });
+    public async findAllStreams(query: any = {}, columns: Array<string> = null): Promise<[StreamInterface]> {
+        return await this.streamModel.findAll({ where: query, attributes: columns, raw: true });
     }
 
     async getAllAssociatedStreams(streamId: string): Promise<any> {
@@ -50,7 +50,7 @@ export default class StreamRepo {
     }
 
     async getStreamsForStatusCheck(): Promise<any> {
-        const lastActiveInterval: number = config.schedulers.statusCheck.lastActiveInterval;
+        const lastActiveInterval: number = config.schedulerConfig.statusCheck.lastActiveInterval;
 
         return await this.streamModel.findAll({
             where: {

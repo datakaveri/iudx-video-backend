@@ -128,10 +128,20 @@ export default class StreamService {
     }
 
     public async findAll(page: number, size: number) {
-        const { limit, offset } = this.utilityService.getPagination(page, size);
-
         try {
-            const streams = await this.streamRepo.listAllStreams(limit, offset);
+            const fields = [
+                'streamId',
+                'cameraId',
+                'provenanceStreamId',
+                'streamName',
+                'streamType',
+                'streamUrl',
+                'streamType',
+                'type',
+                'isPublic',
+            ];
+            const { limit, offset } = this.utilityService.getPagination(page, size);
+            const streams = await this.streamRepo.listAllStreams(limit, offset, fields);
             const response = this.utilityService.getPagingData(streams, page, limit);
             return response;
         } catch (e) {

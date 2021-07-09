@@ -12,14 +12,16 @@ export default class CameraRepo {
     public findCamera: any = jest.fn().mockImplementation((query: any) => {
         const camera = _.find(Cameras, (obj) => {
             return (query.userId ? obj.userId === query.userId : true) &&
-                (query.cameraId ? obj.cameraId === query.cameraId : true);
+                (query.cameraId ? obj.cameraId === query.cameraId : true) &&
+                (query.cameraNum ? obj.cameraNum === query.cameraNum : true) &&
+                (query.cameraName ? obj.cameraName === query.cameraName : true);
         });
 
         if (!camera) {
             return null;
         }
 
-        return _.omit(camera, ['userId']);;
+        return _.omit(camera, ['userId']);
     });
 
     public listAllCameras: any = jest.fn().mockImplementation((limit: number, offset: number) => {

@@ -63,10 +63,33 @@ export default class CameraService {
         }
     }
 
-    public async findAll(page: number, size: number) {
-        const { limit, offset } = this.utilityService.getPagination(page, size);
-
+    public async listAssociatedStreams(userId: string, cameraId: string): Promise<any> {
         try {
+            const fields = [
+                'streamId',
+                'provenanceStreamId',
+                'streamName',
+                'streamUrl',
+                'streamType',
+                'type',
+                'isPublic',
+            ];
+            const streams: Array<any> = await this.streamRepo.findAllStreams({ userId, cameraId }, fields);
+
+            if (streams.length === 0) {
+                return null;
+            }
+
+            return streams;
+        } catch (e) {
+            Logger.error(e);
+            throw new ServiceError('Error fetching the data');
+        }
+    }
+
+    public async findAll(page: number, size: number) {
+        try {
+            const { limit, offset } = this.utilityService.getPagination(page, size);
             const data = await this.cameraRepo.listAllCameras(limit, offset);
             const cameras = this.utilityService.getPagingData(data, page, limit);
             return cameras;

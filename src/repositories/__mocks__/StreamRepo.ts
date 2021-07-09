@@ -12,7 +12,10 @@ export default class StreamRepo {
     public findStream: any = jest.fn().mockImplementation((query: any, columns: Array<string> = null) => {
         const stream = _.find(Streams, (obj) => {
             return (query.userId ? obj.userId === query.userId : true) &&
-                (query.streamId ? obj.streamId === query.streamId : true);
+                (query.streamId ? obj.streamId === query.streamId : true) &&
+                (query.cameraId ? obj.cameraId === query.cameraId : true) &&
+                (query.streamName ? obj.streamName === query.streamName : true) &&
+                (query.streamUrl ? obj.streamUrl === query.streamUrl : true);
         });
 
         if (!stream) {
@@ -22,7 +25,7 @@ export default class StreamRepo {
         return columns ? _.pick(stream, columns) : stream;
     });
 
-    public listAllStreams: any = jest.fn().mockImplementation((limit: number, offset: number) => {
+    public listAllStreams: any = jest.fn().mockImplementation((limit: number, offset: number, columns: Array<string> = null) => {
         return {
             count: Streams.length,
             rows: Streams.slice(offset, limit),
@@ -56,8 +59,21 @@ export default class StreamRepo {
         return [1, result];
     });
 
-    public findAllStreams: any = jest.fn().mockImplementation((query: any = {}) => {
-        return Streams;
+    public findAllStreams: any = jest.fn().mockImplementation((query: any = {}, columns: Array<string> = null) => {
+        let streams: any = _.filter(Streams, (obj) => {
+            return (query.userId ? obj.userId === query.userId : true) &&
+                (query.cameraId ? obj.cameraId === query.cameraId : true);
+        });
+
+        if (!streams) {
+            return null;
+        }
+
+        streams = _.map(streams, stream => {
+            return columns ? _.pick(stream, columns) : stream;
+        });
+
+        return streams;
     });
 
     public getAllAssociatedStreams: any = jest.fn().mockImplementation((streamId: string) => {

@@ -68,13 +68,10 @@ export default {
         statUrl: process.env.RTMP_STAT_URL,
     },
 
-    streamProcessConfig: {
-        initializeStreams: process.env.INITIALIZE_STREAMS === 'true' ? true : false,
-    },
-
-    schedulers: {
+    schedulerConfig: {
         statusCheck: {
             enable: process.env.ENABLE_STATUS_CHECK === 'true' || false,
+            jobInterval: 3, // in minutes
             lastActiveInterval: 5, // in minutes
         }
     },

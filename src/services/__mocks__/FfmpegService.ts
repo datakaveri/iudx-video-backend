@@ -16,10 +16,12 @@ export default class FfmpegService {
     });
 
     public isProcessRunning: any = jest.fn().mockImplementation((pid: any) => {
+        const pids = [1583, 1584];
+
         if (!pid) {
             throw new Error();
         }
-        if (pid === 42 || pid === 43) {
+        if (pids.includes(pid)) {
             return false;
         }
         return true;

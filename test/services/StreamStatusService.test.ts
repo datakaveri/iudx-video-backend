@@ -13,32 +13,6 @@ const streamStatusService = Container.get(StreamStatusService);
 
 describe('Stream Status Service Testing', () => {
 
-    describe('Check Stream Status', () => {
-
-        test('Should resolve and return status object', async () => {
-            const expected: any = {
-                streamId: expect.any(String),
-                cameraId: expect.any(String),
-                streamName: expect.any(String),
-                streamUrl: expect.any(String),
-                type: expect.any(String),
-                isActive: expect.any(Boolean),
-            };
-
-            const userId: string = '1';
-            const streamId: string = '1';
-
-            await expect(streamStatusService.getStatus(userId, streamId)).resolves.toContainEqual(expected);
-        });
-
-        test('Should reject if stream not found', async () => {
-            const userId: string = '1';
-            const streamId: string = '10';
-
-            await expect(streamStatusService.getStatus(userId, streamId)).rejects.toThrowError();
-        });
-    });
-
     describe('Update Stream Status', () => {
 
         test('Should resolve and update stream status', async () => {

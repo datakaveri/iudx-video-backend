@@ -3,7 +3,6 @@ import Logger from '../common/Logger';
 import FfmpegService from './FfmpegService';
 import Queue from '../managers/Queue';
 import StreamRepo from '../repositories/StreamRepo';
-import config from '../config';
 
 @Service()
 export default class ProcessService {
@@ -27,20 +26,5 @@ export default class ProcessService {
                 { processId, isActive: isActiveStream, isStable: isActiveStream }
             );
         });
-    }
-
-    public async initializeStreamProcess() {
-        const streams = await this.streamRepo.findAllStreams({ type: 'camera' });
-        for (let stream of streams) {
-            try {
-                const isRunning = await this.ffmpegService.isProcessRunning(stream.processId);
-                if (!isRunning) {
-                    // this.addStreamProcess(stream.streamId, stream.streamUrl, `${config.rtmpServerConfig.serverUrl}/${stream.streamId}?token=${config.rtmpServerConfig.password}`);
-                }
-            } catch (err) {
-                console.log(err);
-                Logger.error(err);
-            }
-        }
     }
 }

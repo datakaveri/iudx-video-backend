@@ -131,4 +131,60 @@ describe('Stream Service Testing', () => {
             await expect(streamService.delete(userId, streamId)).resolves.toEqual(expected);
         });
     });
+
+    describe('Check Stream Status', () => {
+
+        test('Should resolve and return status object', async () => {
+            const expected: any = {
+                streamId: expect.any(String),
+                cameraId: expect.any(String),
+                provenanceStreamId: expect.any(String),
+                streamName: expect.any(String),
+                streamUrl: expect.any(String),
+                type: expect.any(String),
+                isActive: expect.any(Boolean),
+            };
+
+            const userId: string = '1';
+            const streamId: string = '1';
+
+            await expect(streamService.getStatus(userId, streamId)).resolves.toContainEqual(expected);
+        });
+
+        test('Should reject if stream not found', async () => {
+            const userId: string = '1';
+            const streamId: string = '10';
+
+            await expect(streamService.getStatus(userId, streamId)).rejects.toThrowError();
+        });
+    });
+
+    describe('Get Playback url for a stream', () => {
+
+        test('Should return the stream url template if stream is active', async () => {
+            const expected: any = {
+                urlTemplate: expect.any(String),
+                isActive: expect.any(Boolean),
+            };
+
+            const userId: string = '2';
+            const streamId: string = '5';
+
+            await expect(streamService.playBackUrl(userId, streamId)).resolves.toStrictEqual(expected);
+        });
+
+        test('Should return a message if stream is not active', async () => {
+            const expected: any = {
+                message: expect.any(String),
+                urlTemplate: expect.any(String),
+                isActive: expect.any(Boolean),
+            };
+
+            const userId: string = '2';
+            const streamId: string = '6';
+
+            await expect(streamService.playBackUrl(userId, streamId)).resolves.toStrictEqual(expected);
+        });
+
+    });
 });

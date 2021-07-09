@@ -50,6 +50,26 @@ export default class CameraManagementController {
         }
     }
 
+    async findAssociatedStreams(req: Request, res: Response, next: NextFunction) {
+
+        const userId: string = req.user['userId'];
+        const cameraId: string = req.params.id;
+
+        Logger.debug('Calling Find one Camera endpoint of camera id: %s', cameraId);
+        try {
+            const result = await this.cameraService.listAssociatedStreams(userId, cameraId);
+            const response = {
+                type: result ? 200 : 404,
+                title: result ? 'Success' : 'Not Found',
+                result: result ? result : 'Camera Not Found',
+            }
+            return res.status(response.type).json(response);
+        } catch (e) {
+            Logger.error('error: %o', e);
+            return next(e);
+        }
+    }
+
     async findAll(req: Request, res: Response, next: NextFunction) {
 
         const page: number = +req.query.page;
