@@ -6,59 +6,51 @@ import { Cameras } from '../../../test/data/Cameras';
 @Service()
 export default class CameraRepo {
     public registerCamera: any = jest.fn().mockImplementation((cameraData: any) => {
-        for (const data of cameraData) {
-            const isDuplicate = _.find(Cameras, { cameraId: data.cameraId });
-            if (isDuplicate) {
-                throw new Error();
-            }
-        }
-
-        return true;
+        return cameraData;
     });
 
-    public findCamera: any = jest.fn().mockImplementation((userId: string, cameraId: string) => {
-        const cameraData = _.find(Cameras, (obj) => {
-            return obj.userId === userId && obj.cameraId === cameraId;
+    public findCamera: any = jest.fn().mockImplementation((query: any) => {
+        const camera = _.find(Cameras, (obj) => {
+            return (query.cameraId ? obj.cameraId === query.cameraId : true) &&
+                (query.cameraNum ? obj.cameraNum === query.cameraNum : true) &&
+                (query.cameraName ? obj.cameraName === query.cameraName : true);
         });
 
-        if (!cameraData) {
-            throw new Error();
+        if (!camera) {
+            return null;
         }
 
-        return _.omit(cameraData, ['userId']);
+        return _.omit(camera, ['userId']);
     });
 
     public listAllCameras: any = jest.fn().mockImplementation((limit: number, offset: number) => {
-        const data = Cameras.slice(offset, limit);
-        const cameraData = _.map(data, (item) => {
-            return _.omit(item, ['userId']);
-        })
-
         return {
             count: Cameras.length,
-            rows: cameraData
+            rows: Cameras.slice(offset, limit),
         }
     });
 
-    public updateCamera: any = jest.fn().mockImplementation((userId: string, cameraId: string, params: any) => {
-        const cameraData = _.find(Cameras, (obj) => {
-            return obj.userId === userId && obj.cameraId === cameraId;
+    public updateCamera: any = jest.fn().mockImplementation((data: any, query: any, columns: Array<string> = []) => {
+        const result = _.find(Cameras, (obj) => {
+            return obj.cameraId === query.cameraId;
         });
 
-        if (!cameraData) {
-            throw new Error();
+        if (!result) {
+            return [0];
         }
 
-        return _.omit(cameraData, ['userId']);
+        return [1, _.omit(result, ['userId'])];
     });
 
-    public deleteCamera: any = jest.fn().mockImplementation((userId: string, cameraId: string) => {
-        const cameraData = _.find(Cameras, (obj) => {
-            return obj.userId === userId && obj.cameraId === cameraId;
+    public deleteCamera: any = jest.fn().mockImplementation((query: any) => {
+        const result = _.find(Cameras, (obj) => {
+            return obj.cameraId === query.cameraId;
         });
 
-        if (!cameraData) {
-            throw new Error();
+        if (!result) {
+            return 0;
         }
+
+        return 1;
     });
 }

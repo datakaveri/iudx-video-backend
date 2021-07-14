@@ -57,7 +57,7 @@ const ValidateStreamAccess = async (req: Request, res: Response, next: NextFunct
     const role = req.user['role'];
     if (role === 'admin') {
         return next();
-    } 
+    }
     if (role === 'consumer') {
         return res.status(401).send('Authorization failed');
     }
@@ -72,12 +72,12 @@ const ValidateStreamAccess = async (req: Request, res: Response, next: NextFunct
 
     const streamRepo = Container.get(StreamRepo);
     try {
-        let stream = await streamRepo.findStreamByUser(userId, streamId);
+        let stream = await streamRepo.findStream({ userId, streamId });
         if (!stream) {
             return res.send(401).send('Authorization failed');
         }
         return next();
-    } catch(err) {
+    } catch (err) {
         return res.status(401).send('Authorization failed');
     }
 }

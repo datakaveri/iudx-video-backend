@@ -3,7 +3,7 @@ import { CronJob } from 'cron';
 
 import Logger from '../common/Logger';
 import StreamStatusService from '../services/StreamStatusService';
-
+import config from '../config';
 
 export default class SchedulerManager {
     private streamStatusService: StreamStatusService;
@@ -16,8 +16,10 @@ export default class SchedulerManager {
     // TODO: - Consider running status check in a seperate thread   
 
     public async startStatusCheck() {
+        const cronTime: string = `*/${config.schedulerConfig.statusCheck.jobInterval} * * * *`;
+
         this.checkStatusJob = new CronJob(
-            "*/3 * * * *", // Every 3 minutes 
+            cronTime,
             async () => {
                 try {
                     await this.streamStatusService.checkStatus();

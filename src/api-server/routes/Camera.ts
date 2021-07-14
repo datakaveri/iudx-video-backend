@@ -18,8 +18,13 @@ export default (app: Router) => {
         (req, res, next) => CameraController.register(req, res, next)
     );
 
-    route.get('/:id',
+    route.get('/:cameraId',
         (req, res, next) => CameraController.findOne(req, res, next)
+    );
+
+    route.get('/:cameraId/streams',
+        AuthorizeRole(['admin', 'provider']),
+        (req, res, next) => CameraController.findAssociatedStreams(req, res, next)
     );
 
     route.get('/',
@@ -27,12 +32,12 @@ export default (app: Router) => {
         (req, res, next) => CameraController.findAll(req, res, next)
     );
 
-    route.put('/:id',
+    route.put('/:cameraId',
         AuthorizeRole(['admin', 'provider']),
         (req, res, next) => CameraController.update(req, res, next)
     );
 
-    route.delete('/:id',
+    route.delete('/:cameraId',
         AuthorizeRole(['admin', 'provider']),
         (req, res, next) => CameraController.delete(req, res, next)
     );

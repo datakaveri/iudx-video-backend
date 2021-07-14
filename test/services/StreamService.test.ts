@@ -8,6 +8,7 @@ import StreamService from '../../src/services/StreamService';
 jest.mock('../../src/repositories/StreamRepo');
 jest.mock('../../src/repositories/CameraRepo');
 jest.mock('../../src/services/ProcessService');
+jest.mock('../../src/services/FfmpegService.ts');
 
 const streamService = Container.get(StreamService);
 
@@ -21,6 +22,7 @@ describe('Stream Service Testing', () => {
                 streamName: 'test_stream_3',
                 streamUrl: 'rtsp://testurl:777',
                 streamType: 'RTSP',
+                type: 'camera',
                 isPublic: false,
             },
         ];
@@ -31,11 +33,11 @@ describe('Stream Service Testing', () => {
             await expect(streamService.register(userId, mockStreamData)).resolves;
         });
 
-        test('Should reject if camera not registered for a stream', async () => {
+        test('Should resolve and return null if camera not registered', async () => {
             const userId: string = '1';
             mockStreamData[0]['cameraId'] = '10';
 
-            await expect(streamService.register(userId, mockStreamData)).rejects.toThrowError();
+            await expect(streamService.register(userId, mockStreamData)).resolves;
         });
 
     });
@@ -49,20 +51,18 @@ describe('Stream Service Testing', () => {
                 streamName: expect.any(String),
                 streamType: expect.any(String),
                 streamUrl: expect.any(String),
+                type: expect.any(String),
                 isPublic: expect.any(Boolean),
             };
-
-            const userId: string = '1';
             const streamId: string = '1';
 
-            await expect(streamService.findOne(userId, streamId)).resolves.toStrictEqual(expected);
+            await expect(streamService.findOne(streamId)).resolves.toStrictEqual(expected);
         });
 
-        test('Should reject if data not found', async () => {
-            const userId: string = '1';
+        test('Should resolve and return not found if stream not available', async () => {
             const streamId: string = '10';
 
-            await expect(streamService.findOne(userId, streamId)).rejects.toThrowError();
+            await expect(streamService.findOne(streamId)).resolves;
         });
 
     });
@@ -70,14 +70,12 @@ describe('Stream Service Testing', () => {
     describe('Find all Stream', () => {
 
         test('Should return all stream data with default size 2', async () => {
-
             const expected: any = {
                 currentPage: expect.any(Number),
                 totalItems: expect.any(Number),
                 totalPages: expect.any(Number),
                 results: expect.any(Array)
             };
-
             const page: number = 0;
             const size: number = 0;
 
@@ -101,25 +99,67 @@ describe('Stream Service Testing', () => {
 
     describe('Delete Stream', () => {
 
-        test('Should delete a stream', async () => {
-            const userId: string = '1';
+        test('Should delete a stream and return 1', async () => {
+            const expected: number = 1;
+            const streamId: string = '2';
+
+            await expect(streamService.delete(streamId)).resolves.toEqual(expected);
+        });
+
+        test('Should resolve and return 0 if stream not available', async () => {
+            const expected: number = 0;
+            const streamId: string = '10';
+
+            await expect(streamService.delete(streamId)).resolves.toEqual(expected);
+        });
+    });
+
+    describe('Check Stream Status', () => {
+
+        test('Should resolve and return status object', async () => {
+            const expected: any = {
+                streamId: expect.any(String),
+                cameraId: expect.any(String),
+                provenanceStreamId: expect.any(String),
+                streamName: expect.any(String),
+                streamUrl: expect.any(String),
+                type: expect.any(String),
+                isActive: expect.any(Boolean),
+            };
             const streamId: string = '1';
 
-            await expect(streamService.delete(userId, streamId)).resolves;
+            await expect(streamService.getStatus(streamId)).resolves.toContainEqual(expected);
         });
 
         test('Should reject if stream not found', async () => {
-            const userId: string = '1';
             const streamId: string = '10';
 
-            await expect(streamService.delete(userId, streamId)).rejects.toThrowError();
+            await expect(streamService.getStatus(streamId)).rejects.toThrowError();
+        });
+    });
+
+    describe('Get Playback url for a stream', () => {
+
+        test('Should return the stream url template if stream is active', async () => {
+            const expected: any = {
+                urlTemplate: expect.any(String),
+                isActive: expect.any(Boolean),
+            };
+            const streamId: string = '5';
+
+            await expect(streamService.playBackUrl(streamId)).resolves.toStrictEqual(expected);
         });
 
-        test('Should reject if it is invalid user', async () => {
-            const userId: string = '2';
-            const streamId: string = '1';
+        test('Should return a message if stream is not active', async () => {
+            const expected: any = {
+                message: expect.any(String),
+                urlTemplate: expect.any(String),
+                isActive: expect.any(Boolean),
+            };
+            const streamId: string = '6';
 
-            await expect(streamService.delete(userId, streamId)).rejects.toThrowError();
+            await expect(streamService.playBackUrl(streamId)).resolves.toStrictEqual(expected);
         });
+
     });
 });

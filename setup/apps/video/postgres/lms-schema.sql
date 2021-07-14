@@ -19,19 +19,6 @@ CREATE TABLE IF NOT EXISTS "Users"
   PRIMARY KEY ("id")
 );
 
-CREATE TABLE IF NOT EXISTS "Servers" 
-(
-  "serverId"          SERIAL,
-  "serverName"        TEXT        NOT NULL,
-  "serverType"        TEXT        NOT NULL,
-  "serverUrl"         TEXT        NOT NULL,
-  "status"            TEXT,
-  "totalPublishers"   INTEGER,
-  "totalClients"      INTEGER,
-  UNIQUE ("serverName"),
-  PRIMARY KEY ("serverId")
-);
-
 CREATE TABLE IF NOT EXISTS "Cameras" 
 (
   "cameraId"            UUID,
@@ -56,8 +43,9 @@ CREATE TABLE IF NOT EXISTS "Streams"
   "streamId"              UUID,
   "userId"                UUID          NOT NULL,
   "cameraId"              UUID          NOT NULL,
-  "sourceServerId"        INTEGER,
-  "destinationServerId"   INTEGER,
+  "provenanceStreamId"    UUID          NOT NULL,
+  "sourceServerId"        UUID          NOT NULL,
+  "destinationServerId"   UUID          NOT NULL,
   "processId"             INTEGER,
   "type"                  TEXT          NOT NULL,
   "streamName"            TEXT          NOT NULL,
@@ -68,6 +56,14 @@ CREATE TABLE IF NOT EXISTS "Streams"
   "isPublishing"          BOOLEAN,
   "isStable"              BOOLEAN,
   "totalClients"          INTEGER,
+  "codec"                 TEXT,
+  "resolution"            TEXT,
+  "frameRate"             INTEGER,
+  "bandwidthIn"           BIGINT,
+  "bandwidthOut"          BIGINT,
+  "bytesIn"               BIGINT,
+  "bytesOut"              BIGINT,
+  "activeTime"            INTEGER,
   "lastActive"            TIMESTAMPTZ,
   "createdAt"             TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
   "updatedAt"             TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
@@ -77,13 +73,7 @@ CREATE TABLE IF NOT EXISTS "Streams"
 	  REFERENCES "Users" ("id"),
   CONSTRAINT "cameraFK"
       FOREIGN KEY ("cameraId") 
-	  REFERENCES "Cameras" ("cameraId"),
-  CONSTRAINT "sourceServerFK"
-      FOREIGN KEY ("sourceServerId") 
-	  REFERENCES "Servers" ("serverId"),
-  CONSTRAINT "destinationServerFK"
-      FOREIGN KEY ("destinationServerId") 
-	  REFERENCES "Servers" ("serverId")    
+	  REFERENCES "Cameras" ("cameraId")    
 );
 
 CREATE TABLE IF NOT EXISTS "Archives" 

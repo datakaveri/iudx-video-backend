@@ -189,7 +189,7 @@ printf " \u2714 \033[0;32m Streaming server created successfully\033[0m\n"
 
 # Registering a stream
 printf "\n \u2022 Registering a stream\n"
-stream_id=$(
+camera_stream_id=$(
     curl -sS --location --request POST 'http://localhost:4000/api/streams' \
         --header "Authorization: Bearer ${provider_token}" \
         --header 'Content-Type: application/json' \
@@ -217,12 +217,12 @@ max_counter=30
 stream_status=''
 while [ $counter -lt $max_counter ]; do
     stream_res=$(
-        curl -sS --location --request GET "http://localhost:4000/api/streams/status/${stream_id}" \
+        curl -sS --location --request GET "http://localhost:4000/api/streams/status/${camera_stream_id}" \
             --header "Authorization: Bearer ${consumer_token}"
     )
 
     echo $stream_res | python3 -m json.tool
-    stream_status=$(echo $stream_res | python3 -c "import sys, json; print(json.load(sys.stdin)['results'][0]['isActive'])")
+    stream_status=$(echo $stream_res | python3 -c "import sys, json; print(json.load(sys.stdin)['results'][1]['isActive'])")
     sleep 1
     if [ "$stream_status" == "True" ]; then
         printf "\n\n\n \u2714 \033[0;32m Stream published successfully\033[0m \n"
@@ -249,7 +249,7 @@ curl -sS --location --request DELETE 'http://localhost:4000/api/policy' \
 --header "Authorization: Bearer ${provider_token}" --data-raw "$(getPolicyData)"
 
 # Delete stream
-curl -sS --location --request DELETE "http://localhost:4000/api/streams/${stream_id}" \
+curl -sS --location --request DELETE "http://localhost:4000/api/streams/${camera_stream_id}" \
     --header "Authorization: Bearer ${provider_token}"
 sleep 1
 

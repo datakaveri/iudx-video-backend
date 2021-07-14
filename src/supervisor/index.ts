@@ -5,10 +5,8 @@ import smtpTransport from 'nodemailer-smtp-transport';
 import Logger from '../common/Logger';
 import { Database, ModelDependencyInjector } from '../managers/Database';
 import apiServer from '../api-server';
-import KafkaManager from '../managers/Kafka';
 import config from '../config';
 import Queue from '../managers/Queue';
-import ProcessService from '../services/ProcessService';
 import SchedulerManager from '../managers/Scheduler';
 
 export default async () => {
@@ -44,13 +42,8 @@ export default async () => {
     // Initialize queue Manager
     Container.set('queue', Queue);
 
-    // Restart all the streams
-    if(config.streamProcessConfig.initializeStreams) {
-        let processService = Container.get(ProcessService);
-        await processService.initializeStreamProcess();
-    }
     // Start status check scheduler if enabled
-    if (config.schedulers.statusCheck.enable) {
+    if (config.schedulerConfig.statusCheck.enable) {
         const schedulerManager: SchedulerManager = new SchedulerManager();
         schedulerManager.startStatusCheck();
     }
