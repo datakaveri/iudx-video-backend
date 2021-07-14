@@ -17,9 +17,9 @@ export default class StreamStatusService {
         private utilityService: Utility,
     ) { }
 
-    async getStatus(userId: string, streamId: string) {
+    async getStatus(streamId: string) {
         try {
-            return await this.streamRepo.getStreamStatus(userId, streamId);
+            return await this.streamRepo.getStreamStatus(streamId);
         } catch (e) {
             Logger.error(e);
             throw new ServiceError('Error Getting the stream status');

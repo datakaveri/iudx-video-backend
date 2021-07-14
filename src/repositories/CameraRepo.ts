@@ -21,10 +21,9 @@ export default class CameraRepo {
         return data;
     }
 
-    async findCamera(userId: string, cameraId: string): Promise<any> {
+    async findCamera(cameraId: string): Promise<any> {
         const camera = await this.cameraModel.findOne({
             where: {
-                userId,
                 cameraId,
             }
         })
@@ -42,10 +41,9 @@ export default class CameraRepo {
         })
     }
 
-    async updateCamera(userId: string, cameraId: string, params: any): Promise<any> {
+    async updateCamera(cameraId: string, params: any): Promise<any> {
         const [updated, data] = await this.cameraModel.update(params, {
             where: {
-                userId,
                 cameraId,
             },
             returning: [
@@ -65,10 +63,9 @@ export default class CameraRepo {
         return data;
     }
 
-    async deleteCamera(userId: string, cameraId: string) {
+    async deleteCamera(cameraId: string) {
         const deleted = await this.cameraModel.destroy({
             where: {
-                userId,
                 cameraId,
             }
         })

@@ -3,6 +3,7 @@ import passport from 'passport';
 
 import CameraManagementController from '../controllers/CameraManagementController';
 import { validatePaginationQuery } from '../middlewares/ValidateQuery';
+import { AuthorizeRole } from '../middlewares/Authorization';
 
 const route = Router();
 
@@ -13,6 +14,7 @@ export default (app: Router) => {
     app.use('/cameras', passport.authenticate('jwt', { session: true }), route);
 
     route.post('/',
+        AuthorizeRole(['admin', 'provider']),
         (req, res, next) => CameraController.register(req, res, next)
     );
 
@@ -26,10 +28,12 @@ export default (app: Router) => {
     );
 
     route.put('/:id',
+        AuthorizeRole(['admin', 'provider']),
         (req, res, next) => CameraController.update(req, res, next)
     );
 
     route.delete('/:id',
+        AuthorizeRole(['admin', 'provider']),
         (req, res, next) => CameraController.delete(req, res, next)
     );
 }

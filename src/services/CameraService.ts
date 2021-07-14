@@ -31,9 +31,9 @@ export default class CameraService {
         }
     }
 
-    async findOne(userId: string, cameraId: string): Promise<any> {
+    async findOne(cameraId: string): Promise<any> {
         try {
-            return await this.cameraRepo.findCamera(userId, cameraId);
+            return await this.cameraRepo.findCamera(cameraId);
         } catch (e) {
             Logger.error(e);
             throw new ServiceError('Error fetching the data');
@@ -53,18 +53,18 @@ export default class CameraService {
         }
     }
 
-    async update(userId: string, cameraId: string, params: any) {
+    async update(cameraId: string, params: any) {
         try {
-            return await this.cameraRepo.updateCamera(userId, cameraId, params);
+            return await this.cameraRepo.updateCamera(cameraId, params);
         } catch (e) {
             Logger.error(e);
             throw new ServiceError('Error updating the data');
         }
     }
 
-    async delete(userId: string, cameraId: string) {
+    async delete(cameraId: string) {
         try {
-            await this.cameraRepo.deleteCamera(userId, cameraId);
+            await this.cameraRepo.deleteCamera(cameraId);
         } catch (e) {
             Logger.error(e);
             throw new ServiceError('Error deleting the data');

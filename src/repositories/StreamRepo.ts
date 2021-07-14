@@ -25,24 +25,13 @@ export default class StreamRepo {
         return data;
     }
 
-    async findStream(userId: string, streamId: string): Promise<any> {
+    async findStream(streamId: string): Promise<any> {
         const stream = await this.streamModel.findOne({
             where: {
-                userId,
                 streamId,
             },
-            attributes: [
-                'streamId',
-                'cameraId',
-                'streamName',
-                'streamType',
-                'streamUrl',
-                'streamType',
-                'type',
-                'isPublic',
-                'isActive'
-            ],
-        })
+            attributes: ['streamId', 'cameraId', 'streamName', 'streamType', 'streamUrl', 'streamType', 'type', 'isPublic', 'isActive'],
+        });
         if (!stream) {
             throw new Error();
         }
@@ -58,10 +47,9 @@ export default class StreamRepo {
         });
     }
 
-    async deleteStream(userId: string, streamId: string) {
+    async deleteStream(streamId: string) {
         const deleted = await this.streamModel.destroy({
             where: {
-                userId,
                 streamId,
             },
         });
@@ -70,14 +58,13 @@ export default class StreamRepo {
         }
     }
 
-    async getStreamPid(userId: string, streamId: string): Promise<any> {
+    async getStreamPid(streamId: string): Promise<any> {
         const stream = await this.streamModel.findOne({
             where: {
-                userId,
                 streamId,
             },
             attributes: ['processId'],
-        })
+        });
         if (!stream) {
             throw new Error();
         }
@@ -93,7 +80,7 @@ export default class StreamRepo {
         return await this.streamModel.findAll({ raw: true });
     }
 
-    async getStreamStatus(userId: string, streamId: string): Promise<any> {
+    async getStreamStatus(streamId: string): Promise<any> {
         const query = `
             SELECT * 
             FROM "Streams"
@@ -101,9 +88,7 @@ export default class StreamRepo {
                     ( 
                         SELECT "cameraId", "streamName" 
                         FROM "Streams" 
-                        WHERE 
-                            "userId" = '${userId}' 
-                            AND
+                        WHERE
                             "streamId" = '${streamId}'
                         LIMIT 1
                     ) 
@@ -114,7 +99,7 @@ export default class StreamRepo {
             throw new Error();
         }
 
-        streams = streams.map(stream => {
+        streams = streams.map((stream) => {
             return {
                 streamId: stream.streamId,
                 cameraId: stream.cameraId,
@@ -122,8 +107,8 @@ export default class StreamRepo {
                 streamUrl: stream.streamUrl,
                 type: stream.type,
                 isActive: stream.isActive,
-            }
-        })
+            };
+        });
 
         return streams;
     }
@@ -131,17 +116,10 @@ export default class StreamRepo {
     async updateStreamStatus(streamId: string, params: any): Promise<any> {
         const [updated, data] = await this.streamModel.update(params, {
             where: {
-                streamId
+                streamId,
             },
-            returning: [
-                'streamId',
-                'cameraId',
-                'streamName',
-                'streamUrl',
-                'type',
-                'isActive',
-            ],
-        })
+            returning: ['streamId', 'cameraId', 'streamName', 'streamUrl', 'type', 'isActive'],
+        });
         if (!updated) {
             throw new Error();
         }
@@ -157,18 +135,31 @@ export default class StreamRepo {
                 [Op.or]: [
                     {
                         lastActive: {
-                            [Op.is]: null
-                        }
+                            [Op.is]: null,
+                        },
                     },
                     {
                         lastActive: {
-                            [Op.lt]: new Date(Date.now() - 60000 * lastActiveInterval)
-                        }
-                    }
-                ]
+                            [Op.lt]: new Date(Date.now() - 60000 * lastActiveInterval),
+                        },
+                    },
+                ],
             },
             attributes: ['streamId', 'streamName', 'streamUrl', 'type'],
             raw: true,
-        })
+        });
+    }
+
+    async findStreamByUser(userId: string, streamId: string) {
+        const stream = await this.streamModel.findOne({
+            where: {
+                userId,
+                streamId,
+            },
+        });
+        if (stream) {
+            return true;
+        }
+        return false;
     }
 }

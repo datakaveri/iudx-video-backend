@@ -32,12 +32,11 @@ export default class CameraManagementController {
 
     async findOne(req: Request, res: Response, next: NextFunction) {
 
-        const userId: string = req.user['userId'];
         const cameraId: string = req.params.id;
 
         Logger.debug('Calling Find one Camera endpoint of camera id: %s', cameraId);
         try {
-            const camera = await this.cameraService.findOne(userId, cameraId);
+            const camera = await this.cameraService.findOne(cameraId);
             const response = {
                 type: 200,
                 title: 'Success',
@@ -71,14 +70,12 @@ export default class CameraManagementController {
     }
 
     async update(req: Request, res: Response, next: NextFunction) {
-
-        const userId: string = req.user['userId'];
         const cameraId: string = req.params.id;
         const params: any = req.body;
 
         Logger.debug('Calling Update Camera endpoint with body: %o', params);
         try {
-            const data = await this.cameraService.update(userId, cameraId, params);
+            const data = await this.cameraService.update(cameraId, params);
             const response = {
                 type: 201,
                 title: 'Success',
@@ -92,13 +89,11 @@ export default class CameraManagementController {
     }
 
     async delete(req: Request, res: Response, next: NextFunction) {
-
-        const userId: string = req.user['userId'];
         const cameraId: string = req.params.id;
 
         Logger.debug('Calling Delete Camera endpoint of camera id: %s', cameraId);
         try {
-            await this.cameraService.delete(userId, cameraId);
+            await this.cameraService.delete(cameraId);
             const response = {
                 type: 200,
                 title: 'Success',

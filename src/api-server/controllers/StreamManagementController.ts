@@ -31,13 +31,11 @@ export default class StreamManagementController {
     }
 
     async findOne(req: Request, res: Response, next: NextFunction) {
-
-        const userId: string = req.user['userId'];
-        const streamId: string = req.params.id;
+        const streamId: string = req.params.streamId;
 
         Logger.debug('Calling Find one Stream endpoint of stream id: %s', streamId);
         try {
-            const stream = await this.streamService.findOne(userId, streamId);
+            const stream = await this.streamService.findOne(streamId);
             const response = {
                 type: 200,
                 title: 'Success',
@@ -71,13 +69,11 @@ export default class StreamManagementController {
     }
 
     async delete(req: Request, res: Response, next: NextFunction) {
-
-        const userId: string = req.user['userId'];
-        const streamId: string = req.params.id;
+        const streamId: string = req.params.streamId;
 
         Logger.debug('Calling Delete Stream endpoint of stream id: %s', streamId);
         try {
-            await this.streamService.delete(userId, streamId);
+            await this.streamService.delete(streamId);
             const response = {
                 type: 200,
                 title: 'Success',
@@ -91,13 +87,11 @@ export default class StreamManagementController {
     }
 
     async getStatus(req: Request, res: Response, next: NextFunction) {
-
-        const userId: string = req.user['userId'];
-        const streamId: string = req.params.id;
+        const streamId: string = req.params.streamId;
 
         Logger.debug('Calling Stream status endpoint of stream id: %s', streamId);
         try {
-            const status = await this.streamService.getStatus(userId, streamId);
+            const status = await this.streamService.getStatus(streamId);
             const response = {
                 type: 200,
                 title: 'Success',
@@ -111,13 +105,11 @@ export default class StreamManagementController {
     }
 
     async playBackUrl(req: Request, res: Response, next: NextFunction) {
-
-        const userId: string = req.user['userId'];
-        const streamId: string = req.params.id;
+        const streamId: string = req.params.streamId;
 
         Logger.debug('Calling Playback endpoint of stream id: %s', streamId);
         try {
-            const data = await this.streamService.playBackUrl(userId, streamId);
+            const data = await this.streamService.playBackUrl(streamId);
             const response = {
                 type: 200,
                 title: 'Success',

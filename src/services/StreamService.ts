@@ -25,7 +25,7 @@ export default class StreamService {
     async register(userId: string, streamData: any) {
         try {
             streamData = await Promise.all(streamData.map(async (stream) => {
-                const camera = await this.cameraRepo.findCamera(userId, stream.cameraId);
+                const camera = await this.cameraRepo.findCamera(stream.cameraId);
 
                 if (!camera) {
                     throw new Error();
@@ -44,9 +44,9 @@ export default class StreamService {
         }
     }
 
-    async findOne(userId: string, streamId: string): Promise<any> {
+    async findOne(streamId: string): Promise<any> {
         try {
-            return await this.streamRepo.findStream(userId, streamId);
+            return await this.streamRepo.findStream(streamId);
         } catch (e) {
             Logger.error(e);
             throw new ServiceError('Error fetching the data');
@@ -67,23 +67,23 @@ export default class StreamService {
         }
     }
 
-    async delete(userId: string, streamId: string) {
+    async delete(streamId: string) {
         try {
-            const processId = await this.streamRepo.getStreamPid(userId, streamId);
+            const processId = await this.streamRepo.getStreamPid(streamId);
             const isProcessRunning = await this.ffmpegService.isProcessRunning(processId);
             if (isProcessRunning) {
                 await this.ffmpegService.killProcess(processId);
             }
-            await this.streamRepo.deleteStream(userId, streamId);
+            await this.streamRepo.deleteStream(streamId);
         } catch (e) {
             Logger.error(e);
             throw new ServiceError('Error deleting the data');
         }
     }
 
-    async getStatus(userId, streamId) {
+    async getStatus(streamId) {
         try {
-            const status = await this.streamStatusService.getStatus(userId, streamId);
+            const status = await this.streamStatusService.getStatus(streamId);
             return status;
         } catch(e) {
             Logger.error(e);
@@ -91,9 +91,9 @@ export default class StreamService {
         }
     }
 
-    async playBackUrl(userId, streamId) {
+    async playBackUrl(streamId) {
         try {
-            const stream = await this.streamRepo.findStream(userId, streamId);
+            const stream = await this.streamRepo.findStream(streamId);
             if (stream.isActive) {
                 return {
                     urlTemplate: `${config.rtmpServerConfig.serverUrl}/${streamId}?token=<TOKEN>`,
