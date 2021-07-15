@@ -113,9 +113,29 @@ Run `npm start` from the project directory to start the server.
 2. Edit postgres settings as required in `docker-compose.yml`.  
 3. `docker-compose up -d`
 
-### Testing
+## Testing
 
-#### Unit tests
+### Unit tests
 
 1. Run the server.
 2. Run the unit tests using command `npm test`.
+
+### E2E tests
+
+#### Prerequisites
+
+1. Python 3 
+
+2. curl
+
+3. PSQL Clients
+
+```sh
+sudo apt install postgresql-client-common
+sudo apt-get install postgresql-client
+```
+
+#### Running Test
+
+1. Run the servers
+2. Execute `test/api_test.sh` command from the root of the project directory
