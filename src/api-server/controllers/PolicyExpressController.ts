@@ -29,8 +29,8 @@ export default class PolicyExpressController {
         let params: any = req.body;
         Logger.debug('Calling delete policy endpoint of policy id: %s', params);
         try {
-            const result = await this.policyService.delete(params.userId, params.policyId);
-            return res.status(204).json(result);
+            const result = await this.policyService.delete(params.email, params.streamId);
+            return res.status(200).json(result);
         } catch (e) {
             Logger.error('error: %o', e);
             return next(e);

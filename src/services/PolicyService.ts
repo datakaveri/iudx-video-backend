@@ -16,7 +16,7 @@ export default class PolicyService {
             const namespace: string = config.host.type + 'Policy';
             const policyId: string = new UUID().generateUUIDv5(namespace);
             const user = await this.userRepo.findUser({email});
-            await this.policyRepo.addPolicy({ policyId, providerId, user: user.id, streamId });
+            await this.policyRepo.addPolicy({ policyId, providerId, userId: user.id, streamId });
             return {
                 message: 'Created',
             };
@@ -36,9 +36,10 @@ export default class PolicyService {
         }
     }
 
-    public async delete(userId: string, streamId: string) {
+    public async delete(email: string, streamId: string) {
         try {
-            await this.policyRepo.removePolicy(userId, streamId);
+            const user = await this.userRepo.findUser({email});
+            await this.policyRepo.removePolicy(user.id, streamId);
             return {
                 message: 'Deleted',
             };
