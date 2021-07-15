@@ -54,16 +54,16 @@ export default class CameraService {
         }
     }
 
-    public async findOne(userId: string, cameraId: string): Promise<any> {
+    async findOne(cameraId: string): Promise<any> {
         try {
-            return await this.cameraRepo.findCamera({ userId, cameraId });
+            return await this.cameraRepo.findCamera({ cameraId });
         } catch (e) {
             Logger.error(e);
             throw new ServiceError('Error fetching the data');
         }
     }
 
-    public async listAssociatedStreams(userId: string, cameraId: string): Promise<any> {
+    public async listAssociatedStreams(cameraId: string): Promise<any> {
         try {
             const fields = [
                 'streamId',
@@ -74,7 +74,7 @@ export default class CameraService {
                 'type',
                 'isPublic',
             ];
-            const streams: Array<any> = await this.streamRepo.findAllStreams({ userId, cameraId }, fields);
+            const streams: Array<any> = await this.streamRepo.findAllStreams({ cameraId }, fields);
 
             if (streams.length === 0) {
                 return null;
@@ -99,7 +99,7 @@ export default class CameraService {
         }
     }
 
-    public async update(userId: string, cameraId: string, params: any) {
+    public async update(cameraId: string, params: any) {
         try {
             const fields = [
                 'cameraId',
@@ -110,7 +110,7 @@ export default class CameraService {
                 'cameraOrientation',
                 'city',
             ];
-            const [updated, result] = await this.cameraRepo.updateCamera(params, { userId, cameraId }, fields);
+            const [updated, result] = await this.cameraRepo.updateCamera(params, { cameraId }, fields);
 
             if (!updated) {
                 return null;
@@ -123,9 +123,9 @@ export default class CameraService {
         }
     }
 
-    public async delete(userId: string, cameraId: string) {
+    public async delete(cameraId: string) {
         try {
-            const streams: Array<any> = await this.streamRepo.findAllStreams({ userId, cameraId });
+            const streams: Array<any> = await this.streamRepo.findAllStreams({ cameraId });
 
             if (streams.length > 0) {
                 for (const stream of streams) {
@@ -139,7 +139,7 @@ export default class CameraService {
                 await this.streamRepo.deleteStream({ cameraId });
             }
 
-            return await this.cameraRepo.deleteCamera({ userId, cameraId });
+            return await this.cameraRepo.deleteCamera({ cameraId });
         } catch (e) {
             Logger.error(e);
             throw new ServiceError('Error deleting the data');

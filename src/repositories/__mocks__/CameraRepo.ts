@@ -11,8 +11,7 @@ export default class CameraRepo {
 
     public findCamera: any = jest.fn().mockImplementation((query: any) => {
         const camera = _.find(Cameras, (obj) => {
-            return (query.userId ? obj.userId === query.userId : true) &&
-                (query.cameraId ? obj.cameraId === query.cameraId : true) &&
+            return (query.cameraId ? obj.cameraId === query.cameraId : true) &&
                 (query.cameraNum ? obj.cameraNum === query.cameraNum : true) &&
                 (query.cameraName ? obj.cameraName === query.cameraName : true);
         });
@@ -33,8 +32,7 @@ export default class CameraRepo {
 
     public updateCamera: any = jest.fn().mockImplementation((data: any, query: any, columns: Array<string> = []) => {
         const result = _.find(Cameras, (obj) => {
-            return (query.userId ? obj.userId === query.userId : true) &&
-                (query.cameraId ? obj.cameraId === query.cameraId : true);
+            return obj.cameraId === query.cameraId;
         });
 
         if (!result) {
@@ -46,8 +44,7 @@ export default class CameraRepo {
 
     public deleteCamera: any = jest.fn().mockImplementation((query: any) => {
         const result = _.find(Cameras, (obj) => {
-            return (query.userId ? obj.userId === query.userId : true) &&
-                (query.cameraId ? obj.cameraId === query.cameraId : true);
+            return obj.cameraId === query.cameraId;
         });
 
         if (!result) {

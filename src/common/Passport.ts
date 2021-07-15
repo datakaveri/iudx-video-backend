@@ -29,6 +29,10 @@ passport.use(
                 if (found) {
                     return done(new Error('User already exists'));
                 }
+                const role = req.body.role;
+                if (!(role === 'consumer' || role === 'provider' || role === 'admin')) {
+                    return done(new Error('Invalid role provided in request'));
+                }
                 await userRepo.createUser({ id: uuidv4(), name: req.body.name, email, password, verificationCode, verified: false, role: req.body.role });
                 return done(null, verificationCode);
             } catch (error) {

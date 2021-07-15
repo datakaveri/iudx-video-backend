@@ -54,18 +54,15 @@ describe('Stream Service Testing', () => {
                 type: expect.any(String),
                 isPublic: expect.any(Boolean),
             };
-
-            const userId: string = '1';
             const streamId: string = '1';
 
-            await expect(streamService.findOne(userId, streamId)).resolves.toStrictEqual(expected);
+            await expect(streamService.findOne(streamId)).resolves.toStrictEqual(expected);
         });
 
         test('Should resolve and return not found if stream not available', async () => {
-            const userId: string = '1';
             const streamId: string = '10';
 
-            await expect(streamService.findOne(userId, streamId)).resolves;
+            await expect(streamService.findOne(streamId)).resolves;
         });
 
     });
@@ -73,14 +70,12 @@ describe('Stream Service Testing', () => {
     describe('Find all Stream', () => {
 
         test('Should return all stream data with default size 2', async () => {
-
             const expected: any = {
                 currentPage: expect.any(Number),
                 totalItems: expect.any(Number),
                 totalPages: expect.any(Number),
                 results: expect.any(Array)
             };
-
             const page: number = 0;
             const size: number = 0;
 
@@ -106,29 +101,16 @@ describe('Stream Service Testing', () => {
 
         test('Should delete a stream and return 1', async () => {
             const expected: number = 1;
-
-            const userId: string = '1';
             const streamId: string = '2';
 
-            await expect(streamService.delete(userId, streamId)).resolves.toEqual(expected);
+            await expect(streamService.delete(streamId)).resolves.toEqual(expected);
         });
 
         test('Should resolve and return 0 if stream not available', async () => {
             const expected: number = 0;
-
-            const userId: string = '1';
             const streamId: string = '10';
 
-            await expect(streamService.delete(userId, streamId)).resolves.toEqual(expected);
-        });
-
-        test('Should resolve and return 0 if it is invalid user', async () => {
-            const expected: number = 0;
-
-            const userId: string = '2';
-            const streamId: string = '1';
-
-            await expect(streamService.delete(userId, streamId)).resolves.toEqual(expected);
+            await expect(streamService.delete(streamId)).resolves.toEqual(expected);
         });
     });
 
@@ -144,18 +126,15 @@ describe('Stream Service Testing', () => {
                 type: expect.any(String),
                 isActive: expect.any(Boolean),
             };
-
-            const userId: string = '1';
             const streamId: string = '1';
 
-            await expect(streamService.getStatus(userId, streamId)).resolves.toContainEqual(expected);
+            await expect(streamService.getStatus(streamId)).resolves.toContainEqual(expected);
         });
 
         test('Should reject if stream not found', async () => {
-            const userId: string = '1';
             const streamId: string = '10';
 
-            await expect(streamService.getStatus(userId, streamId)).rejects.toThrowError();
+            await expect(streamService.getStatus(streamId)).rejects.toThrowError();
         });
     });
 
@@ -166,11 +145,9 @@ describe('Stream Service Testing', () => {
                 urlTemplate: expect.any(String),
                 isActive: expect.any(Boolean),
             };
-
-            const userId: string = '2';
             const streamId: string = '5';
 
-            await expect(streamService.playBackUrl(userId, streamId)).resolves.toStrictEqual(expected);
+            await expect(streamService.playBackUrl(streamId)).resolves.toStrictEqual(expected);
         });
 
         test('Should return a message if stream is not active', async () => {
@@ -179,11 +156,9 @@ describe('Stream Service Testing', () => {
                 urlTemplate: expect.any(String),
                 isActive: expect.any(Boolean),
             };
-
-            const userId: string = '2';
             const streamId: string = '6';
 
-            await expect(streamService.playBackUrl(userId, streamId)).resolves.toStrictEqual(expected);
+            await expect(streamService.playBackUrl(streamId)).resolves.toStrictEqual(expected);
         });
 
     });

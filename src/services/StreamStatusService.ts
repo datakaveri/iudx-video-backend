@@ -19,7 +19,7 @@ export default class StreamStatusService {
         private streamReviveService: StreamReviveService,
     ) { }
 
-    public async getStatus(userId: string, streamId: string) {
+    public async getStatus(streamId: string) {
         try {
             let streams = await this.streamRepo.getAllAssociatedStreams(streamId);
 

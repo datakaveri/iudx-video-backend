@@ -69,7 +69,7 @@ export default class StreamService {
                 const streamId: string = new UUID().generateUUIDv5(namespace);
 
                 const isDuplicateStream = await this.streamRepo.findStream(stream);
-                const camera = await this.cameraRepo.findCamera({ userId, cameraId: stream.cameraId });
+                const camera = await this.cameraRepo.findCamera({ cameraId: stream.cameraId });
 
                 if (!camera || isDuplicateStream) {
                     return null;
@@ -107,7 +107,7 @@ export default class StreamService {
         }
     }
 
-    public async findOne(userId: string, streamId: string): Promise<any> {
+    public async findOne(streamId: string): Promise<any> {
         try {
             const fields = [
                 'streamId',
@@ -120,7 +120,7 @@ export default class StreamService {
                 'isPublic',
             ];
 
-            return await this.streamRepo.findStream({ userId, streamId }, fields);
+            return await this.streamRepo.findStream({ streamId }, fields);
         } catch (e) {
             Logger.error(e);
             throw new ServiceError('Error fetching the data');
@@ -150,9 +150,9 @@ export default class StreamService {
         }
     }
 
-    public async delete(userId: string, streamId: string) {
+    public async delete(streamId: string) {
         try {
-            const streamData = await this.streamRepo.findStream({ userId, streamId, type: 'camera' });
+            const streamData = await this.streamRepo.findStream({ streamId, type: 'camera' });
 
             if (!streamData) {
                 return 0;
@@ -161,13 +161,13 @@ export default class StreamService {
             const streams = await this.streamRepo.getAllAssociatedStreams(streamId);
 
             for (const stream of streams) {
-                if (!stream.processId) continue;
-                const isProcessRunning = await this.ffmpegService.isProcessRunning(stream.processId);
+                if (stream.processId) {
+                    const isProcessRunning = await this.ffmpegService.isProcessRunning(stream.processId);
 
-                if (isProcessRunning) {
-                    await this.ffmpegService.killProcess(stream.processId);
+                    if (isProcessRunning) {
+                        await this.ffmpegService.killProcess(stream.processId);
+                    }
                 }
-
                 await this.streamRepo.deleteStream({ streamId: stream.streamId });
             }
 
@@ -178,9 +178,9 @@ export default class StreamService {
         }
     }
 
-    public async getStatus(userId, streamId) {
+    public async getStatus(streamId) {
         try {
-            const status = await this.streamStatusService.getStatus(userId, streamId);
+            const status = await this.streamStatusService.getStatus(streamId);
             return status;
         } catch (e) {
             Logger.error(e);
@@ -188,9 +188,9 @@ export default class StreamService {
         }
     }
 
-    public async playBackUrl(userId, streamId) {
+    public async playBackUrl(streamId) {
         try {
-            const stream = await this.streamRepo.findStream({ userId, streamId });
+            const stream = await this.streamRepo.findStream({ streamId });
             if (stream.isActive) {
                 return {
                     urlTemplate: `${config.rtmpServerConfig.serverUrl}/${streamId}?token=<TOKEN>`,

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import passport from 'passport';
 
 import StreamManagementController from '../controllers/StreamManagementController';
+import { AuthorizeRole, ValidateStreamAccess, ValidatePolicy } from '../middlewares/Authorization';
 import { validatePaginationQuery } from '../middlewares/ValidateQuery';
 
 const route = Router();
@@ -13,10 +14,11 @@ export default (app: Router) => {
     app.use('/streams', passport.authenticate('jwt', { session: true }), route);
 
     route.post('/',
+        AuthorizeRole(['admin', 'provider']),
         (req, res, next) => StreamController.register(req, res, next)
     );
 
-    route.get('/:id',
+    route.get('/:streamId',
         (req, res, next) => StreamController.findOne(req, res, next)
     );
 
@@ -25,15 +27,17 @@ export default (app: Router) => {
         (req, res, next) => StreamController.findAll(req, res, next)
     );
 
-    route.delete('/:id',
+    route.delete('/:streamId',
+        AuthorizeRole(['admin', 'provider']),
+        ValidateStreamAccess,
         (req, res, next) => StreamController.delete(req, res, next)
     );
 
-    route.get('/status/:id',
+    route.get('/status/:streamId',
         (req, res, next) => StreamController.getStatus(req, res, next)
     );
 
-    route.get('/playback/:id',
+    route.get('/playback/:streamId', ValidatePolicy,
         (req, res, next) => StreamController.playBackUrl(req, res, next)
     );
 }

@@ -11,8 +11,7 @@ export default class StreamRepo {
 
     public findStream: any = jest.fn().mockImplementation((query: any, columns: Array<string> = null) => {
         const stream = _.find(Streams, (obj) => {
-            return (query.userId ? obj.userId === query.userId : true) &&
-                (query.streamId ? obj.streamId === query.streamId : true) &&
+            return (query.streamId ? obj.streamId === query.streamId : true) &&
                 (query.cameraId ? obj.cameraId === query.cameraId : true) &&
                 (query.streamName ? obj.streamName === query.streamName : true) &&
                 (query.streamUrl ? obj.streamUrl === query.streamUrl : true);
@@ -34,8 +33,7 @@ export default class StreamRepo {
 
     public deleteStream: any = jest.fn().mockImplementation((query: any) => {
         const result = _.find(Streams, (obj) => {
-            return (query.userId ? obj.userId === query.userId : true) &&
-                (query.streamId ? obj.streamId === query.streamId : true) &&
+            return (query.streamId ? obj.streamId === query.streamId : true) &&
                 (query.cameraId ? obj.cameraId === query.cameraId : true) &&
                 (query.streamName ? obj.streamName === query.streamName : true);
         });
@@ -49,7 +47,7 @@ export default class StreamRepo {
 
     public updateStream: any = jest.fn().mockImplementation((query: any, updateData: any) => {
         const result = _.find(Streams, (obj) => {
-            return (query.streamId ? obj.streamId === query.streamId : true);
+            return obj.streamId === query.streamId;
         });
 
         if (!result) {
@@ -61,8 +59,7 @@ export default class StreamRepo {
 
     public findAllStreams: any = jest.fn().mockImplementation((query: any = {}, columns: Array<string> = null) => {
         let streams: any = _.filter(Streams, (obj) => {
-            return (query.userId ? obj.userId === query.userId : true) &&
-                (query.cameraId ? obj.cameraId === query.cameraId : true);
+            return obj.cameraId === query.cameraId;
         });
 
         if (!streams) {

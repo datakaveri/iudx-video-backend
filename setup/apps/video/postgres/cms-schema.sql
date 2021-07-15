@@ -112,3 +112,23 @@ CREATE TABLE IF NOT EXISTS "Archives"
       FOREIGN KEY("streamId") 
 	  REFERENCES "Streams" ("streamId")
 );
+
+CREATE TABLE IF NOT EXISTS "Policies" 
+(
+  "policyId"            UUID,
+  "userId"              UUID        NOT NULL,
+  "streamId"            UUID,
+  "providerId"          UUID,
+  "createdAt"           TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
+  "updatedAt"           TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
+  PRIMARY KEY ("policyId"),
+  CONSTRAINT "userFK"
+      FOREIGN KEY ("userId") 
+	  REFERENCES "Users" ("id"),
+  CONSTRAINT "streamFK"
+      FOREIGN KEY("streamId") 
+	  REFERENCES "Streams" ("streamId"),
+  CONSTRAINT "userFK2"
+      FOREIGN KEY("providerId") 
+	  REFERENCES "Users" ("id")
+);

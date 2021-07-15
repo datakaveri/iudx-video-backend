@@ -57,17 +57,17 @@ export default class StreamRepo {
                 [Op.or]: [
                     {
                         lastActive: {
-                            [Op.is]: null
-                        }
+                            [Op.is]: null,
+                        },
                     },
                     {
                         lastActive: {
-                            [Op.lt]: new Date(Date.now() - 60000 * lastActiveInterval)
-                        }
-                    }
-                ]
+                            [Op.lt]: new Date(Date.now() - 60000 * lastActiveInterval),
+                        },
+                    },
+                ],
             },
             raw: true,
-        })
+        });
     }
 }
