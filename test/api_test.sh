@@ -121,8 +121,11 @@ printf "\n\n\n"
 # Register the users
 printf " \u2022 Registering admin, provider and consumer test users\n"
 curl -sS --location --request POST 'http://localhost:4000/api/auth/signup' --header 'Content-Type: application/json' --data-raw "$(getAdminData)"
+printf "\n"
 curl -sS --location --request POST 'http://localhost:4000/api/auth/signup' --header 'Content-Type: application/json' --data-raw "$(getProviderData)"
+printf "\n"
 curl -sS --location --request POST 'http://localhost:4000/api/auth/signup' --header 'Content-Type: application/json' --data-raw "$(getConsumerData)"
+printf "\n"
 
 sleep 2
 printf "\n\n \u2714 \033[0;32m Registered users\033[0m\n"
@@ -138,8 +141,11 @@ updated_provider_code=$(echo "${provider_code}" | xargs)
 updated_consumer_code=$(echo "${consumer_code}" | xargs)
 
 curl -sS --location --request GET "http://localhost:4000/api/auth/verify?verificationCode=${updated_admin_code}"
+printf "\n"
 curl -sS --location --request GET "http://localhost:4000/api/auth/verify?verificationCode=${updated_provider_code}"
+printf "\n"
 curl -sS --location --request GET "http://localhost:4000/api/auth/verify?verificationCode=${updated_consumer_code}"
+printf "\n"
 sleep 2
 printf "\n\n \u2714 \033[0;32m Verified users\033[0m\n"
 
@@ -189,6 +195,7 @@ printf " \u2714 \033[0;32m Streaming server created successfully\033[0m\n"
 
 # Registering a stream
 printf "\n \u2022 Registering a stream\n"
+
 camera_stream_id=$(
     curl -sS --location --request POST 'http://localhost:4000/api/streams' \
         --header "Authorization: Bearer ${provider_token}" \
@@ -196,17 +203,29 @@ camera_stream_id=$(
         --data-raw "$(getStreamData)" | python3 -c \
         "import sys, json; print(json.load(sys.stdin)['results'][0]['streamId'])"
 )
-printf " \u2714 \033[0;32m Registered the stream\033[0m\n"
+
+printf "\n \u2714 \033[0;32m Registered the stream\033[0m\n"
 
 printf "\n \u2022 Stream List\n"
-curl -sS --location --request GET 'http://localhost:4000/api/streams?size=7&page=1' --header "Authorization: Bearer ${consumer_token}" | python3 -m json.tool
+stream_list=$(
+    curl -sS --location --request GET "http://localhost:4000/api/streams?size=7&page=1" --header "Authorization: Bearer ${consumer_token}"
+)
 
+echo $stream_list | python3 -m json.tool
+stream_id=$(echo $stream_list| python3 -c \
+    "import sys, json; print(json.load(sys.stdin)['results']['results'][1]['streamId'])"
+)
 sleep 2
 
 # Create policy for the consumer
+printf "\n \u2022 Creating consumer policy for a stream\n"
 curl -sS --location --request POST 'http://localhost:4000/api/policy' \
 --header 'Content-Type: application/json' \
 --header "Authorization: Bearer ${provider_token}" --data-raw "$(getPolicyData)"
+
+sleep 1
+printf "\n \u2714 \033[0;32m Policy registered\033[0m\n"
+
 
 # Check stream status
 printf "\n \u2022 Checking status of the stream\n"
@@ -217,12 +236,12 @@ max_counter=30
 stream_status=''
 while [ $counter -lt $max_counter ]; do
     stream_res=$(
-        curl -sS --location --request GET "http://localhost:4000/api/streams/status/${camera_stream_id}" \
+        curl -sS --location --request GET "http://localhost:4000/api/streams/status/${stream_id}" \
             --header "Authorization: Bearer ${consumer_token}"
     )
 
     echo $stream_res | python3 -m json.tool
-    stream_status=$(echo $stream_res | python3 -c "import sys, json; print(json.load(sys.stdin)['results'][1]['isActive'])")
+    stream_status=$(echo $stream_res | python3 -c "import sys, json; print(json.load(sys.stdin)['results'][0]['isActive'])")
     sleep 1
     if [ "$stream_status" == "True" ]; then
         printf "\n\n\n \u2714 \033[0;32m Stream published successfully\033[0m \n"
@@ -234,10 +253,21 @@ done
 
 if [ "$stream_status" == "True" ]; then
     printf "\n\n\n \u2714 \033[0;32m Stream published successfully\033[0m \n"
-    break
 else
     printf "\n\n\n \u274c \033[0;31m Stream failed to publish\033[0m \n"
 fi
+
+# Stream Playback
+printf "\n \u2022 Calling Stream Playback URL\n"
+
+playback_res=$(
+    curl -sS --location --request GET "http://localhost:4000/api/streams/playback/${stream_id}" \
+        --header "Authorization: Bearer ${consumer_token}"
+)
+sleep 1
+echo $playback_res | python3 -m json.tool
+printf "\n \u2714 \033[0;32m Completed plack API request\033[0m\n"
+
 
 # cleanup
 
@@ -245,8 +275,11 @@ printf "\n \u2022 Cleaning...\n"
 
 #Delete  the policy
 curl -sS --location --request DELETE 'http://localhost:4000/api/policy' \
+--header "Authorization: Bearer ${provider_token}" \
 --header 'Content-Type: application/json' \
---header "Authorization: Bearer ${provider_token}" --data-raw "$(getPolicyData)"
+--data-raw "$(getPolicyData)"
+
+printf "\n"
 
 # Delete stream
 curl -sS --location --request DELETE "http://localhost:4000/api/streams/${camera_stream_id}" \
@@ -270,6 +303,7 @@ docker container stop stream-test
 docker rm stream-test
 
 printf "\n \u2714 \033[0;32m Cleaning Completed"
+
 # Show test result
 
 if [ "$stream_status" == "True" ]; then
