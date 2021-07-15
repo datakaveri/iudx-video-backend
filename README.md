@@ -12,7 +12,12 @@ Backend Application for IUDX Video Server.
    git clone https://github.com/datakaveri/iudx-video-backend.git && cd iudx-video-backend
    ```
 
-2. Create a `.env` file in the root directory of the project based on the template given below:
+2. Generate JWT Keys 
+    ```sh
+    openssl ecparam -name secp256k1 -genkey -noout -out privateECDSASHA256.pem
+    openssl ec -in privateECDSASHA256.pem -pubout > pubECDSASHA256.pem
+    ```
+3. Create a `.env` file in the root directory of the project based on the template given below:
 
     ```sh
     NODE_ENV=development
