@@ -266,7 +266,7 @@ playback_res=$(
 )
 sleep 1
 echo $playback_res | python3 -m json.tool
-printf "\n \u2714 \033[0;32m Completed plack API request\033[0m\n"
+printf "\n \u2714 \033[0;32m Completed pyayback API request\033[0m\n"
 
 
 # cleanup
