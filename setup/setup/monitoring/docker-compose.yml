@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  pushgateway:
+    image: prom/pushgateway
+    container_name: prompushgateway
+    network_mode: host
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    restart: always
+    volumes:
+      - ${PROJECT_ROOT}/setup/setup/monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    network_mode: host
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: always
+    volumes:
+      - ${PROJECT_ROOT}/setup/setup/monitoring/grafana/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+    environment:
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+    network_mode: host
