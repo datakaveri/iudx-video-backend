@@ -42,10 +42,18 @@ export default async () => {
     // Initialize queue Manager
     Container.set('queue', Queue);
 
+    const schedulerManager: SchedulerManager = new SchedulerManager();
+
     // Start status check scheduler if enabled
     if (config.schedulerConfig.statusCheck.enable) {
-        const schedulerManager: SchedulerManager = new SchedulerManager();
         schedulerManager.startStatusCheck();
+        Logger.info('Status check service started.');
+    }
+
+    // Initialize Monitoring Service
+    if (config.schedulerConfig.metricsMonitor.enable && config.host.type === 'LMS') {
+        schedulerManager.startMetricsMonitoring();
+        Logger.info('Monitoring service started.');
     }
 
     // Start Express API Server
