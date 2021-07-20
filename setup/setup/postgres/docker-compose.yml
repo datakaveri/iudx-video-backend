@@ -1,38 +1,46 @@
 version: "3.8"
 
+networks:
+  vs-net:
+    external: true
+
 volumes:
-    pg_data:
-    pgadmin:
+  pg_data: {}
+  pgadmin: {}
 
 services:
-    postgres:
-        image: postgres
-        container_name: postgres
-        restart: always
-        logging:
-            options:
-                max-size: 10m
-                max-file: "10"
-        ports:
-            - "5432:5432"
-        environment:
-            TZ: Asia/Kolkata
-            POSTGRES_USER: ${POSTGRES_INITDB_USERNAME}
-            POSTGRES_PASSWORD: ${POSTGRES_INITDB_PASSWORD}
-            POSTGRES_DB: ${POSTGRES_INITDB_DATABASE}
-        volumes:
-            - ${SCHEMA_FILE}:/docker-entrypoint-initdb.d/schema.sql
-            - pg_data:/var/lib/postgresql/data/
+  postgres:
+    image: postgres
+    container_name: postgres
+    restart: always
+    logging:
+      options:
+        max-size: 10m
+        max-file: "10"
+    ports:
+      - "127.0.0.1:5432:5432"
+    environment:
+      TZ: Asia/Kolkata
+      POSTGRES_USER: ${POSTGRES_INITDB_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_INITDB_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_INITDB_DATABASE}
+    volumes:
+      - ${SCHEMA_FILE}:/docker-entrypoint-initdb.d/schema.sql
+      - pg_data:/var/lib/postgresql/data/
+    networks: 
+      - vs-net 
 
-    pgadmin:
-        image: dpage/pgadmin4
-        container_name: pgadmin
-        restart: always
-        environment:
-            PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-            PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-            PGADMIN_CONFIG_SERVER_MODE: 'False'
-        volumes:
-            - pgadmin:/root/.pgadmin
-        ports:
-            - "5050:80"
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin:/root/.pgadmin
+    ports:
+      - "5050:80"
+    networks: 
+      - vs-net 
