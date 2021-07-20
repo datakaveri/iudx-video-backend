@@ -38,8 +38,9 @@ Backend Application for IUDX Video Server.
     RTMP_SERVER_PUBLISH_PASSWORD=user123
     RTMP_STAT_URL=http://localhost:6002/stat
     ENABLE_STATUS_CHECK=true
-    INITIALIZE_STREAMS=false
     SERVER_ID=54d6f331-6a8f-5362-9932-00609b42902f # UUID
+    ENABLE_METRICS_MONITOR=true
+    PROM_PUSHGATEWAY_URL=http://localhost:9091
     ```
 
 ### Setup
@@ -57,7 +58,7 @@ Backend Application for IUDX Video Server.
 
 ### Local Media Server (LMS) setup
 
-This setup takes care of setting up Nginx RTMP server, Postgresql and Video server.
+This setup takes care of setting up Nginx RTMP server, Postgresql, Monitoring services and Video server.
 
 1. Execute the LMS script.
 
@@ -73,7 +74,7 @@ To bring down LMS, run `./stop_lms.sh`.
 
 ### Cloud Media Server (CMS) setup
 
-This setup takes care of setting up Zookeeper, Kafka, Nginx RTMP server, Postgresql and Video server.
+This setup takes care of setting up Zookeeper, Kafka, Nginx RTMP server, Postgresql, Monitoring services and Video server.
 
 1. Execute the CMS script.
 
@@ -87,15 +88,23 @@ This setup takes care of setting up Zookeeper, Kafka, Nginx RTMP server, Postgre
 
 To bring down CMS, run `./stop_cms.sh`.
 
-### Starting backend server in Development/Deployment environment
+### Development setup
 
-#### Docker
+This setup takes care of setting up Nginx RTMP server, Postgresql and Monitoring services.
 
-Setting up `LMS/CMS` will bring up the backend server.
+1. Execute the Dev script.
 
-#### local
+    ```sh
+    # Change path to scripts directory
+    cd ./setup/scipts/
 
-Run `npm start` from the project directory to start the server.
+    # Run DEV script
+    ./setup_dev.sh
+    ```
+
+2. Run `npm run start` from the project root directory to start the server.
+
+To bring down Dev setup, run `./stop_dev.sh`.
 
 ### Fine tuning
 

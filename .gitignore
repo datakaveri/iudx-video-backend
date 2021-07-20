@@ -13,6 +13,7 @@ jwtRS256.key
 coverage
 
 setup/certificates
+setup/setup/nginx-rtmp/logs
 
 record/
 

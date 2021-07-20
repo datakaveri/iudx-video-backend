@@ -73,6 +73,15 @@ export default {
             enable: process.env.ENABLE_STATUS_CHECK === 'true' || false,
             jobInterval: 3, // in minutes
             lastActiveInterval: 5, // in minutes
-        }
+        },
+        metricsMonitor: {
+            enable: process.env.ENABLE_METRICS_MONITOR === 'true' || false,
+            jobInterval: 5, // in seconds
+        },
     },
+
+    prometheusConfig: {
+        pushGatewayUrl: process.env.PROM_PUSHGATEWAY_URL,
+        requestTimeout: 3000, // in milliseconds
+    }
 };

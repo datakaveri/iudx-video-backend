@@ -59,6 +59,7 @@
         "passport-local": "^1.0.0",
         "pg": "^8.6.0",
         "pg-hstore": "^2.3.3",
+        "prom-client": "^13.1.0",
         "ps-node": "^0.1.6",
         "reflect-metadata": "^0.1.13",
         "sequelize": "^6.6.2",

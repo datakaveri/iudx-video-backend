@@ -6,7 +6,8 @@ export PROJECT_ROOT=$PROJECT_ROOT
 export TOPICS_FILE="$PROJECT_ROOT/setup/apps/video/kafka/topics.json"
 export SCHEMA_FILE="$PROJECT_ROOT/setup/apps/video/postgres/schema.sql"
 
-echo "[1] Development  [2] Production"
+echo "Choose the build environment:"
+echo -e "\033[1;30m[1] Development  [2] Production \033[0m"
 read environment
 
 if [[ $environment -eq 1 ]]
@@ -16,7 +17,7 @@ then
 elif [[ $environment -eq 2 ]]
 then
     echo "Choose type of Nginx RTMP configuration:"
-    echo "[1] SSL  [2] SSL + on-demand"
+    echo -e "\033[1;30m[1] SSL  [2] SSL + on-demand \033[0m"
     read nginxconf
     if [[ $nginxconf -eq 1 ]]
     then

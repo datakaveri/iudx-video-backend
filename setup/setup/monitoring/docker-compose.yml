@@ -1,0 +1,68 @@
+version: "3.8"
+   
+networks:
+  vs-net:
+    external: true
+
+volumes:
+  prometheus_data: {}
+  grafana_data: {}
+
+services:
+  loki:
+    image: grafana/loki
+    container_name: loki
+    volumes:
+      - ${PROJECT_ROOT}/setup/setup/monitoring/loki/local-config.yaml:/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/local-config.yaml
+    restart: always
+    ports:
+      - "3100:3100"
+    networks: 
+      - vs-net
+
+  promtail:
+    image: grafana/promtail
+    container_name: promtail
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers
+      - ${PROJECT_ROOT}/setup/setup/monitoring/promtail/docker-config.yml:/etc/promtail/config.yml
+    command: -config.file=/etc/promtail/config.yml
+    restart: always
+    networks: 
+      - vs-net
+
+  pushgateway:
+    image: prom/pushgateway
+    container_name: pushgateway
+    restart: always
+    ports:
+      - "9091:9091"
+    networks: 
+      - vs-net
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    restart: always
+    volumes:
+      - prometheus_data:/prometheus
+      - ${PROJECT_ROOT}/setup/setup/monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    expose:
+      - "9090"
+    network_mode: host
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: always
+    environment:
+      - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin123}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ${PROJECT_ROOT}/setup/setup/monitoring/grafana/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+    expose:
+      - "3000"
+    network_mode: host
