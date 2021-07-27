@@ -1,6 +1,7 @@
 import Container from 'typedi';
 import nodemailer from 'nodemailer';
 import smtpTransport from 'nodemailer-smtp-transport';
+import { v4 as uuidv4 } from 'uuid';
 
 import Logger from '../common/Logger';
 import { Database, ModelDependencyInjector } from '../managers/Database';
@@ -8,6 +9,8 @@ import apiServer from '../api-server';
 import config from '../config';
 import Queue from '../managers/Queue';
 import SchedulerManager from '../managers/Scheduler';
+import UserRepo from '../repositories/UserRepo';
+import Utility from '../common/Utility';
 
 export default async () => {
     // Initialize Database connection and load model injector
@@ -54,6 +57,22 @@ export default async () => {
     if (config.schedulerConfig.metricsMonitor.enable && config.host.type === 'LMS') {
         schedulerManager.startMetricsMonitoring();
         Logger.info('Monitoring service started.');
+    }
+
+
+    // Creating CMS admin
+    if (config.host.type === 'CMS') {
+        const email = config.cmsAdminConfig.email;
+        const password = config.cmsAdminConfig.password;
+        const name = config.cmsAdminConfig.name;
+        const userRepo: UserRepo = Container.get(UserRepo);
+        const UtilityService = Container.get(Utility);
+        const verificationCode = UtilityService.generateCode();
+        const found = await userRepo.findUser({ email });
+        if (!found) {
+            const userData = { id: uuidv4(), name: name, email, password, verificationCode, verified: true, role: 'cms-admin', approved: true };
+            await userRepo.createUser(userData);
+        }
     }
 
     // Start Express API Server

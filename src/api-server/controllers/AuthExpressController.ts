@@ -142,4 +142,15 @@ export default class AuthExpressController {
             return next(e);
         }
     }
+
+    async approve(req: Request, res: Response, next: NextFunction) {
+        Logger.debug('Calling rtmp token validate endpoint');
+        try {
+            let response = await this.authService.approve(req.body.email);
+            return res.status(200).send(response);
+        } catch(e) {
+            Logger.error('error: %o', e);
+            return next(e);
+        }
+    }
 }

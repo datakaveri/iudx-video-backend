@@ -83,5 +83,11 @@ export default {
     prometheusConfig: {
         pushGatewayUrl: process.env.PROM_PUSHGATEWAY_URL,
         requestTimeout: 3000, // in milliseconds
+    },
+
+    cmsAdminConfig: {
+        email: process.env.CMS_ADMIN_EMAIL,
+        password: process.env.CMS_ADMIN_PASSWORD,
+        name: 'CMS Admin'
     }
 };

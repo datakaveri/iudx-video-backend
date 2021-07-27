@@ -55,11 +55,17 @@ const ValidatePolicy = async (req: Request, res: Response, next: NextFunction) =
 const ValidateStreamAccess = async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user['userId'];
     const role = req.user['role'];
-    if (role === 'admin') {
+    if (role === 'cms-admin') {
         return next();
     }
     if (role === 'consumer') {
         return res.status(401).send('Authorization failed');
+    }
+    /** TODO
+     *  
+     */
+    if (role === 'lms-admin') {
+        return next();
     }
     if (!userId) {
         return res.send(401).send('Authorization failed, invalid token provided');

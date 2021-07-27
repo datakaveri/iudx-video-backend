@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS "Users"
   "verificationCode"   TEXT,
   "verified"           BOOLEAN,
   "role"               TEXT,
+  "approved"           BOOLEAN,
   "createdAt"          TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
   "updatedAt"          TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
   UNIQUE ("email"),

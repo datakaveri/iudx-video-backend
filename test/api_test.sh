@@ -3,7 +3,7 @@
 docker build -t stream-server ../setup/testimage
 
 admin_email='admin@datakaveri.org'
-admin_password='admin'
+admin_password='admin123'
 
 provider_email='provider@datakaveri.org'
 provider_password='provider'
@@ -41,6 +41,14 @@ getConsumerData() {
     "email": "$consumer_email",
     "password": "$consumer_password",
     "role": "consumer"
+}
+EOF
+}
+
+getProviderEmail() {
+    cat <<EOF
+{
+    "email": "$provider_email"
 }
 EOF
 }
@@ -119,9 +127,7 @@ EOF
 printf "\n\n\n"
 
 # Register the users
-printf " \u2022 Registering admin, provider and consumer test users\n"
-curl -sS --location --request POST 'http://localhost:4000/api/auth/signup' --header 'Content-Type: application/json' --data-raw "$(getAdminData)"
-printf "\n"
+printf " \u2022 Registering provider and consumer test users\n"
 curl -sS --location --request POST 'http://localhost:4000/api/auth/signup' --header 'Content-Type: application/json' --data-raw "$(getProviderData)"
 printf "\n"
 curl -sS --location --request POST 'http://localhost:4000/api/auth/signup' --header 'Content-Type: application/json' --data-raw "$(getConsumerData)"
@@ -131,17 +137,13 @@ sleep 2
 printf "\n\n \u2714 \033[0;32m Registered users\033[0m\n"
 
 # Verify the user
-printf "\n\n \u2022 Verifying admin, provider and consumer users\n"
-admin_code=$(psql -t postgresql://user:user%40123@localhost:5432/vs_db -c 'SELECT "verificationCode" FROM public."Users" WHERE email=$$admin@datakaveri.org$$')
+printf "\n\n \u2022 Verifying provider and consumer users\n"
 provider_code=$(psql -t postgresql://user:user%40123@localhost:5432/vs_db -c 'SELECT "verificationCode" FROM public."Users" WHERE email=$$provider@datakaveri.org$$')
 consumer_code=$(psql -t postgresql://user:user%40123@localhost:5432/vs_db -c 'SELECT "verificationCode" FROM public."Users" WHERE email=$$consumer@datakaveri.org$$')
 
-updated_admin_code=$(echo "${admin_code}" | xargs)
 updated_provider_code=$(echo "${provider_code}" | xargs)
 updated_consumer_code=$(echo "${consumer_code}" | xargs)
 
-curl -sS --location --request GET "http://localhost:4000/api/auth/verify?verificationCode=${updated_admin_code}"
-printf "\n"
 curl -sS --location --request GET "http://localhost:4000/api/auth/verify?verificationCode=${updated_provider_code}"
 printf "\n"
 curl -sS --location --request GET "http://localhost:4000/api/auth/verify?verificationCode=${updated_consumer_code}"
@@ -150,12 +152,22 @@ sleep 2
 printf "\n\n \u2714 \033[0;32m Verified users\033[0m\n"
 
 # Get Token
-printf "\n\n \u2022 Generating Token\n"
 admin_token=$(
     curl -sS --location --request POST 'http://localhost:4000/api/auth/token' \
         --header 'Content-Type: application/json' --data-raw "$(getAdminTokenData)" | python3 -c \
         "import sys, json; print(json.load(sys.stdin)['token'])"
 )
+
+# Approving provider
+printf "\n\n \u2022 Approving provider for usage\n"
+curl -sS --location --request POST 'http://localhost:4000/api/auth/approve' \
+--header 'Content-Type: application/json' \
+--header "Authorization: Bearer ${admin_token}" --data-raw "$(getProviderEmail)"
+
+sleep 1
+printf "\n \u2714 \033[0;32m Provider approved Successfully \033[0m\n\n"
+
+printf "\n\n \u2022 Generating Token for provider and consumer\n"
 provider_token=$(
     curl -sS --location --request POST 'http://localhost:4000/api/auth/token' \
         --header 'Content-Type: application/json' --data-raw "$(getProviderTokenData)" | python3 -c \
@@ -295,7 +307,6 @@ sleep 1
 
 printf "\n"
 # Delete the user
-psql -t postgresql://user:user%40123@localhost:5432/vs_db -c 'DELETE FROM public."Users" WHERE "email"=$$admin@datakaveri.org$$'
 psql -t postgresql://user:user%40123@localhost:5432/vs_db -c 'DELETE FROM public."Users" WHERE "email"=$$provider@datakaveri.org$$'
 psql -t postgresql://user:user%40123@localhost:5432/vs_db -c 'DELETE FROM public."Users" WHERE "email"=$$consumer@datakaveri.org$$'
 
