@@ -51,6 +51,10 @@ export function UserModel(Database: Sequelize) {
                 type: DataTypes.STRING,
                 allowNull: false,
             },
+            approved: {
+                type: DataTypes.BOOLEAN,
+                allowNull: true,
+            }
         },
         {
             timestamps: true,

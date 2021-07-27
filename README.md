@@ -41,6 +41,8 @@ Backend Application for IUDX Video Server.
     SERVER_ID=54d6f331-6a8f-5362-9932-00609b42902f # UUID
     ENABLE_METRICS_MONITOR=true
     PROM_PUSHGATEWAY_URL=http://localhost:9091
+    CMS_ADMIN_EMAIL=admin@datakaveri.org
+    CMS_ADMIN_PASSWORD=admin123
     ```
 
 ### Setup

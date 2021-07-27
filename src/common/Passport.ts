@@ -30,10 +30,14 @@ passport.use(
                     return done(new Error('User already exists'));
                 }
                 const role = req.body.role;
-                if (!(role === 'consumer' || role === 'provider' || role === 'admin')) {
+                if (!(role === 'consumer' || role === 'provider' || role === 'lms-admin')) {
                     return done(new Error('Invalid role provided in request'));
                 }
-                await userRepo.createUser({ id: uuidv4(), name: req.body.name, email, password, verificationCode, verified: false, role: req.body.role });
+                const userData = { id: uuidv4(), name: req.body.name, email, password, verificationCode, verified: false, role: req.body.role };
+                if (role === 'consumer') {
+                    userData['approved'] = true;
+                }
+                await userRepo.createUser(userData);
                 return done(null, verificationCode);
             } catch (error) {
                 done(error);
@@ -63,6 +67,9 @@ passport.use(
                 }
                 if (!user.verified) {
                     return done(null, false, { message: 'User is not verified' });
+                }
+                if (!user.approved) {
+                    return done(null, false, { message: 'User registration not approved, contact admin' });
                 }
                 const payload = { userId: user.id, name: user.name, email: user.email, role: user.role };
                 const token = jwt.sign(payload, privateKey, {

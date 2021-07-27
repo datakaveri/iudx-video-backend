@@ -14,7 +14,7 @@ export default (app: Router) => {
     app.use('/streams', passport.authenticate('jwt', { session: true }), route);
 
     route.post('/',
-        AuthorizeRole(['admin', 'provider']),
+        AuthorizeRole(['cms-admin', 'lms-admin', 'provider']),
         (req, res, next) => StreamController.register(req, res, next)
     );
 
@@ -28,7 +28,7 @@ export default (app: Router) => {
     );
 
     route.delete('/:streamId',
-        AuthorizeRole(['admin', 'provider']),
+        AuthorizeRole(['cms-admin', 'lms-admin', 'provider']),
         ValidateStreamAccess,
         (req, res, next) => StreamController.delete(req, res, next)
     );

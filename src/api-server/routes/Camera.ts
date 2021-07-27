@@ -14,7 +14,7 @@ export default (app: Router) => {
     app.use('/cameras', passport.authenticate('jwt', { session: true }), route);
 
     route.post('/',
-        AuthorizeRole(['admin', 'provider']),
+        AuthorizeRole(['cms-admin', 'lms-admin', 'provider']),
         (req, res, next) => CameraController.register(req, res, next)
     );
 
@@ -23,7 +23,7 @@ export default (app: Router) => {
     );
 
     route.get('/:cameraId/streams',
-        AuthorizeRole(['admin', 'provider']),
+        AuthorizeRole(['cms-admin', 'lms-admin', 'provider']),
         (req, res, next) => CameraController.findAssociatedStreams(req, res, next)
     );
 
@@ -33,12 +33,12 @@ export default (app: Router) => {
     );
 
     route.put('/:cameraId',
-        AuthorizeRole(['admin', 'provider']),
+        AuthorizeRole(['cms-admin', 'lms-admin', 'provider']),
         (req, res, next) => CameraController.update(req, res, next)
     );
 
     route.delete('/:cameraId',
-        AuthorizeRole(['admin', 'provider']),
+        AuthorizeRole(['cms-admin', 'lms-admin', 'provider']),
         (req, res, next) => CameraController.delete(req, res, next)
     );
 }
