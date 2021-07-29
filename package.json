@@ -1,5 +1,5 @@
 {
-    "name": "iudx-video-server-backend",
+    "name": "iudx-video-backend",
     "version": "1.0.0",
     "description": "",
     "main": "src/app.ts",
