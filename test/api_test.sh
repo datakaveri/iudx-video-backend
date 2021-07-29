@@ -11,6 +11,9 @@ provider_password='provider'
 consumer_email='consumer@datakaveri.org'
 consumer_password='consumer'
 
+postgres_uname='iudx'
+postgres_pwd='iudx123'
+
 # SignUp Data
 getAdminData() {
     cat <<EOF
@@ -65,8 +68,7 @@ EOF
 
 getProviderTokenData() {
     cat <<EOF
-{
-    "email": "$provider_email",
+{ "email": "$provider_email",
     "password": "$provider_password"
 }
 EOF
@@ -138,8 +140,8 @@ printf "\n\n \u2714 \033[0;32m Registered users\033[0m\n"
 
 # Verify the user
 printf "\n\n \u2022 Verifying provider and consumer users\n"
-provider_code=$(psql -t postgresql://user:user%40123@localhost:5432/vs_db -c 'SELECT "verificationCode" FROM public."Users" WHERE email=$$provider@datakaveri.org$$')
-consumer_code=$(psql -t postgresql://user:user%40123@localhost:5432/vs_db -c 'SELECT "verificationCode" FROM public."Users" WHERE email=$$consumer@datakaveri.org$$')
+provider_code=$(psql -t postgresql://${postgres_uname}:${postgres_pwd}@localhost:5432/vs_db -c 'SELECT "verificationCode" FROM public."Users" WHERE email=$$provider@datakaveri.org$$')
+consumer_code=$(psql -t postgresql://${postgres_uname}:${postgres_pwd}@localhost:5432/vs_db -c 'SELECT "verificationCode" FROM public."Users" WHERE email=$$consumer@datakaveri.org$$')
 
 updated_provider_code=$(echo "${provider_code}" | xargs)
 updated_consumer_code=$(echo "${consumer_code}" | xargs)
