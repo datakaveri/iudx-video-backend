@@ -22,8 +22,9 @@ export default {
 
     kafkaConfig: {
         clientId: process.env.KAFKA_CLIENT_ID,
-        brokers: process.env.KAFKA_BROKER,
+        brokers: [process.env.KAFKA_BROKER],
         consumerGroupId: 'cloud-media-server-consumer',
+        defaultRetentionValue: '172800000'
     },
     /**
      * Used by winston logger
