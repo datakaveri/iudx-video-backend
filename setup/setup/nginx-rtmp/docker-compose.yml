@@ -1,5 +1,10 @@
 version: "3.8"
 
+
+networks:
+  vs-net:
+    external: true
+
 services: 
   nginxrtmp:
     restart: always
@@ -13,4 +18,8 @@ services:
     expose:
       - "1935"
       - "8080"
-    network_mode: host
+      - "6060"
+    ports:
+      - "8080:8080"
+    networks: 
+      - vs-net

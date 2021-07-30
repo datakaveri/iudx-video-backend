@@ -18,7 +18,7 @@ services:
         max-size: 10m
         max-file: "10"
     ports:
-      - "127.0.0.1:5432:5432"
+      - "5432:5432"
     environment:
       TZ: Asia/Kolkata
       POSTGRES_USER: ${POSTGRES_INITDB_USERNAME}
