@@ -21,5 +21,6 @@ services:
       - "6060"
     ports:
       - "8080:8080"
+      - "1935:1935"
     networks: 
       - vs-net

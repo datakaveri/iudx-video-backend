@@ -11,8 +11,8 @@ provider_password='provider'
 consumer_email='consumer@datakaveri.org'
 consumer_password='consumer'
 
-postgres_uname='iudx'
-postgres_pwd='iudx123'
+postgres_uname='user'
+postgres_pwd='user%40123'
 
 # SignUp Data
 getAdminData() {
@@ -107,7 +107,7 @@ getStreamData() {
     {
         "cameraId" : "$camera_id",
         "streamName" : "test_stream_1" ,
-        "streamUrl" : "rtsp://localhost:8554/stream1",
+        "streamUrl" : "rtsp://172.17.0.1:8554/stream1",
         "streamType" : "RTMP",
         "type": "camera",
         "isPublic" : false
@@ -309,8 +309,8 @@ sleep 1
 
 printf "\n"
 # Delete the user
-psql -t postgresql://user:user%40123@localhost:5432/vs_db -c 'DELETE FROM public."Users" WHERE "email"=$$provider@datakaveri.org$$'
-psql -t postgresql://user:user%40123@localhost:5432/vs_db -c 'DELETE FROM public."Users" WHERE "email"=$$consumer@datakaveri.org$$'
+psql -t postgresql://${postgres_uname}:${postgres_pwd}@localhost:5432/vs_db -c 'DELETE FROM public."Users" WHERE "email"=$$provider@datakaveri.org$$'
+psql -t postgresql://${postgres_uname}:${postgres_pwd}@localhost:5432/vs_db -c 'DELETE FROM public."Users" WHERE "email"=$$consumer@datakaveri.org$$'
 
 docker container stop stream-test
 docker rm stream-test

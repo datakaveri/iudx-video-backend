@@ -20,6 +20,8 @@ export default {
 
     databaseURL: process.env.DB_URL,
 
+    isStandaloneLms: process.env.STANDALONE_LMS === 'true' || false,
+
     kafkaConfig: {
         clientId: process.env.KAFKA_CLIENT_ID,
         brokers: process.env.KAFKA_BROKER,
@@ -89,5 +91,11 @@ export default {
         email: process.env.CMS_ADMIN_EMAIL,
         password: process.env.CMS_ADMIN_PASSWORD,
         name: 'CMS Admin'
+    },
+
+    lmsAdminConfig: {
+        email: process.env.LMS_ADMIN_EMAIL,
+        password: process.env.LMS_ADMIN_PASSWORD,
+        name: 'LMS Admin'
     }
 };
