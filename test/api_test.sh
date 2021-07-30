@@ -11,6 +11,9 @@ provider_password='provider'
 consumer_email='consumer@datakaveri.org'
 consumer_password='consumer'
 
+postgres_uname='user'
+postgres_pwd='user%40123'
+
 # SignUp Data
 getAdminData() {
     cat <<EOF
