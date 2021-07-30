@@ -75,6 +75,21 @@ export default async () => {
         }
     }
 
+    // Creating LMS admin
+    if (config.isStandaloneLms && config.host.type === 'LMS') {
+        const email = config.lmsAdminConfig.email;
+        const password = config.lmsAdminConfig.password;
+        const name = config.lmsAdminConfig.name;
+        const userRepo: UserRepo = Container.get(UserRepo);
+        const UtilityService = Container.get(Utility);
+        const verificationCode = UtilityService.generateCode();
+        const found = await userRepo.findUser({ email });
+        if (!found) {
+            const userData = { id: uuidv4(), name: name, email, password, verificationCode, verified: true, role: 'lms-admin', approved: true };
+            await userRepo.createUser(userData);
+        }
+    }
+
     // Start Express API Server
     apiServer();
 };

@@ -10,7 +10,4 @@ services:
     container_name: nginxrtmp
     volumes:
       - ${PROJECT_ROOT}/setup/certificates:/certificates
-    expose:
-      - "1935"
-      - "8080"
     network_mode: host

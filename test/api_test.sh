@@ -11,18 +11,10 @@ provider_password='provider'
 consumer_email='consumer@datakaveri.org'
 consumer_password='consumer'
 
-# SignUp Data
-getAdminData() {
-    cat <<EOF
-{
-    "name": "Test Admin User",
-    "email": "$admin_email",
-    "password": "$admin_password",
-    "role": "admin"
-}
-EOF
-}
+postgres_uname='user'
+postgres_pwd='user%40123'
 
+# SignUp Data
 getProviderData() {
     cat <<EOF
 {
@@ -65,8 +57,7 @@ EOF
 
 getProviderTokenData() {
     cat <<EOF
-{
-    "email": "$provider_email",
+{ "email": "$provider_email",
     "password": "$provider_password"
 }
 EOF
@@ -138,8 +129,8 @@ printf "\n\n \u2714 \033[0;32m Registered users\033[0m\n"
 
 # Verify the user
 printf "\n\n \u2022 Verifying provider and consumer users\n"
-provider_code=$(psql -t postgresql://user:user%40123@localhost:5432/vs_db -c 'SELECT "verificationCode" FROM public."Users" WHERE email=$$provider@datakaveri.org$$')
-consumer_code=$(psql -t postgresql://user:user%40123@localhost:5432/vs_db -c 'SELECT "verificationCode" FROM public."Users" WHERE email=$$consumer@datakaveri.org$$')
+provider_code=$(psql -t postgresql://${postgres_uname}:${postgres_pwd}@localhost:5432/vs_db -c 'SELECT "verificationCode" FROM public."Users" WHERE email=$$provider@datakaveri.org$$')
+consumer_code=$(psql -t postgresql://${postgres_uname}:${postgres_pwd}@localhost:5432/vs_db -c 'SELECT "verificationCode" FROM public."Users" WHERE email=$$consumer@datakaveri.org$$')
 
 updated_provider_code=$(echo "${provider_code}" | xargs)
 updated_consumer_code=$(echo "${consumer_code}" | xargs)
@@ -283,42 +274,42 @@ printf "\n \u2714 \033[0;32m Completed pyayback API request\033[0m\n"
 
 # cleanup
 
-printf "\n \u2022 Cleaning...\n"
+# printf "\n \u2022 Cleaning...\n"
 
-#Delete  the policy
-curl -sS --location --request DELETE 'http://localhost:4000/api/policy' \
---header "Authorization: Bearer ${provider_token}" \
---header 'Content-Type: application/json' \
---data-raw "$(getPolicyData)"
+# #Delete  the policy
+# curl -sS --location --request DELETE 'http://localhost:4000/api/policy' \
+# --header "Authorization: Bearer ${provider_token}" \
+# --header 'Content-Type: application/json' \
+# --data-raw "$(getPolicyData)"
 
-printf "\n"
+# printf "\n"
 
-# Delete stream
-curl -sS --location --request DELETE "http://localhost:4000/api/streams/${camera_stream_id}" \
-    --header "Authorization: Bearer ${provider_token}"
-sleep 1
+# # Delete stream
+# curl -sS --location --request DELETE "http://localhost:4000/api/streams/${camera_stream_id}" \
+#     --header "Authorization: Bearer ${provider_token}"
+# sleep 1
 
-printf "\n"
+# printf "\n"
 
-# Delete Camera
-curl -sS --location --request DELETE "http://localhost:4000/api/cameras/${camera_id}" \
-    --header "Authorization: Bearer ${provider_token}"
-sleep 1
+# # Delete Camera
+# curl -sS --location --request DELETE "http://localhost:4000/api/cameras/${camera_id}" \
+#     --header "Authorization: Bearer ${provider_token}"
+# sleep 1
 
-printf "\n"
-# Delete the user
-psql -t postgresql://user:user%40123@localhost:5432/vs_db -c 'DELETE FROM public."Users" WHERE "email"=$$provider@datakaveri.org$$'
-psql -t postgresql://user:user%40123@localhost:5432/vs_db -c 'DELETE FROM public."Users" WHERE "email"=$$consumer@datakaveri.org$$'
+# printf "\n"
+# # Delete the user
+# psql -t postgresql://${postgres_uname}:${postgres_pwd}@localhost:5432/vs_db -c 'DELETE FROM public."Users" WHERE "email"=$$provider@datakaveri.org$$'
+# psql -t postgresql://${postgres_uname}:${postgres_pwd}@localhost:5432/vs_db -c 'DELETE FROM public."Users" WHERE "email"=$$consumer@datakaveri.org$$'
 
-docker container stop stream-test
-docker rm stream-test
+# docker container stop stream-test
+# docker rm stream-test
 
-printf "\n \u2714 \033[0;32m Cleaning Completed"
+# printf "\n \u2714 \033[0;32m Cleaning Completed"
 
-# Show test result
+# # Show test result
 
-if [ "$stream_status" == "True" ]; then
-    printf "\n\n\n \u2714 \033[0;32m Stream creation flow passed\033[0m \n"
-else
-    printf "\n\n\n \u274c \033[0;31m Stream creation failed\033[0m \n"
-fi
+# if [ "$stream_status" == "True" ]; then
+#     printf "\n\n\n \u2714 \033[0;32m Stream creation flow passed\033[0m \n"
+# else
+#     printf "\n\n\n \u274c \033[0;31m Stream creation failed\033[0m \n"
+# fi
