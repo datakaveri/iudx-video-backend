@@ -68,6 +68,8 @@ export default {
         serverUrl: process.env.RTMP_SERVER,
         password: process.env.RTMP_SERVER_PUBLISH_PASSWORD,
         statUrl: process.env.RTMP_STAT_URL,
+        publicServerIp: process.env.RTMP_SERVER_PUBLIC_IP,
+        publicServerPort: process.env.RTMP_SERVER_PUBLIC_PORT
     },
 
     schedulerConfig: {

@@ -193,14 +193,14 @@ export default class StreamService {
             const stream = await this.streamRepo.findStream({ streamId });
             if (stream.isActive) {
                 return {
-                    urlTemplate: `${config.rtmpServerConfig.serverUrl}/${streamId}?token=<TOKEN>`,
+                    urlTemplate: `rtmp://${config.rtmpServerConfig.publicServerIp}:${config.rtmpServerConfig.publicServerPort}/live/${streamId}?token=<TOKEN>`,
                     isActive: true
                 }
             } else {
                 return {
                     isActive: false,
                     message: 'Stream will be available shortly, please check status API to know the status',
-                    urlTemplate: `${config.rtmpServerConfig.serverUrl}/${streamId}}?token=<TOKEN>`
+                    urlTemplate: `rtmp://${config.rtmpServerConfig.publicServerIp}:${config.rtmpServerConfig.publicServerPort}/live/${streamId}}?token=<TOKEN>`
                 }
             }
         } catch (e) {

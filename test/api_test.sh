@@ -15,17 +15,6 @@ postgres_uname='user'
 postgres_pwd='user%40123'
 
 # SignUp Data
-getAdminData() {
-    cat <<EOF
-{
-    "name": "Test Admin User",
-    "email": "$admin_email",
-    "password": "$admin_password",
-    "role": "admin"
-}
-EOF
-}
-
 getProviderData() {
     cat <<EOF
 {
@@ -107,7 +96,7 @@ getStreamData() {
     {
         "cameraId" : "$camera_id",
         "streamName" : "test_stream_1" ,
-        "streamUrl" : "rtsp://172.17.0.1:8554/stream1",
+        "streamUrl" : "rtsp://localhost:8554/stream1",
         "streamType" : "RTMP",
         "type": "camera",
         "isPublic" : false
@@ -285,42 +274,42 @@ printf "\n \u2714 \033[0;32m Completed pyayback API request\033[0m\n"
 
 # cleanup
 
-printf "\n \u2022 Cleaning...\n"
+# printf "\n \u2022 Cleaning...\n"
 
-#Delete  the policy
-curl -sS --location --request DELETE 'http://localhost:4000/api/policy' \
---header "Authorization: Bearer ${provider_token}" \
---header 'Content-Type: application/json' \
---data-raw "$(getPolicyData)"
+# #Delete  the policy
+# curl -sS --location --request DELETE 'http://localhost:4000/api/policy' \
+# --header "Authorization: Bearer ${provider_token}" \
+# --header 'Content-Type: application/json' \
+# --data-raw "$(getPolicyData)"
 
-printf "\n"
+# printf "\n"
 
-# Delete stream
-curl -sS --location --request DELETE "http://localhost:4000/api/streams/${camera_stream_id}" \
-    --header "Authorization: Bearer ${provider_token}"
-sleep 1
+# # Delete stream
+# curl -sS --location --request DELETE "http://localhost:4000/api/streams/${camera_stream_id}" \
+#     --header "Authorization: Bearer ${provider_token}"
+# sleep 1
 
-printf "\n"
+# printf "\n"
 
-# Delete Camera
-curl -sS --location --request DELETE "http://localhost:4000/api/cameras/${camera_id}" \
-    --header "Authorization: Bearer ${provider_token}"
-sleep 1
+# # Delete Camera
+# curl -sS --location --request DELETE "http://localhost:4000/api/cameras/${camera_id}" \
+#     --header "Authorization: Bearer ${provider_token}"
+# sleep 1
 
-printf "\n"
-# Delete the user
-psql -t postgresql://${postgres_uname}:${postgres_pwd}@localhost:5432/vs_db -c 'DELETE FROM public."Users" WHERE "email"=$$provider@datakaveri.org$$'
-psql -t postgresql://${postgres_uname}:${postgres_pwd}@localhost:5432/vs_db -c 'DELETE FROM public."Users" WHERE "email"=$$consumer@datakaveri.org$$'
+# printf "\n"
+# # Delete the user
+# psql -t postgresql://${postgres_uname}:${postgres_pwd}@localhost:5432/vs_db -c 'DELETE FROM public."Users" WHERE "email"=$$provider@datakaveri.org$$'
+# psql -t postgresql://${postgres_uname}:${postgres_pwd}@localhost:5432/vs_db -c 'DELETE FROM public."Users" WHERE "email"=$$consumer@datakaveri.org$$'
 
-docker container stop stream-test
-docker rm stream-test
+# docker container stop stream-test
+# docker rm stream-test
 
-printf "\n \u2714 \033[0;32m Cleaning Completed"
+# printf "\n \u2714 \033[0;32m Cleaning Completed"
 
-# Show test result
+# # Show test result
 
-if [ "$stream_status" == "True" ]; then
-    printf "\n\n\n \u2714 \033[0;32m Stream creation flow passed\033[0m \n"
-else
-    printf "\n\n\n \u274c \033[0;31m Stream creation failed\033[0m \n"
-fi
+# if [ "$stream_status" == "True" ]; then
+#     printf "\n\n\n \u2714 \033[0;32m Stream creation flow passed\033[0m \n"
+# else
+#     printf "\n\n\n \u274c \033[0;31m Stream creation failed\033[0m \n"
+# fi
