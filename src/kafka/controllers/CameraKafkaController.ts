@@ -22,7 +22,7 @@ export default class CameraKafkaController {
     }
 
     public async subscribe() {
-        const topic = config.host.type === 'CMS' ? /.*.camera/ : config.serverId + '.camera';
+        const topic = config.host.type === 'CMS' ? /.*.upstream/ : config.serverId + '.downstream';
         await this.kafkaManager.subscribe(topic, (err, message) => this.handleMessage(err, message));
     }
 
@@ -57,7 +57,7 @@ export default class CameraKafkaController {
 
     public async register(serverId: string, userId: string, cameraData: any) {
         try {
-            const topic: string = serverId + '.camera';
+            const topic: string = serverId + '.downstream';
             const message: any = { taskIdentifier: 'registerCamera', data: { userId, cameraData } };
             const { messageId } = await this.kafkaManager.publish(topic, message, 'HTTP_REQ');
             const result = await this.utilityService.getKafkaMessageResponse(messageId);

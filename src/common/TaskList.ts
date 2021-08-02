@@ -11,7 +11,7 @@ export const taskList = {
         try {
             const cameraService: CameraService = Container.get(CameraService);
             const kafkaManager: KafkaManager = Container.get(KafkaManager);
-            const topic: string = config.serverId + '.camera';
+            const topic: string = config.serverId + '.upstream';
 
             const { messageId, data } = payload;
             const result = await cameraService.register(data.userId, data.cameraData);

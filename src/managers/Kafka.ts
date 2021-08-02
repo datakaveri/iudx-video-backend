@@ -32,10 +32,7 @@ export default class KafkaManager {
                     for (let [key, value] of Object.entries(message.headers)) {
                         message.headers[key] = value.toString();
                     }
-
-                    if (config.host.type !== message.headers.messageSource) {
-                        callback(null, message);
-                    }
+                    callback(null, message);
                 },
             });
         } catch (err) {
@@ -57,11 +54,7 @@ export default class KafkaManager {
                 messages: [
                     {
                         value: msg,
-                        headers: {
-                            messageId,
-                            messageType,
-                            messageSource: config.host.type,
-                        }
+                        headers: { messageId, messageType }
                     }
                 ],
             });
