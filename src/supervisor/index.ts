@@ -8,6 +8,9 @@ import apiServer from '../api-server';
 import config from '../config';
 import Queue from '../managers/Queue';
 import SchedulerManager from '../managers/Scheduler';
+import JobQueueManager from '../managers/JobQueue';
+import KafkaManager from '../managers/Kafka';
+import kafkaService from '../kafka';
 
 export default async () => {
     // Initialize Database connection and load model injector
@@ -20,9 +23,9 @@ export default async () => {
         Logger.error(error);
     }
 
-    // Initialize Kafka and Topics to listen for new messages
-    // const KafkaManager: KafkaManager = Container.get('KafkaManager');
-    // KafkaManager.connect();
+    //Initialize Kafka and Topics to listen for new messages
+    const kafkaManager: KafkaManager = Container.get(KafkaManager);
+    kafkaManager.connect();
 
     // Initialize Mail Client
     Container.set(
@@ -42,6 +45,10 @@ export default async () => {
     // Initialize queue Manager
     Container.set('queue', Queue);
 
+    // Initialize Job Queue Manager
+    const jobQueueManager: JobQueueManager = Container.get(JobQueueManager);
+    jobQueueManager.init();
+
     const schedulerManager: SchedulerManager = new SchedulerManager();
 
     // Start status check scheduler if enabled
@@ -58,4 +65,7 @@ export default async () => {
 
     // Start Express API Server
     apiServer();
+
+    // Start Kafka Service
+    kafkaService();
 };

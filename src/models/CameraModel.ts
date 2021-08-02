@@ -43,7 +43,7 @@ export function CameraModel(Database: Sequelize) {
             timestamps: true,
             defaultScope: {
                 attributes: {
-                    exclude: ['userId', 'createdAt', 'updatedAt']
+                    exclude: ['createdAt', 'updatedAt']
                 }
             },
         }

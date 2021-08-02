@@ -34,20 +34,8 @@ export default class CameraService {
                 cameras.push({ cameraId, userId, ...camera });
             }
 
-            let result = await this.cameraRepo.registerCamera(cameras);
-            result = result.map(camera => {
-                return {
-                    cameraId: camera.cameraId,
-                    cameraNum: camera.cameraNum,
-                    cameraName: camera.cameraName,
-                    cameraType: camera.cameraType,
-                    cameraUsage: camera.cameraUsage,
-                    cameraOrientation: camera.cameraOrientation,
-                    city: camera.city,
-                }
-            });
-
-            return result;
+            await this.cameraRepo.registerCamera(cameras);
+            return cameras;
         } catch (e) {
             Logger.error(e);
             throw new ServiceError('Error Registering the data');

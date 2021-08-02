@@ -3,25 +3,47 @@ import Container from 'typedi';
 
 import Logger from '../../common/Logger';
 import CameraService from '../../services/CameraService';
+import CameraKafkaController from '../../kafka/controllers/CameraKafkaController';
 
 export default class CameraManagementController {
     private cameraService: CameraService;
+    private cameraKafkaController: CameraKafkaController;
 
     constructor() {
         this.cameraService = Container.get(CameraService);
+        this.cameraKafkaController = new CameraKafkaController();
     }
 
     async register(req: Request, res: Response, next: NextFunction) {
         const userId: string = req.user['userId'];
-        let params: any = req.body;
+        const data: any = req.body;
+        const serverId: string = (req.query as any)['serverId'];
+        let result: any;
 
-        Logger.debug('Calling Register Camera endpoint with body: %o', params);
+        Logger.debug('Calling Register Camera endpoint with body: %o', data);
         try {
-            const result = await this.cameraService.register(userId, params);
+            if (serverId) {
+                result = await this.cameraKafkaController.register(serverId, userId, data);
+            }
+            else {
+                result = await this.cameraService.register(userId, data);
+            }
+
+            result = Array.isArray(result) && result.map(camera => {
+                return {
+                    cameraId: camera.cameraId,
+                    cameraNum: camera.cameraNum,
+                    cameraName: camera.cameraName,
+                    cameraType: camera.cameraType,
+                    cameraUsage: camera.cameraUsage,
+                    cameraOrientation: camera.cameraOrientation,
+                    city: camera.city,
+                }
+            });
             const response = {
                 type: result ? 201 : 400,
                 title: result ? 'Success' : 'Bad Request',
-                results: result ? result : 'Camera Already Registered',
+                results: result ? result : 'Camera Already Registered | Request Timeout',
             }
             return res.status(response.type).json(response);
         } catch (e) {

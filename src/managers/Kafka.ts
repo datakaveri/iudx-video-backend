@@ -2,13 +2,14 @@ import { Kafka } from 'kafkajs';
 import { Service } from 'typedi';
 
 import config from '../config';
+import UUID from '../common/UUID';
 
 @Service()
 export default class KafkaManager {
     private kafka: Kafka;
     private kafkaConsumerGroupId: string;
 
-    constructor() {}
+    constructor() { }
 
     public connect() {
         this.kafka = new Kafka({
@@ -28,7 +29,13 @@ export default class KafkaManager {
 
             await consumer.run({
                 eachMessage: async ({ topic, partition, message }) => {
-                    callback(null, message);
+                    for (let [key, value] of Object.entries(message.headers)) {
+                        message.headers[key] = value.toString();
+                    }
+
+                    if (config.host.type !== message.headers.messageSource) {
+                        callback(null, message);
+                    }
                 },
             });
         } catch (err) {
@@ -36,17 +43,30 @@ export default class KafkaManager {
         }
     }
 
-    public async publish(topic, message) {
+    public async publish(topic: string, message: any, messageType: string, messageId?: string) {
         try {
+            if (!messageId) {
+                const namespace: string = config.host.type + 'KafkaMsg';
+                messageId = new UUID().generateUUIDv5(namespace);
+            }
             const msg = JSON.stringify(message);
             const producer = this.kafka.producer();
             await producer.connect();
             const record = await producer.send({
                 topic,
-                messages: [{ value: msg }],
+                messages: [
+                    {
+                        value: msg,
+                        headers: {
+                            messageId,
+                            messageType,
+                            messageSource: config.host.type,
+                        }
+                    }
+                ],
             });
-            return record;
-        } catch(err) {
+            return { messageId, record };
+        } catch (err) {
             throw err;
         }
     }

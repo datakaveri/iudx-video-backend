@@ -24,6 +24,7 @@ export default {
         clientId: process.env.KAFKA_CLIENT_ID,
         brokers: process.env.KAFKA_BROKER,
         consumerGroupId: 'cloud-media-server-consumer',
+        messageWaitTime: 10 // in seconds
     },
     /**
      * Used by winston logger
