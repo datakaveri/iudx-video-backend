@@ -11,7 +11,7 @@ if (envFound.error) {
 export default {
     host: {
         name: process.env.HOST_NAME,
-        type: process.env.HOST_TYPE
+        type: process.env.HOST_TYPE,
     },
 
     port: parseInt(process.env.PORT, 10),
@@ -24,7 +24,14 @@ export default {
         clientId: process.env.KAFKA_CLIENT_ID,
         brokers: [process.env.KAFKA_BROKER],
         consumerGroupId: 'cloud-media-server-consumer',
-        defaultRetentionValue: '172800000'
+        defaultRetentionValue: '172800000',
+        // TODO - credentials will be dynamic later
+        adminUsername: '',
+        adminPassword: '',
+        consumerUsername: '',
+        consumerPassword: '',
+        producerUsername: '',
+        producerPassword: ''
     },
     /**
      * Used by winston logger
@@ -89,6 +96,6 @@ export default {
     cmsAdminConfig: {
         email: process.env.CMS_ADMIN_EMAIL,
         password: process.env.CMS_ADMIN_PASSWORD,
-        name: 'CMS Admin'
-    }
+        name: 'CMS Admin',
+    },
 };
