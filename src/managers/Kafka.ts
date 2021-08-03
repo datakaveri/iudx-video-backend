@@ -16,7 +16,7 @@ export default class KafkaManager {
             clientId: config.kafkaConfig.clientId,
             brokers: [config.kafkaConfig.brokers],
         });
-        this.kafkaConsumerGroupId = config.kafkaConfig.consumerGroupId;
+        this.kafkaConsumerGroupId = config.serverId;
         Object.freeze(this);
     }
 

@@ -17,11 +17,17 @@ export default class StreamManagementController {
 
         Logger.debug('Calling Register Stream endpoint with body: %o', params);
         try {
-            const result = await this.streamService.register(userId, params);
+            let result = await this.streamService.register(userId, params);
+            if (result) {
+                result = {
+                    streamId: result.streamData.streamId,
+                    ...params
+                }
+            }
             const response = {
                 type: result ? 201 : 400,
                 title: result ? 'Success' : 'Bad Request',
-                results: result ? result : 'Camera Not Registered | Stream Already Registered',
+                result: result ? result : 'Camera Not Registered | Stream Already Registered',
             }
             return res.status(response.type).json(response);
         } catch (e) {

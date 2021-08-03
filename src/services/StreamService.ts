@@ -22,85 +22,52 @@ export default class StreamService {
         private streamStatusService: StreamStatusService,
     ) { }
 
-    public async publishRegisteredStreams(streamData: Array<any>) {
-        let streamsToPublish: Array<any> = [];
-
-        const rtmpStreamData = streamData.map(stream => {
-            const namespace: string = config.host.type + 'Stream';
-            const streamId: string = new UUID().generateUUIDv5(namespace);
-            const rtmpStreamUrl = `${config.rtmpServerConfig.serverUrl}/${streamId}?token=${config.rtmpServerConfig.password}`;
-
-            streamsToPublish.push({
-                inputStreamId: stream.streamId,
-                outputStreamId: streamId,
-                inputStreamUrl: stream.streamUrl,
-                outputStreamUrl: rtmpStreamUrl,
-            });
-
-            return {
-                streamId: streamId,
-                cameraId: stream.cameraId,
-                userId: stream.userId,
-                provenanceStreamId: stream.streamId,
-                sourceServerId: config.serverId,
-                destinationServerId: config.serverId,
-                streamName: stream.streamName,
-                streamUrl: rtmpStreamUrl,
-                streamType: 'RTMP',
-                type: 'rtmp',
-                isPublic: stream.isPublic,
-            }
-        });
+    public async publishRegisteredStreams(streamData: any) {
+        const namespace: string = config.host.type + 'Stream';
+        const streamId: string = new UUID().generateUUIDv5(namespace);
+        const rtmpStreamUrl = `${config.rtmpServerConfig.serverUrl}/${streamId}?token=${config.rtmpServerConfig.password}`;
+        const rtmpStreamData: any = {
+            streamId,
+            cameraId: streamData['cameraId'],
+            userId: streamData['userId'],
+            provenanceStreamId: streamData['streamId'],
+            sourceServerId: config.serverId,
+            destinationServerId: config.serverId,
+            streamName: streamData['streamName'],
+            streamUrl: rtmpStreamUrl,
+            streamType: 'RTMP',
+            type: 'rtmp',
+            isPublic: streamData['isPublic'],
+        };
 
         await this.streamRepo.registerStream(rtmpStreamData);
-
-        streamsToPublish.map(stream => {
-            this.processService.addStreamProcess(stream.inputStreamId, stream.outputStreamId,
-                stream.inputStreamUrl, stream.outputStreamUrl);
-        });
+        this.processService.addStreamProcess(streamData['streamId'], streamId, streamData['streamUrl'], rtmpStreamUrl);
+        return rtmpStreamData;
     }
 
-    public async register(userId: string, streamData: Array<any>) {
+    public async register(userId: string, streamData: any) {
         try {
-            const streams: Array<any> = [];
+            const namespace: string = config.host.type + 'Stream';
+            const streamId: string = new UUID().generateUUIDv5(namespace);
+            const isDuplicateStream = await this.streamRepo.findStream(streamData);
+            const camera = await this.cameraRepo.findCamera({ cameraId: streamData['cameraId'] });
 
-            for (const stream of streamData) {
-                const namespace: string = config.host.type + 'Stream';
-                const streamId: string = new UUID().generateUUIDv5(namespace);
-
-                const isDuplicateStream = await this.streamRepo.findStream(stream);
-                const camera = await this.cameraRepo.findCamera({ cameraId: stream.cameraId });
-
-                if (!camera || isDuplicateStream) {
-                    return null;
-                }
-
-                streams.push({
-                    streamId,
-                    userId,
-                    provenanceStreamId: streamId,
-                    sourceServerId: config.serverId,
-                    destinationServerId: config.serverId,
-                    ...stream
-                });
+            if (!camera || isDuplicateStream) {
+                return null;
             }
 
-            let result = await this.streamRepo.registerStream(streams);
+            streamData = {
+                streamId,
+                userId,
+                provenanceStreamId: streamId,
+                sourceServerId: config.serverId,
+                destinationServerId: config.serverId,
+                ...streamData,
+            }
 
-            result = result.map((stream) => {
-                return {
-                    streamId: stream.streamId,
-                    cameraId: stream.cameraId,
-                    streamName: stream.streamName,
-                    streamUrl: stream.streamUrl,
-                    streamType: stream.streamType,
-                    type: stream.type,
-                    isPublic: stream.isPublic,
-                };
-            });
-            await this.publishRegisteredStreams(streams);
-
-            return result;
+            await this.streamRepo.registerStream(streamData);
+            const rtmpStreamData = await this.publishRegisteredStreams(streamData);
+            return { streamData, rtmpStreamData };
         } catch (e) {
             Logger.error(e);
             throw new ServiceError('Error Registering the data');

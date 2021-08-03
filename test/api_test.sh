@@ -76,33 +76,29 @@ EOF
 # Camera Data
 getCameraData() {
     cat <<EOF
-[
-    {
-        "cameraNum": 15,
-        "cameraName" : "camera_5",
-        "cameraType" : "DOME",
-        "cameraUsage" : "RLVD",
-        "cameraOrientation" : "NORTH-EAST",
-        "city" : "Bangalore",
-        "location" : "lat/long"
-    }
-]
+{
+    "cameraNum": 15,
+    "cameraName" : "camera_5",
+    "cameraType" : "DOME",
+    "cameraUsage" : "RLVD",
+    "cameraOrientation" : "NORTH-EAST",
+    "city" : "Bangalore",
+    "location" : "lat/long"
+}
 EOF
 }
 
 # Stream Data
 getStreamData() {
     cat <<EOF
-[
-    {
-        "cameraId" : "$camera_id",
-        "streamName" : "test_stream_1" ,
-        "streamUrl" : "rtsp://localhost:8554/stream1",
-        "streamType" : "RTMP",
-        "type": "camera",
-        "isPublic" : false
-    }
-]
+{
+    "cameraId" : "$camera_id",
+    "streamName" : "test_stream_1" ,
+    "streamUrl" : "rtsp://localhost:8554/stream1",
+    "streamType" : "RTMP",
+    "type": "camera",
+    "isPublic" : false
+}
 EOF
 }
 
@@ -177,7 +173,7 @@ camera_id=$(
         --header "Authorization: Bearer ${provider_token}" \
         --header 'Content-Type: application/json' \
         --data-raw "$(getCameraData)" | python3 -c \
-        "import sys, json; print(json.load(sys.stdin)['results'][0]['cameraId'])"
+        "import sys, json; print(json.load(sys.stdin)['result']['cameraId'])"
 )
 
 sleep 1
@@ -201,7 +197,7 @@ camera_stream_id=$(
         --header "Authorization: Bearer ${provider_token}" \
         --header 'Content-Type: application/json' \
         --data-raw "$(getStreamData)" | python3 -c \
-        "import sys, json; print(json.load(sys.stdin)['results'][0]['streamId'])"
+        "import sys, json; print(json.load(sys.stdin)['result']['streamId'])"
 )
 
 printf "\n \u2714 \033[0;32m Registered the stream\033[0m\n"

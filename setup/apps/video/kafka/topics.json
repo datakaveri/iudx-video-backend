@@ -1,73 +1,7 @@
 {
     "topics": [
         {
-            "name": "cameraUpdate",
-            "num.partitions": 1,
-            "replication": 1,
-            "retention.ms": 172800000
-        },
-        {
-            "name": "localStreamUpdate",
-            "num.partitions": 1,
-            "replication": 1,
-            "retention.ms": 172800000
-        },
-        {
-            "name": "cloudStreamUpdate",
-            "num.partitions": 1,
-            "replication": 1,
-            "retention.ms": 172800000
-        },
-        {
-            "name": "cameraStatus",
-            "num.partitions": 1,
-            "replication": 1,
-            "retention.ms": 172800000
-        },
-        {
-            "name": "localStreamStatus",
-            "num.partitions": 1,
-            "replication": 1,
-            "retention.ms": 172800000
-        },
-        {
-            "name": "cloudStreamStatus",
-            "num.partitions": 1,
-            "replication": 1,
-            "retention.ms": 172800000
-        },
-        {
-            "name": "streamArchive",
-            "num.partitions": 1,
-            "replication": 1,
-            "retention.ms": 172800000
-        },
-        {
-            "name": "uploadArchive",
-            "num.partitions": 1,
-            "replication": 1,
-            "retention.ms": 172800000
-        },
-        {
-            "name": "localServiceStatus",
-            "num.partitions": 1,
-            "replication": 1,
-            "retention.ms": 172800000
-        },
-        {
-            "name": "cloudServiceStatus",
-            "num.partitions": 1,
-            "replication": 1,
-            "retention.ms": 172800000
-        },
-        {
-            "name": "localServiceLogs",
-            "num.partitions": 1,
-            "replication": 1,
-            "retention.ms": 172800000
-        },
-        {
-            "name": "cloudServiceLogs",
+            "name": "healthCheck",
             "num.partitions": 1,
             "replication": 1,
             "retention.ms": 172800000

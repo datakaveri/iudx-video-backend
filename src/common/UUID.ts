@@ -1,14 +1,15 @@
 import {
     v4 as uuidv4,
     v5 as uuidv5,
-    NIL as NIL_UUID
 } from 'uuid';
+
+import config from '../config';
 
 export default class UUID {
     constructor() { }
 
     public generateUUIDv5(namespace: string): string {
-        const NAMESPACE = uuidv5(namespace, NIL_UUID);
+        const NAMESPACE = uuidv5(namespace, config.serverId);
 
         return uuidv5(uuidv4(), NAMESPACE);
     }

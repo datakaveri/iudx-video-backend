@@ -23,7 +23,6 @@ export default {
     kafkaConfig: {
         clientId: process.env.KAFKA_CLIENT_ID,
         brokers: process.env.KAFKA_BROKER,
-        consumerGroupId: 'cloud-media-server-consumer',
         messageWaitTime: 10 // in seconds
     },
     /**
@@ -83,6 +82,6 @@ export default {
 
     prometheusConfig: {
         pushGatewayUrl: process.env.PROM_PUSHGATEWAY_URL,
-        requestTimeout: 3000, // in milliseconds
+        requestTimeout: 3, // in seconds
     }
 };

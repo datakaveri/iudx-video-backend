@@ -5,7 +5,7 @@ export default class CameraRepo {
     @Inject('CameraModel') private cameraModel;
 
     async registerCamera(cameraData: any) {
-        return await this.cameraModel.bulkCreate(cameraData);
+        return await this.cameraModel.create(cameraData);
     }
 
     async findCamera(query: any): Promise<any> {

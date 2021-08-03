@@ -43,5 +43,8 @@ export default class JobQueueManager {
     public events(): WorkerEvents {
         return this.runner.events;
     }
+
+    // TODO: Remove all incomplete jobs when server is restarted
+    public removeIncompleteJobs() { }
 }
 

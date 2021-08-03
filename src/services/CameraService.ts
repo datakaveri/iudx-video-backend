@@ -21,21 +21,16 @@ export default class CameraService {
     public async register(userId: string, cameraData: any) {
         try {
             const namespace: string = config.host.type + 'Camera';
-            const cameras: Array<any> = [];
+            const cameraId: string = new UUID().generateUUIDv5(namespace);
+            const isDuplicateCamera: any = await this.cameraRepo.findCamera(cameraData);
 
-            for (const camera of cameraData) {
-                const cameraId: string = new UUID().generateUUIDv5(namespace);
-                const isDuplicateCamera: any = await this.cameraRepo.findCamera(camera);
-
-                if (isDuplicateCamera) {
-                    return null;
-                }
-
-                cameras.push({ cameraId, userId, ...camera });
+            if (isDuplicateCamera) {
+                return null;
             }
 
-            await this.cameraRepo.registerCamera(cameras);
-            return cameras;
+            cameraData = { cameraId, userId, ...cameraData };
+            await this.cameraRepo.registerCamera(cameraData);
+            return cameraData;
         } catch (e) {
             Logger.error(e);
             throw new ServiceError('Error Registering the data');

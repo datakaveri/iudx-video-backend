@@ -16,17 +16,15 @@ describe('Camera Service Testing', () => {
 
     describe('Register Camera', () => {
 
-        const mockCameraData = [
-            {
-                cameraNum: 15,
-                cameraName: 'camera_1',
-                cameraType: 'DOME',
-                cameraUsage: 'RLVD',
-                cameraOrientation: 'NORTH-EAST',
-                city: 'Bangalore',
-                location: 'lat/long',
-            },
-        ];
+        const mockCameraData = {
+            cameraNum: 15,
+            cameraName: 'camera_1',
+            cameraType: 'DOME',
+            cameraUsage: 'RLVD',
+            cameraOrientation: 'NORTH-EAST',
+            city: 'Bangalore',
+            location: 'lat/long',
+        };
 
         test('Should register the camera', async () => {
             const userId: string = '3';
@@ -36,7 +34,7 @@ describe('Camera Service Testing', () => {
 
         test('Should resolve and return null if the camera already registered', async () => {
             const userId: string = '3';
-            mockCameraData[0].cameraNum = 15758;
+            mockCameraData['cameraNum'] = 15758;
 
             await expect(cameraService.register(userId, mockCameraData)).resolves.toBeNull();
         });

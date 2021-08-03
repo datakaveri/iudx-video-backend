@@ -30,7 +30,7 @@ export default class MonitoringService {
         try {
             const gateway = new prometheusClient.Pushgateway(
                 config.prometheusConfig.pushGatewayUrl,
-                { timeout: config.prometheusConfig.requestTimeout },
+                { timeout: config.prometheusConfig.requestTimeout * 1000 },
                 register
             );
 

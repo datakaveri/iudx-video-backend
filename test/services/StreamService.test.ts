@@ -16,16 +16,14 @@ describe('Stream Service Testing', () => {
 
     describe('Register Stream', () => {
 
-        const mockStreamData = [
-            {
-                cameraId: '1',
-                streamName: 'test_stream_3',
-                streamUrl: 'rtsp://testurl:777',
-                streamType: 'RTSP',
-                type: 'camera',
-                isPublic: false,
-            },
-        ];
+        const mockStreamData = {
+            cameraId: '1',
+            streamName: 'test_stream_3',
+            streamUrl: 'rtsp://testurl:777',
+            streamType: 'RTSP',
+            type: 'camera',
+            isPublic: false,
+        };
 
         test('Should register the stream', async () => {
             const userId: string = '1';
@@ -35,7 +33,7 @@ describe('Stream Service Testing', () => {
 
         test('Should resolve and return null if camera not registered', async () => {
             const userId: string = '1';
-            mockStreamData[0]['cameraId'] = '10';
+            mockStreamData['cameraId'] = '10';
 
             await expect(streamService.register(userId, mockStreamData)).resolves;
         });

@@ -9,7 +9,7 @@ export default class StreamRepo {
     @Inject('StreamModel') private streamModel;
 
     async registerStream(streamData: Array<any>) {
-        return await this.streamModel.bulkCreate(streamData);
+        return await this.streamModel.create(streamData);
     }
 
     async findStream(query: any, columns: Array<string> = null): Promise<any> {
