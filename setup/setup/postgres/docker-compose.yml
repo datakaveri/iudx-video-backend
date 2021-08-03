@@ -1,9 +1,5 @@
 version: "3.8"
 
-networks:
-  vs-net:
-    external: true
-
 volumes:
   pg_data: {}
   pgadmin: {}
@@ -18,7 +14,7 @@ services:
         max-size: 10m
         max-file: "10"
     ports:
-      - "127.0.0.1:5432:5432"
+      - "5432:5432"
     environment:
       TZ: Asia/Kolkata
       POSTGRES_USER: ${POSTGRES_INITDB_USERNAME}
@@ -27,8 +23,6 @@ services:
     volumes:
       - ${SCHEMA_FILE}:/docker-entrypoint-initdb.d/schema.sql
       - pg_data:/var/lib/postgresql/data/
-    networks: 
-      - vs-net 
 
   pgadmin:
     image: dpage/pgadmin4
@@ -42,5 +36,3 @@ services:
       - pgadmin:/root/.pgadmin
     ports:
       - "5050:80"
-    networks: 
-      - vs-net 

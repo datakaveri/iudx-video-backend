@@ -36,6 +36,7 @@ ADD nginx.conf /config/nginx.conf
 ADD stat.xsl /opt/nginx/html/stat.xsl
 EXPOSE 1935
 EXPOSE 8080
+EXPOSE 6060
 
 WORKDIR /
 CMD ["nginx", "-g", "daemon off;"]

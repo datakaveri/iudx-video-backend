@@ -20,6 +20,8 @@ export default {
 
     databaseURL: process.env.DB_URL,
 
+    isStandaloneLms: process.env.STANDALONE_LMS === 'true' || false,
+
     kafkaConfig: {
         clientId: process.env.KAFKA_CLIENT_ID,
         brokers: [process.env.KAFKA_BROKER],
@@ -74,6 +76,8 @@ export default {
         serverUrl: process.env.RTMP_SERVER,
         password: process.env.RTMP_SERVER_PUBLISH_PASSWORD,
         statUrl: process.env.RTMP_STAT_URL,
+        publicServerIp: process.env.RTMP_SERVER_PUBLIC_IP,
+        publicServerPort: process.env.RTMP_SERVER_PUBLIC_PORT
     },
 
     schedulerConfig: {
@@ -96,6 +100,12 @@ export default {
     cmsAdminConfig: {
         email: process.env.CMS_ADMIN_EMAIL,
         password: process.env.CMS_ADMIN_PASSWORD,
-        name: 'CMS Admin',
+        name: 'CMS Admin'
     },
+
+    lmsAdminConfig: {
+        email: process.env.LMS_ADMIN_EMAIL,
+        password: process.env.LMS_ADMIN_PASSWORD,
+        name: 'LMS Admin'
+    }
 };

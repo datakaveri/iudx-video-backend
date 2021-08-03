@@ -13,6 +13,6 @@ docker-compose \
     -f $PROJECT_ROOT/setup/setup/monitoring/docker-compose.yml \
     --env-file $PROJECT_ROOT/.env \
     -p iudx_vs \
-    down 
+    down -v
 
 docker network rm vs-net

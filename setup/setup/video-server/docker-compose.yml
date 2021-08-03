@@ -9,8 +9,6 @@ services:
     image: iudx_vs/backend-server
     container_name: videoserver
     network_mode: host
-    expose:
-      - "4000"
     depends_on:
       - postgres
     command: "npm start"
