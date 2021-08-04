@@ -1,4 +1,4 @@
-import { Kafka } from 'kafkajs';
+import { Kafka, Consumer, Producer, Admin } from 'kafkajs';
 import { Service } from 'typedi';
 
 import config from '../config';
@@ -7,7 +7,9 @@ import UUID from '../common/UUID';
 @Service()
 export default class KafkaManager {
     private kafka: Kafka;
-    private kafkaConsumerGroupId: string;
+    private kafkaConsumer: Consumer;
+    private kafkaProducer: Producer;
+    private kafkaAdmin: Admin;
 
     constructor() { }
 
@@ -16,18 +18,15 @@ export default class KafkaManager {
             clientId: config.kafkaConfig.clientId,
             brokers: [config.kafkaConfig.brokers],
         });
-        this.kafkaConsumerGroupId = config.serverId;
-        Object.freeze(this);
+        Object.freeze(this.kafka);
     }
 
-    public async subscribe(topic, callback) {
+    public async subscribe(topic: string, callback: any) {
         try {
-            const consumer = this.kafka.consumer({ groupId: this.kafkaConsumerGroupId });
-
-            await consumer.connect();
-            await consumer.subscribe({ topic });
-
-            await consumer.run({
+            this.kafkaConsumer = this.kafka.consumer({ groupId: config.serverId });
+            await this.kafkaConsumer.connect();
+            await this.kafkaConsumer.subscribe({ topic });
+            await this.kafkaConsumer.run({
                 eachMessage: async ({ topic, partition, message }) => {
                     for (let [key, value] of Object.entries(message.headers)) {
                         message.headers[key] = value.toString();
@@ -47,9 +46,9 @@ export default class KafkaManager {
                 messageId = new UUID().generateUUIDv5(namespace);
             }
             const msg = JSON.stringify(message);
-            const producer = this.kafka.producer();
-            await producer.connect();
-            const record = await producer.send({
+            this.kafkaProducer = this.kafka.producer();
+            await this.kafkaProducer.connect();
+            const record = await this.kafkaProducer.send({
                 topic,
                 messages: [
                     {
@@ -60,6 +59,30 @@ export default class KafkaManager {
             });
             return { messageId, record };
         } catch (err) {
+            throw err;
+        }
+    }
+
+    public async listTopics() {
+        try {
+            this.kafkaAdmin = this.kafka.admin();
+            await this.kafkaAdmin.connect();
+            const topics = await this.kafkaAdmin.listTopics();
+            await this.kafkaAdmin.disconnect();
+            return topics;
+        }
+        catch (err) {
+            throw err;
+        }
+    }
+
+    public async unsubscribe() {
+        try {
+            if (this.kafkaConsumer) {
+                await this.kafkaConsumer.disconnect();
+            }
+        }
+        catch (err) {
             throw err;
         }
     }

@@ -1,7 +1,7 @@
-import CameraKafkaController from "./controllers/CameraKafkaController";
+import BaseKafkaController from "./controllers/BaseKafkaController";
 
-export default () => {
-    const cameraKafkaController = new CameraKafkaController();
+export default async () => {
+    const baseKafkaController = new BaseKafkaController();
 
-    cameraKafkaController.subscribe();
+    await baseKafkaController.subscribe();
 }

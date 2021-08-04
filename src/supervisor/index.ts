@@ -63,9 +63,9 @@ export default async () => {
         Logger.info('Monitoring service started.');
     }
 
+    // Start Kafka Service
+    await kafkaService();
+
     // Start Express API Server
     apiServer();
-
-    // Start Kafka Service
-    kafkaService();
 };
