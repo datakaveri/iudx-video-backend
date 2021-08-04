@@ -4,6 +4,7 @@ import Camera from './Camera';
 import Policy from './Policy';
 import Stream from './Stream';
 import Monitor from './Monitor';
+import Server from './Server';
 
 export default () => {
 	const app = Router();
@@ -12,6 +13,7 @@ export default () => {
 	Stream(app);
 	Policy(app);
 	Monitor(app);
+	Server(app);
 
 	return app;
 }

@@ -37,10 +37,17 @@ Backend Application for IUDX Video Server.
     RTMP_SERVER=rtmp://localhost:6001/live
     RTMP_SERVER_PUBLISH_PASSWORD=user123
     RTMP_STAT_URL=http://localhost:6002/stat
+    RTMP_SERVER_PUBLIC_IP=localhost
+    RTMP_SERVER_PUBLIC_PORT=1935
     ENABLE_STATUS_CHECK=true
     SERVER_ID=54d6f331-6a8f-5362-9932-00609b42902f # UUID
     ENABLE_METRICS_MONITOR=true
     PROM_PUSHGATEWAY_URL=http://localhost:9091
+    CMS_ADMIN_EMAIL=admin@datakaveri.org
+    CMS_ADMIN_PASSWORD=admin123
+    STANDALONE_LMS=false
+    LMS_ADMIN_EMAIL=admin@datakaveri.org
+    LMS_ADMIN_PASSWORD=admin123
     ```
 
 ### Setup

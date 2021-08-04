@@ -8,7 +8,7 @@ const route = Router();
 export default (app: Router) => {
     const PolicyController = new PolicyExpressController();
 
-    app.use('/policy', passport.authenticate('jwt', { session: true }), AuthorizeRole(['admin', 'provider']), route);
+    app.use('/policy', passport.authenticate('jwt', { session: true }), AuthorizeRole(['cms-admin', 'lms-admin', 'provider']), route);
 
     route.post('/', ValidateStreamAccess, (req, res, next) => PolicyController.addPolicy(req, res, next));
 

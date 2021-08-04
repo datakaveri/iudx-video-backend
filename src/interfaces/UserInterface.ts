@@ -7,4 +7,5 @@ export interface UserInterface {
     verificationCode: string;
     verified: boolean;
     role: string;
+    approved: boolean;
 }

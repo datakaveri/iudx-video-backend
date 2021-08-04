@@ -6,6 +6,7 @@ import { UserModel } from '../models/UserModel';
 import { CameraModel } from '../models/CameraModel';
 import { StreamModel } from '../models/StreamModel';
 import { PolicyModel } from '../models/PolicyModel';
+import { ServerModel } from '../models/ServerModel';
 
 const Database = new Sequelize(config.databaseURL, { dialect: 'postgres' });
 
@@ -26,6 +27,10 @@ const ModelDependencyInjector = () => {
         {
             name: 'PolicyModel',
             model: PolicyModel(Database),
+        },
+        {
+            name: 'ServerModel',
+            model: ServerModel(Database),
         }
     ];
     models.forEach((m) => {

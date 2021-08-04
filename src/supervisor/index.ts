@@ -1,6 +1,7 @@
 import Container from 'typedi';
 import nodemailer from 'nodemailer';
 import smtpTransport from 'nodemailer-smtp-transport';
+import { v4 as uuidv4 } from 'uuid';
 
 import Logger from '../common/Logger';
 import { Database, ModelDependencyInjector } from '../managers/Database';
@@ -11,6 +12,9 @@ import SchedulerManager from '../managers/Scheduler';
 import JobQueueManager from '../managers/JobQueue';
 import KafkaManager from '../managers/Kafka';
 import kafkaService from '../kafka';
+import UserRepo from '../repositories/UserRepo';
+import Utility from '../common/Utility';
+import ServerService from '../services/ServerService';
 
 export default async () => {
     // Initialize Database connection and load model injector
@@ -64,7 +68,52 @@ export default async () => {
     }
 
     // Start Kafka Service
-    await kafkaService();
+    if (!config.isStandaloneLms) {
+        await kafkaService();
+    }
+
+    // Creating CMS admin
+    if (config.host.type === 'CMS') {
+        const email = config.cmsAdminConfig.email;
+        const password = config.cmsAdminConfig.password;
+        const name = config.cmsAdminConfig.name;
+        const userRepo: UserRepo = Container.get(UserRepo);
+        const UtilityService = Container.get(Utility);
+        const verificationCode = UtilityService.generateCode();
+        const found = await userRepo.findUser({ email });
+        if (!found) {
+            const userData = { id: uuidv4(), name: name, email, password, verificationCode, verified: true, role: 'cms-admin', approved: true };
+            await userRepo.createUser(userData);
+        }
+    }
+
+    // Creating LMS admin
+    if (config.isStandaloneLms && config.host.type === 'LMS') {
+        const email = config.lmsAdminConfig.email;
+        const password = config.lmsAdminConfig.password;
+        const name = config.lmsAdminConfig.name;
+        const userRepo: UserRepo = Container.get(UserRepo);
+        const UtilityService = Container.get(Utility);
+        const verificationCode = UtilityService.generateCode();
+        const found = await userRepo.findUser({ email });
+        if (!found) {
+            const userData = { id: uuidv4(), name: name, email, password, verificationCode, verified: true, role: 'lms-admin', approved: true };
+            await userRepo.createUser(userData);
+        }
+    }
+
+    // Server register in CMS
+    if (config.host.type === 'CMS') {
+        const ServerServiceInstance = Container.get(ServerService);
+        const found = await ServerServiceInstance.findServer(config.serverId);
+        if (!found) {
+            const server = await ServerServiceInstance.register('cms-server', 'CMS', config.serverId, config.kafkaConfig.consumerGroupId);
+        }
+    }
+
+    // Server register in LMS standalone
+    // TODO
+
 
     // Start Express API Server
     apiServer();

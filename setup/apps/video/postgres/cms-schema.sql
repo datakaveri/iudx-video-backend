@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS "Users"
   "verificationCode"   TEXT,
   "verified"           BOOLEAN,
   "role"               TEXT,
+  "approved"           BOOLEAN,
   "createdAt"          TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
   "updatedAt"          TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
   UNIQUE ("email"),
@@ -24,11 +25,9 @@ CREATE TABLE IF NOT EXISTS "Servers"
   "serverId"          UUID,
   "serverName"        TEXT        NOT NULL,
   "serverType"        TEXT        NOT NULL,
-  "serverUrl"         TEXT        NOT NULL,
-  "status"            TEXT,
-  "totalPublishers"   INTEGER,
-  "totalClients"      INTEGER,
-  UNIQUE ("serverName"),
+  "upstreamTopic"     TEXT        NOT NULL,
+  "downstreamTopic"   TEXT        NOT NULL,  
+  "consumerGroupId"   TEXT        NOT NULL,  
   PRIMARY KEY ("serverId")
 );
 

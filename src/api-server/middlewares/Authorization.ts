@@ -2,12 +2,19 @@ import { Request, Response, NextFunction } from 'express';
 import Container from 'typedi';
 
 import Logger from '../../common/Logger';
+import config from '../../config';
 import PolicyRepo from '../../repositories/PolicyRepo';
 import StreamRepo from '../../repositories/StreamRepo';
 
 const AuthorizeRole = (allowedRoles) => {
     return (req: Request, res: Response, next: NextFunction) => {
         const role = req.user['role'];
+
+        // If the server is standalone lms then allow lms admin all permissions which cms admin can perform
+        if (config.isStandaloneLms) {
+            allowedRoles.push('lms-admin');
+        }
+        
         if (!role) {
             return res.send(401).send('Authorization failed, invalid token provided');
         }
@@ -55,11 +62,17 @@ const ValidatePolicy = async (req: Request, res: Response, next: NextFunction) =
 const ValidateStreamAccess = async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user['userId'];
     const role = req.user['role'];
-    if (role === 'admin') {
+    if (role === 'cms-admin') {
         return next();
     }
     if (role === 'consumer') {
         return res.status(401).send('Authorization failed');
+    }
+    /** TODO
+     *  
+     */
+    if (role === 'lms-admin') {
+        return next();
     }
     if (!userId) {
         return res.send(401).send('Authorization failed, invalid token provided');

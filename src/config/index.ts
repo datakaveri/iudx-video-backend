@@ -11,7 +11,7 @@ if (envFound.error) {
 export default {
     host: {
         name: process.env.HOST_NAME,
-        type: process.env.HOST_TYPE
+        type: process.env.HOST_TYPE,
     },
 
     port: parseInt(process.env.PORT, 10),
@@ -20,10 +20,20 @@ export default {
 
     databaseURL: process.env.DB_URL,
 
+    isStandaloneLms: process.env.STANDALONE_LMS === 'true' || false,
+
     kafkaConfig: {
         clientId: process.env.KAFKA_CLIENT_ID,
-        brokers: process.env.KAFKA_BROKER,
-        messageWaitTime: 10 // in seconds
+        brokers: [process.env.KAFKA_BROKER],
+        consumerGroupId: 'cloud-media-server-consumer',
+        defaultRetentionValue: '172800000',
+        // TODO - credentials will be dynamic later
+        adminUsername: '',
+        adminPassword: '',
+        consumerUsername: '',
+        consumerPassword: '',
+        producerUsername: '',
+        producerPassword: ''
     },
     /**
      * Used by winston logger
@@ -66,6 +76,8 @@ export default {
         serverUrl: process.env.RTMP_SERVER,
         password: process.env.RTMP_SERVER_PUBLISH_PASSWORD,
         statUrl: process.env.RTMP_STAT_URL,
+        publicServerIp: process.env.RTMP_SERVER_PUBLIC_IP,
+        publicServerPort: process.env.RTMP_SERVER_PUBLIC_PORT
     },
 
     schedulerConfig: {
@@ -83,5 +95,17 @@ export default {
     prometheusConfig: {
         pushGatewayUrl: process.env.PROM_PUSHGATEWAY_URL,
         requestTimeout: 3, // in seconds
+    },
+
+    cmsAdminConfig: {
+        email: process.env.CMS_ADMIN_EMAIL,
+        password: process.env.CMS_ADMIN_PASSWORD,
+        name: 'CMS Admin'
+    },
+
+    lmsAdminConfig: {
+        email: process.env.LMS_ADMIN_EMAIL,
+        password: process.env.LMS_ADMIN_PASSWORD,
+        name: 'LMS Admin'
     }
 };
