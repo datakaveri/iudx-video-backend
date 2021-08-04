@@ -27,6 +27,7 @@ export default {
         brokers: [process.env.KAFKA_BROKER],
         consumerGroupId: 'cloud-media-server-consumer',
         defaultRetentionValue: '172800000',
+        messageWaitTime: 10, // in seconds
         // TODO - credentials will be dynamic later
         adminUsername: '',
         adminPassword: '',

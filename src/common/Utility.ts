@@ -3,7 +3,6 @@ import fs from 'fs';
 import { parseString } from 'xml2js';
 
 import config from '../config';
-import eventEmitter from './EventEmitter';
 
 @Service()
 export default class Utility {
@@ -98,17 +97,5 @@ export default class Utility {
                 }
             });
         })
-    }
-
-    public getKafkaMessageResponse(messageId: string) {
-        setTimeout(() => {
-            eventEmitter.emit(messageId, null);
-        }, config.kafkaConfig.messageWaitTime * 1000);
-
-        return new Promise((resolve, reject) => {
-            eventEmitter.once(messageId, data => {
-                return resolve(data);
-            });
-        });
     }
 }

@@ -1,6 +1,7 @@
 import { ConfigResourceTypes, Kafka } from 'kafkajs';
 import { Service } from 'typedi';
 import config from '../config';
+import eventEmitter from '../common/EventEmitter';
 
 @Service()
 export default class KafkaUtilService {
@@ -68,4 +69,30 @@ export default class KafkaUtilService {
             throw err;
         }
     }
+
+    public async listTopics() {
+        try {
+            const kafkaAdminClient = this.kafka.admin();
+            await kafkaAdminClient.connect();
+            const topics = await kafkaAdminClient.listTopics();
+            await kafkaAdminClient.disconnect();
+            return topics;
+        }
+        catch (err) {
+            throw err;
+        }
+    }
+
+    public getKafkaMessageResponse(messageId: string) {
+        setTimeout(() => {
+            eventEmitter.emit(messageId, null);
+        }, config.kafkaConfig.messageWaitTime * 1000);
+
+        return new Promise((resolve, reject) => {
+            eventEmitter.once(messageId, data => {
+                return resolve(data);
+            });
+        });
+    }
+
 }

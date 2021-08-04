@@ -70,6 +70,7 @@ export default async () => {
     // Start Kafka Service
     if (!config.isStandaloneLms) {
         await kafkaService();
+        Logger.info('Connected to Kafka successfully.');
     }
 
     // Creating CMS admin

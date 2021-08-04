@@ -5,10 +5,12 @@ import Logger from "../../common/Logger";
 import eventEmitter from "../../common/EventEmitter";
 import KafkaManager from "../../managers/Kafka";
 import JobQueueManager from "../../managers/JobQueue";
+import KafkaUtilService from "../../services/KafkaUtilService";
 
 export default class BaseController {
     private kafkaManager: KafkaManager;
     private jobQueueManager: JobQueueManager;
+    private kafkaUtilService: KafkaUtilService;
     private topic: any;
     private topicCount: number;
 
@@ -17,6 +19,7 @@ export default class BaseController {
         this.topic = config.host.type === 'CMS' ? /.*.upstream/ : config.serverId + '.downstream';
         this.kafkaManager = Container.get(KafkaManager);
         this.jobQueueManager = Container.get(JobQueueManager);
+        this.kafkaUtilService = Container.get(KafkaUtilService);
     }
 
     public async subscribe() {
@@ -54,13 +57,16 @@ export default class BaseController {
 
     public async subscribeToNewTopics() {
         try {
-            const topics: Array<string> = await this.kafkaManager.listTopics();
+            const topics: Array<string> = await this.kafkaUtilService.listTopics();
             const noOfTopics: number = topics.length;
+
             if (this.topicCount !== 0 && this.topicCount < noOfTopics) {
                 Logger.info('New Topics Detected.');
+
                 await this.kafkaManager.unsubscribe();
                 await this.subscribe();
             }
+
             this.topicCount = noOfTopics;
         }
         catch (err) {

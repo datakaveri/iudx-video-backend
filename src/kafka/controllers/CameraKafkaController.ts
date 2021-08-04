@@ -1,19 +1,20 @@
 import { Container } from 'typedi';
 
 import Logger from '../../common/Logger';
-import Utility from '../../common/Utility';
 import KafkaManager from '../../managers/Kafka';
 import CameraRepo from '../../repositories/CameraRepo';
+import KafkaUtilService from '../../services/KafkaUtilService';
 
 export default class CameraKafkaController {
     private kafkaManager: KafkaManager;
     private cameraRepo: CameraRepo;
-    private utilityService: Utility;
+    private kafkaUtilService: KafkaUtilService;
+
 
     constructor() {
         this.kafkaManager = Container.get(KafkaManager);
         this.cameraRepo = Container.get(CameraRepo);
-        this.utilityService = Container.get(Utility);
+        this.kafkaUtilService = Container.get(KafkaUtilService);
     }
 
     public async register(serverId: string, userId: string, cameraData: any) {
@@ -21,10 +22,12 @@ export default class CameraKafkaController {
             const topic: string = serverId + '.downstream';
             const message: any = { taskIdentifier: 'registerCamera', data: { userId, cameraData } };
             const { messageId } = await this.kafkaManager.publish(topic, message, 'HTTP_REQ');
-            const result = await this.utilityService.getKafkaMessageResponse(messageId);
+            const result = await this.kafkaUtilService.getKafkaMessageResponse(messageId);
+
             if (result) {
                 await this.cameraRepo.registerCamera(result);
             }
+
             return result;
         }
         catch (err) {
