@@ -11,6 +11,7 @@ import Queue from '../managers/Queue';
 import SchedulerManager from '../managers/Scheduler';
 import UserRepo from '../repositories/UserRepo';
 import Utility from '../common/Utility';
+import ServerService from '../services/ServerService';
 
 export default async () => {
     // Initialize Database connection and load model injector
@@ -89,6 +90,19 @@ export default async () => {
             await userRepo.createUser(userData);
         }
     }
+
+    // Server register in CMS
+    if (config.host.type === 'CMS') {
+        const ServerServiceInstance = Container.get(ServerService);
+        const found = await ServerServiceInstance.findServer(config.serverId);
+        if (!found) {
+            const server = await ServerServiceInstance.register('cms-server', 'CMS', config.serverId, config.kafkaConfig.consumerGroupId);
+        }
+    }
+
+    // Server register in LMS standalone
+    // TODO
+
 
     // Start Express API Server
     apiServer();
