@@ -17,17 +17,17 @@ export default class ServerService {
             const newServerId: string = serverId || new UUID().generateUUIDv5(serverName);
 
             // Create upstream and downstream topics for the server
-            const upstreamTopicName = `${serverId}.upstream`;
-            const downstreamTopicName = `${serverId}.downstream`;
+            const upstreamTopicName = `${newServerId}.upstream`;
+            const downstreamTopicName = `${newServerId}.downstream`;
             await this.kafkaUtilService.createTopic(upstreamTopicName);
             await this.kafkaUtilService.createTopic(downstreamTopicName);
 
             // Subscribe to new topics created
             const baseKafkaController = new BaseKafkaController();
-            baseKafkaController.subscribeToNewTopics();
+            await baseKafkaController.subscribeToNewTopics();
 
             // Create consumer group id for the server
-            const newConsumerGroupId = consumerGroupId || `${serverId}-group`;
+            const newConsumerGroupId = consumerGroupId || `${newServerId}-group`;
 
             // Update data in database
             await this.serverRepo.addServer({
