@@ -17,12 +17,13 @@ export default class KafkaManager {
             clientId: config.kafkaConfig.clientId,
             brokers: config.kafkaConfig.brokers,
         });
-        Object.freeze(this.kafka);
+        this.kafkaConsumer = this.kafka.consumer({ groupId: config.serverId + '-group' });
+        this.kafkaProducer = this.kafka.producer();
+        Object.freeze(this);
     }
 
     public async subscribe(topic: string, callback: any) {
         try {
-            this.kafkaConsumer = this.kafka.consumer({ groupId: config.serverId + '-group' });
             await this.kafkaConsumer.connect();
             await this.kafkaConsumer.subscribe({ topic });
             await this.kafkaConsumer.run({
@@ -46,7 +47,6 @@ export default class KafkaManager {
             }
 
             const msg = JSON.stringify(message);
-            this.kafkaProducer = this.kafka.producer();
             await this.kafkaProducer.connect();
             const record = await this.kafkaProducer.send({
                 topic,
@@ -66,9 +66,7 @@ export default class KafkaManager {
 
     public async unsubscribe() {
         try {
-            if (this.kafkaConsumer) {
-                await this.kafkaConsumer.disconnect();
-            }
+            await this.kafkaConsumer.disconnect();
         }
         catch (err) {
             throw err;

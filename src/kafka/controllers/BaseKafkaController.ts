@@ -5,21 +5,16 @@ import Logger from "../../common/Logger";
 import eventEmitter from "../../common/EventEmitter";
 import KafkaManager from "../../managers/Kafka";
 import JobQueueManager from "../../managers/JobQueue";
-import KafkaUtilService from "../../services/KafkaUtilService";
 
 export default class BaseKafkaController {
     private kafkaManager: KafkaManager;
     private jobQueueManager: JobQueueManager;
-    private kafkaUtilService: KafkaUtilService;
     private topic: any;
-    private topicCount: number;
 
     constructor() {
-        this.topicCount = 0;
         this.topic = config.host.type === 'CMS' ? /.*.upstream/ : config.serverId + '.downstream';
-        this.kafkaManager = Container.get(KafkaManager);
         this.jobQueueManager = Container.get(JobQueueManager);
-        this.kafkaUtilService = Container.get(KafkaUtilService);
+        this.kafkaManager = Container.get(KafkaManager);
     }
 
     public async subscribe() {
@@ -57,15 +52,8 @@ export default class BaseKafkaController {
 
     public async subscribeToNewTopics() {
         try {
-            const topics: Array<string> = await this.kafkaUtilService.listTopics();
-            const noOfTopics: number = topics.length;
-
-            if (this.topicCount !== 0 && this.topicCount < noOfTopics) {
-                await this.kafkaManager.unsubscribe();
-                await this.subscribe();
-            }
-
-            this.topicCount = noOfTopics;
+            await this.kafkaManager.unsubscribe();
+            await this.subscribe();
         }
         catch (err) {
             Logger.error('error: %o', err);

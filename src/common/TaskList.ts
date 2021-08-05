@@ -1,9 +1,10 @@
 import { Container } from 'typedi';
 
-import CameraService from '../services/CameraService';
-import KafkaManager from '../managers/Kafka';
 import config from '../config';
 import Logger from './Logger';
+import KafkaManager from '../managers/Kafka';
+import CameraService from '../services/CameraService';
+import StreamService from '../services/StreamService';
 
 export const taskList = {
 
@@ -22,4 +23,20 @@ export const taskList = {
             console.log(err);
         }
     },
+    registerStream: async (payload, helpers) => {
+        try {
+            const streamService: StreamService = Container.get(StreamService);
+            const kafkaManager: KafkaManager = Container.get(KafkaManager);
+            const topic: string = config.serverId + '.upstream';
+
+            const { messageId, data } = payload;
+            const result = await streamService.register(data.userId, data.streamData);
+            await kafkaManager.publish(topic, { data: result }, 'HTTP_RES', messageId);
+        }
+        catch (err) {
+            Logger.error('error: %o', err);
+            console.log(err);
+        }
+    },
+
 }
