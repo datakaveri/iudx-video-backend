@@ -6,10 +6,11 @@ import UUID from '../common/UUID';
 import config from '../config';
 import KafkaUtilService from './KafkaUtilService';
 import ServerRepo from '../repositories/ServerRepo';
+import BaseKafkaController from '../kafka/controllers/BaseKafkaController';
 
 @Service()
 export default class ServerService {
-    constructor(private kafkaUtilService: KafkaUtilService, private serverRepo: ServerRepo) {}
+    constructor(private kafkaUtilService: KafkaUtilService, private serverRepo: ServerRepo) { }
 
     public async register(serverName: string, serverType: string, serverId?: string, consumerGroupId?: string) {
         try {
@@ -21,8 +22,12 @@ export default class ServerService {
             await this.kafkaUtilService.createTopic(upstreamTopicName);
             await this.kafkaUtilService.createTopic(downstreamTopicName);
 
+            // Subscribe to new topics created
+            const baseKafkaController = new BaseKafkaController();
+            baseKafkaController.subscribeToNewTopics();
+
             // Create consumer group id for the server
-            const newConsumerGroupId =  consumerGroupId || `${serverId}-group`;
+            const newConsumerGroupId = consumerGroupId || `${serverId}-group`;
 
             // Update data in database
             await this.serverRepo.addServer({

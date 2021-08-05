@@ -23,11 +23,13 @@ CREATE TABLE IF NOT EXISTS "Users"
 CREATE TABLE IF NOT EXISTS "Servers" 
 (
   "serverId"          UUID,
-  "serverName"        TEXT        NOT NULL,
-  "serverType"        TEXT        NOT NULL,
-  "upstreamTopic"     TEXT        NOT NULL,
-  "downstreamTopic"   TEXT        NOT NULL,  
-  "consumerGroupId"   TEXT        NOT NULL,  
+  "serverName"        TEXT         NOT NULL,
+  "serverType"        TEXT         NOT NULL,
+  "upstreamTopic"     TEXT         NOT NULL,
+  "downstreamTopic"   TEXT         NOT NULL,  
+  "consumerGroupId"   TEXT         NOT NULL,
+  "createdAt"         TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+  "updatedAt"         TIMESTAMPTZ  NOT NULL DEFAULT NOW(),  
   PRIMARY KEY ("serverId")
 );
 

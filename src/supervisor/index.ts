@@ -62,7 +62,7 @@ export default async () => {
     }
 
     // Initialize Monitoring Service
-    if (config.schedulerConfig.metricsMonitor.enable && config.host.type === 'LMS') {
+    if (config.schedulerConfig.metricsMonitor.enable && config.host.type === 'LMS' && !config.isStandaloneLms) {
         schedulerManager.startMetricsMonitoring();
         Logger.info('Monitoring service started.');
     }

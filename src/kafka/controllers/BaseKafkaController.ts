@@ -7,7 +7,7 @@ import KafkaManager from "../../managers/Kafka";
 import JobQueueManager from "../../managers/JobQueue";
 import KafkaUtilService from "../../services/KafkaUtilService";
 
-export default class BaseController {
+export default class BaseKafkaController {
     private kafkaManager: KafkaManager;
     private jobQueueManager: JobQueueManager;
     private kafkaUtilService: KafkaUtilService;
@@ -61,8 +61,6 @@ export default class BaseController {
             const noOfTopics: number = topics.length;
 
             if (this.topicCount !== 0 && this.topicCount < noOfTopics) {
-                Logger.info('New Topics Detected.');
-
                 await this.kafkaManager.unsubscribe();
                 await this.subscribe();
             }
