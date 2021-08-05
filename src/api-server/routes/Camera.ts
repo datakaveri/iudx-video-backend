@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import passport from 'passport';
 
-import CameraManagementController from '../controllers/CameraManagementController';
+import CameraExpressController from '../controllers/CameraExpressController';
 import { validatePaginationQuery } from '../middlewares/ValidateQuery';
 import { AuthorizeRole } from '../middlewares/Authorization';
 
@@ -9,7 +9,7 @@ const route = Router();
 
 export default (app: Router) => {
 
-    const CameraController = new CameraManagementController();
+    const CameraController = new CameraExpressController();
 
     app.use('/cameras', passport.authenticate('jwt', { session: true }), route);
 

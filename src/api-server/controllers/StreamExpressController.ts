@@ -3,31 +3,43 @@ import Container from 'typedi';
 
 import Logger from '../../common/Logger';
 import StreamService from '../../services/StreamService';
+import StreamKafkaController from '../../kafka/controllers/StreamKafkaController';
 
-export default class StreamManagementController {
+export default class StreamExpressController {
     private streamService: StreamService;
+    private streamKafkaController: StreamKafkaController;
 
     constructor() {
         this.streamService = Container.get(StreamService);
+        this.streamKafkaController = new StreamKafkaController();
     }
 
     async register(req: Request, res: Response, next: NextFunction) {
         const userId: string = req.user['userId'];
         let params: any = req.body;
+        const serverId: string = (req.query as any)['serverId'];
+        let result: any;
 
         Logger.debug('Calling Register Stream endpoint with body: %o', params);
         try {
-            let result = await this.streamService.register(userId, params);
+            if (serverId) {
+                result = await this.streamKafkaController.register(serverId, userId, params);
+            }
+            else {
+                result = await this.streamService.register(userId, params);
+            }
+
             if (result) {
                 result = {
                     streamId: result.streamData.streamId,
                     ...params
                 }
             }
+
             const response = {
                 type: result ? 201 : 400,
                 title: result ? 'Success' : 'Bad Request',
-                result: result ? result : 'Camera Not Registered | Stream Already Registered',
+                result: result ? result : 'Camera Not Registered | Stream Already Registered | Request Timeout',
             }
             return res.status(response.type).json(response);
         } catch (e) {

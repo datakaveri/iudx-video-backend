@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import passport from 'passport';
 
-import StreamManagementController from '../controllers/StreamManagementController';
+import StreamExpressController from '../controllers/StreamExpressController';
 import { AuthorizeRole, ValidateStreamAccess, ValidatePolicy } from '../middlewares/Authorization';
 import { validatePaginationQuery } from '../middlewares/ValidateQuery';
 
@@ -9,7 +9,7 @@ const route = Router();
 
 export default (app: Router) => {
 
-    const StreamController = new StreamManagementController();
+    const StreamController = new StreamExpressController();
 
     app.use('/streams', passport.authenticate('jwt', { session: true }), route);
 

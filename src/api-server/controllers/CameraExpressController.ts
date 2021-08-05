@@ -5,7 +5,7 @@ import Logger from '../../common/Logger';
 import CameraService from '../../services/CameraService';
 import CameraKafkaController from '../../kafka/controllers/CameraKafkaController';
 
-export default class CameraManagementController {
+export default class CameraExpressController {
     private cameraService: CameraService;
     private cameraKafkaController: CameraKafkaController;
 

@@ -4,7 +4,7 @@ import Container from 'typedi';
 import Logger from '../../common/Logger';
 import MonitoringService from '../../services/MonitoringService';
 
-export default class MonitoringController {
+export default class MonitoringExpressController {
     private monitoringService: MonitoringService;
 
     constructor() {

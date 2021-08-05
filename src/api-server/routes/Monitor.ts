@@ -1,11 +1,11 @@
 import { Router } from 'express';
 
-import MonitoringController from '../controllers/MonitoringController';
+import MonitoringExpressController from '../controllers/MonitoringExpressController';
 
 const route = Router();
 
 export default (app: Router) => {
-    const monitoringController = new MonitoringController();
+    const monitoringController = new MonitoringExpressController();
     app.use('/metrics', route);
 
     route.get('/', (req, res, next) => monitoringController.getPromMetrics(req, res, next));

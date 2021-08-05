@@ -10,7 +10,7 @@ volumes:
 
 services:
   loki:
-    image: grafana/loki
+    image: grafana/loki:2.0.0
     container_name: loki
     volumes:
       - ${PROJECT_ROOT}/setup/setup/monitoring/loki/local-config.yaml:/etc/loki/local-config.yaml
@@ -22,7 +22,7 @@ services:
       - vs-net
 
   promtail:
-    image: grafana/promtail
+    image: grafana/promtail:2.0.0
     container_name: promtail
     volumes:
       - /var/lib/docker/containers:/var/lib/docker/containers
@@ -33,7 +33,7 @@ services:
       - vs-net
 
   pushgateway:
-    image: prom/pushgateway
+    image: prom/pushgateway:1.4.1
     container_name: pushgateway
     restart: always
     ports:
@@ -42,7 +42,7 @@ services:
       - vs-net
 
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:v2.28.1
     container_name: prometheus
     restart: always
     volumes:
