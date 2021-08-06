@@ -22,3 +22,5 @@ pubECDSASHA256.pem
 
 
 ./tags
+
+kafka_certs

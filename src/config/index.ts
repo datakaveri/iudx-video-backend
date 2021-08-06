@@ -29,12 +29,14 @@ export default {
         defaultRetentionValue: '172800000',
         messageWaitTime: 20, // in seconds
         // TODO - credentials will be dynamic later
-        adminUsername: '',
-        adminPassword: '',
-        consumerUsername: '',
-        consumerPassword: '',
-        producerUsername: '',
-        producerPassword: ''
+        adminUsername: process.env.KAFKA_CLIENT_USERNAME,
+        adminPassword: process.env.KAFKA_CLIENT_PASSWORD,
+        consumerUsername: process.env.KAFKA_CLIENT_USERNAME,
+        consumerPassword: process.env.KAFKA_CLIENT_PASSWORD,
+        producerUsername: process.env.KAFKA_CLIENT_USERNAME,
+        producerPassword: process.env.KAFKA_CLIENT_PASSWORD,
+        sslCAPath: process.env.KAFKA_SSL_CA_FILEPATH,
+        sslCERTPath: process.env.KAFKA_SSL_CERT_FILEPATH,
     },
     /**
      * Used by winston logger

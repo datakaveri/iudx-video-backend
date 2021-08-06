@@ -10,19 +10,22 @@ volumes:
 
 services:
   zook:
-    image: zookeeper:3.4.9
+    image: confluentinc/cp-zookeeper:latest
     container_name: zookeeper
     hostname: zook
     restart: always
     ports:
       - "2181:2181"
     environment:
-      ZOO_MY_ID: 2
-      ZOO_PORT: 2181
-      ZOO_SERVERS: server.1=zook:2888:3888
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      KAFKA_OPTS: -Djava.security.auth.login.config=/etc/kafka/zookeeper_jaas.conf
+                  -Dzookeeper.authProvider.1=org.apache.zookeeper.server.auth.SASLAuthenticationProvider
+                  -DrequireClientAuthScheme=sasl
+                  -Dzookeeper.allowSaslFailedClients=false
     volumes:
       - zkdata:/data
       - zkdatalog:/datalog
+      - ${PROJECT_ROOT}/setup/setup/zookeeper/config/zookeeper_jaas.conf:/etc/kafka/zookeeper_jaas.conf
     networks: 
       - vs-net
-
