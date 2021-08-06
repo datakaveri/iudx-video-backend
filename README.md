@@ -89,6 +89,9 @@ This setup takes care of setting up Zookeeper, Kafka, Nginx RTMP server, Postgre
     # Change path to scripts directory
     cd ./setup/scipts/
 
+    # Generate Self Signed SSL Keys for Kafka
+    ./kafka_cert_generate.sh
+
     # Run CMS script
     ./setup_cms.sh
     ```

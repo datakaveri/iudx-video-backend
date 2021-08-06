@@ -33,7 +33,7 @@ services:
       - vs-net
 
   pushgateway:
-    image: prom/pushgateway:1.4.1
+    image: prom/pushgateway:v1.4.1
     container_name: pushgateway
     restart: always
     ports:
