@@ -1,12 +1,13 @@
 import { Kafka, Consumer, Producer } from 'kafkajs';
 import { Service } from 'typedi';
+import fs from 'fs';
 
 import config from '../config';
 import UUID from '../common/UUID';
 
 @Service()
 export default class KafkaManager {
-    private kafka: Kafka;
+    public kafka: Kafka;
     private kafkaConsumer: Consumer;
     private kafkaProducer: Producer;
 
@@ -16,6 +17,16 @@ export default class KafkaManager {
         this.kafka = new Kafka({
             clientId: config.kafkaConfig.clientId,
             brokers: config.kafkaConfig.brokers,
+            ssl: {
+                rejectUnauthorized: true,
+                ca: [fs.readFileSync(config.kafkaConfig.sslCAPath, 'utf-8')],
+                cert: [fs.readFileSync(config.kafkaConfig.sslCERTPath, 'utf-8')],
+            },
+            sasl: {
+                mechanism: 'plain',
+                username: config.kafkaConfig.adminUsername,
+                password: config.kafkaConfig.adminPassword
+            }
         });
         this.kafkaConsumer = this.kafka.consumer({ groupId: config.serverId + '-group' });
         this.kafkaProducer = this.kafka.producer();
