@@ -2,17 +2,15 @@ import { ConfigResourceTypes, Kafka } from 'kafkajs';
 import { Service } from 'typedi';
 import config from '../config';
 import eventEmitter from '../common/EventEmitter';
+import KafkaManager from '../managers/Kafka';
 
 @Service()
 export default class KafkaUtilService {
-    private kafka = new Kafka({
-        clientId: config.kafkaConfig.clientId,
-        brokers: config.kafkaConfig.brokers,
-    });
+    constructor(private kafkaManger: KafkaManager) {}
 
     async createTopic(topicName) {
         try {
-            const kafkaAdminClient = this.kafka.admin();
+            const kafkaAdminClient = this.kafkaManger.kafka.admin();
             await kafkaAdminClient.connect();
             await kafkaAdminClient.createTopics({
                 topics: [
@@ -35,7 +33,7 @@ export default class KafkaUtilService {
 
     async deleteTopic(topicName) {
         try {
-            const kafkaAdminClient = this.kafka.admin();
+            const kafkaAdminClient = this.kafkaManger.kafka.admin();
             await kafkaAdminClient.connect();
             await kafkaAdminClient.deleteTopics({
                 topics: [topicName],
@@ -48,7 +46,7 @@ export default class KafkaUtilService {
 
     async updateTopicRetentionPolicy(topicName, value) {
         try {
-            const kafkaAdminClient = this.kafka.admin();
+            const kafkaAdminClient = this.kafkaManger.kafka.admin();
             await kafkaAdminClient.connect();
             await kafkaAdminClient.alterConfigs({
                 validateOnly: false,
@@ -72,7 +70,7 @@ export default class KafkaUtilService {
 
     public async listTopics() {
         try {
-            const kafkaAdminClient = this.kafka.admin();
+            const kafkaAdminClient = this.kafkaManger.kafka.admin();
             await kafkaAdminClient.connect();
             const topics = await kafkaAdminClient.listTopics();
             await kafkaAdminClient.disconnect();
