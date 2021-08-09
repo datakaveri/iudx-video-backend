@@ -107,6 +107,7 @@ export default {
     },
 
     lmsAdminConfig: {
+        id: process.env.LMS_ADMIN_ID,
         email: process.env.LMS_ADMIN_EMAIL,
         password: process.env.LMS_ADMIN_PASSWORD,
         name: 'LMS Admin'

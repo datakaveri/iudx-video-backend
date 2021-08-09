@@ -89,7 +89,8 @@ export default async () => {
     }
 
     // Creating LMS admin
-    if (config.isStandaloneLms && config.host.type === 'LMS') {
+    if (config.host.type === 'LMS') {
+        const id = config.lmsAdminConfig.id || uuidv4();
         const email = config.lmsAdminConfig.email;
         const password = config.lmsAdminConfig.password;
         const name = config.lmsAdminConfig.name;
@@ -98,7 +99,7 @@ export default async () => {
         const verificationCode = UtilityService.generateCode();
         const found = await userRepo.findUser({ email });
         if (!found) {
-            const userData = { id: uuidv4(), name: name, email, password, verificationCode, verified: true, role: 'lms-admin', approved: true };
+            const userData = { id, name: name, email, password, verificationCode, verified: true, role: 'lms-admin', approved: true };
             await userRepo.createUser(userData);
         }
     }

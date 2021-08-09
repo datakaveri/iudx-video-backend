@@ -77,7 +77,7 @@ export default class KafkaManager {
 
     public async unsubscribe() {
         try {
-            await this.kafkaConsumer.disconnect();
+            await this.kafkaConsumer.stop();
         }
         catch (err) {
             throw err;

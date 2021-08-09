@@ -5,6 +5,7 @@ import Logger from './Logger';
 import KafkaManager from '../managers/Kafka';
 import CameraService from '../services/CameraService';
 import StreamService from '../services/StreamService';
+import { KafkaMessageType } from '../common/Constants';
 
 export const taskList = {
 
@@ -16,7 +17,7 @@ export const taskList = {
 
             const { messageId, data } = payload;
             const result = await cameraService.register(data.userId, data.cameraData);
-            await kafkaManager.publish(topic, { data: result }, 'HTTP_RES', messageId);
+            await kafkaManager.publish(topic, { data: result }, KafkaMessageType.HTTP_RESPONSE, messageId);
         }
         catch (err) {
             Logger.error('error: %o', err);
@@ -31,7 +32,7 @@ export const taskList = {
 
             const { messageId, data } = payload;
             const result = await streamService.register(data.userId, data.streamData);
-            await kafkaManager.publish(topic, { data: result }, 'HTTP_RES', messageId);
+            await kafkaManager.publish(topic, { data: result }, KafkaMessageType.HTTP_RESPONSE, messageId);
         }
         catch (err) {
             Logger.error('error: %o', err);

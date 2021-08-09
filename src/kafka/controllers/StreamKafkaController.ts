@@ -1,6 +1,7 @@
 import { Container } from 'typedi';
 
 import Logger from '../../common/Logger';
+import { KafkaMessageType } from '../../common/Constants';
 import KafkaManager from '../../managers/Kafka';
 import StreamRepo from '../../repositories/StreamRepo';
 import KafkaUtilService from '../../services/KafkaUtilService';
@@ -21,7 +22,7 @@ export default class StreamKafkaController {
         try {
             const topic: string = serverId + '.downstream';
             const message: any = { taskIdentifier: 'registerStream', data: { userId, streamData } };
-            const { messageId } = await this.kafkaManager.publish(topic, message, 'HTTP_REQ');
+            const { messageId } = await this.kafkaManager.publish(topic, message, KafkaMessageType.HTTP_REQUEST);
             const result = await this.kafkaUtilService.getKafkaMessageResponse(messageId);
 
             if (result) {

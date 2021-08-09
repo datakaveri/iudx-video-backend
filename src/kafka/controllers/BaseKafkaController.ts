@@ -3,6 +3,7 @@ import { Container } from "typedi";
 import config from "../../config";
 import Logger from "../../common/Logger";
 import eventEmitter from "../../common/EventEmitter";
+import { KafkaMessageType } from "../../common/Constants";
 import KafkaManager from "../../managers/Kafka";
 import JobQueueManager from "../../managers/JobQueue";
 
@@ -30,12 +31,12 @@ export default class BaseKafkaController {
             const messageId: string = message.headers.messageId;
 
             switch (message.headers.messageType) {
-                case 'HTTP_REQ':
+                case KafkaMessageType.HTTP_REQUEST:
                     msg = JSON.parse(message.value.toString());
                     await this.jobQueueManager.add(msg.taskIdentifier, { messageId, data: msg.data });
                     break;
 
-                case 'HTTP_RES':
+                case KafkaMessageType.HTTP_RESPONSE:
                     msg = JSON.parse(message.value.toString());
                     eventEmitter.emit(messageId, msg.data);
                     break;

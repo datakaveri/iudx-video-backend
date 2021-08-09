@@ -33,12 +33,17 @@ passport.use(
                 if (!(role === 'consumer' || role === 'provider' || role === 'lms-admin')) {
                     return done(new Error('Invalid role provided in request'));
                 }
-                const userData = { id: uuidv4(), name: req.body.name, email, password, verificationCode, verified: false, role: req.body.role };
+                const userId = uuidv4();
+                const userData = { id: userId, name: req.body.name, email, password, verificationCode, verified: false, role: req.body.role };
                 if (role === 'consumer') {
                     userData['approved'] = true;
                 }
                 await userRepo.createUser(userData);
-                return done(null, verificationCode);
+                let result = { verificationCode };
+                if (role === 'lms-admin') {
+                    result['userId'] = userId;
+                }
+                return done(null, result);
             } catch (error) {
                 done(error);
             }

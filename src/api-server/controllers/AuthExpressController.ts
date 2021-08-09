@@ -15,18 +15,21 @@ export default class AuthExpressController {
     async signUp(req: Request, res: Response, next: NextFunction) {
         Logger.debug('Calling Sign-Up endpoint with body: %o', req.body);
         try {
-            passport.authenticate('signup', async (err, verificationCode) => {
+            passport.authenticate('signup', async (err, result) => {
                 try {
                     if (err) {
                         return next(err);
-                    } else if(!verificationCode) {
+                    } else if (!result.verificationCode) {
                         const error = new Error('An error occurred.');
                         return next(error);
                     }
                     // send mail of confirmation code
                     // await this.authService.signUp({name: req.body.name, email: req.body.email, verificationCode})
-
-                    return res.status(201).json({ message: 'User account created, please verify your email' });
+                    let response = {
+                        ...result.userId && { userId: result.userId },
+                        message: 'User account created, please verify your email'
+                    };
+                    return res.status(201).json(response);
                 } catch (error) {
                     return next(error);
                 }

@@ -23,8 +23,10 @@ export default class ServerService {
             await this.kafkaUtilService.createTopic(downstreamTopicName);
 
             // Subscribe to new topics created
-            const baseKafkaController = new BaseKafkaController();
-            await baseKafkaController.subscribeToNewTopics();
+            if (serverType === 'LMS') {
+                const baseKafkaController = new BaseKafkaController();
+                await baseKafkaController.subscribeToNewTopics();
+            }
 
             // Create consumer group id for the server
             const newConsumerGroupId = consumerGroupId || `${newServerId}-group`;
