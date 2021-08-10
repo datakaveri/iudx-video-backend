@@ -4,12 +4,15 @@ import passport from 'passport';
 
 import Logger from '../../common/Logger';
 import AuthService from '../../services/AuthService';
+import AuthKafkaController from '../../kafka/controllers/AuthKafkaController';
 
 export default class AuthExpressController {
     private authService: AuthService;
+    private authKafkaController: AuthKafkaController;
 
     constructor() {
         this.authService = Container.get(AuthService);
+        this.authKafkaController = new AuthKafkaController();
     }
 
     async signUp(req: Request, res: Response, next: NextFunction) {
@@ -147,9 +150,16 @@ export default class AuthExpressController {
     }
 
     async approve(req: Request, res: Response, next: NextFunction) {
-        Logger.debug('Calling rtmp token validate endpoint');
+        Logger.debug('Calling user approval endpoint');
+        const serverId: string = (req.query as any)['serverId'];
+        let response: any;
         try {
-            let response = await this.authService.approve(req.body.email);
+            if (serverId) {
+                response = await this.authKafkaController.approveUser(serverId, req.body.email);
+            }
+            else {
+                response = await this.authService.approve(req.body.email);
+            }
             return res.status(200).send(response);
         } catch(e) {
             Logger.error('error: %o', e);

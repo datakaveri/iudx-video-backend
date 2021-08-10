@@ -9,9 +9,11 @@ import config from '../config';
 import Container from 'typedi';
 import UserRepo from '../repositories/UserRepo';
 import Utility from './Utility';
+import AuthKafkaController from '../kafka/controllers/AuthKafkaController';
 
 const UtilityService = Container.get(Utility);
 const privateKey = UtilityService.getPrivateKey();
+const authKafkaController = new AuthKafkaController();
 
 passport.use(
     'signup',
@@ -37,6 +39,10 @@ passport.use(
                 const userData = { id: userId, name: req.body.name, email, password, verificationCode, verified: false, role: req.body.role };
                 if (role === 'consumer') {
                     userData['approved'] = true;
+                }
+                const serverId: string = (req.query as any)['serverId'];
+                if (serverId) {
+                    await authKafkaController.signUp(serverId, userData);
                 }
                 await userRepo.createUser(userData);
                 let result = { verificationCode };
@@ -97,6 +103,10 @@ passport.use(
             const userRepo: UserRepo = Container.get(UserRepo);
             const user = await userRepo.findUser({ verificationCode: code });
             if (user && code === user.verificationCode) {
+                const serverId: string = (req.query as any)['serverId'];
+                if (serverId) {
+                    await authKafkaController.verifyUser(serverId, { email: user.email });
+                }
                 await userRepo.updateUser({ email: user.email }, { verified: true });
                 return done(null, { success: true, message: 'Verification successful' });
             } else {
