@@ -131,6 +131,17 @@ export const taskList = {
             console.log(err);
         }
     },
+    updateStreamData: async (payload, helpers) => {
+        try {
+            const streamRepo: StreamRepo = Container.get(StreamRepo);
+            const { data } = payload;
+
+            await streamRepo.updateStream(data.query, data.streamData);
+        } catch (err) {
+            Logger.error('error: %o', err);
+            console.log(err);
+        }
+    },
     requestStream: async (payload, helpers) => {
         try {
             const streamService: StreamService = Container.get(StreamService);
@@ -141,17 +152,6 @@ export const taskList = {
 
             let cmsStreamData = await streamService.publishStreamToCloud(data.cmsServerId, data.streamData);
             await kafkaManager.publish(topic, { data: cmsStreamData }, KafkaMessageType.HTTP_RESPONSE, messageId);
-        } catch (err) {
-            Logger.error('error: %o', err);
-            console.log(err);
-        }
-    },
-    updateStreamData: async (payload, helpers) => {
-        try {
-            const streamRepo: StreamRepo = Container.get(StreamRepo);
-            const { data } = payload;
-
-            await streamRepo.updateStream(data.query, data.streamData);
         } catch (err) {
             Logger.error('error: %o', err);
             console.log(err);
