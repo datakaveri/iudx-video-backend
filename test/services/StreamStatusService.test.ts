@@ -16,23 +16,29 @@ describe('Stream Status Service Testing', () => {
     describe('Update Stream Status', () => {
 
         test('Should resolve and update stream status', async () => {
-            const streamId: string = '1';
+            const stream: any = {
+                streamId: '1',
+                destinationServerId: '1',
+            }
             const isActive: boolean = true;
             const isStable: boolean = true;
             const isPublishing: boolean = true;
 
-            await expect(streamStatusService.updateStatus(streamId, isActive, isStable, isPublishing)).resolves;
+            await expect(streamStatusService.updateStatus(stream, isActive, isStable, isPublishing)).resolves;
         });
 
         test('Should resolve an return 0 if stream not found', async () => {
             const expected: Array<number> = [0];
 
-            const streamId: string = '10';
+            const stream: any = {
+                streamId: '10',
+                destinationServerId: '1',
+            }
             const isActive: boolean = true;
             const isStable: boolean = true;
             const isPublishing: boolean = true;
 
-            await expect(streamStatusService.updateStatus(streamId, isActive, isStable, isPublishing)).resolves.toEqual(expected);
+            await expect(streamStatusService.updateStatus(stream, isActive, isStable, isPublishing)).resolves.toEqual(expected);
         });
     });
 

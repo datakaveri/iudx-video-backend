@@ -20,7 +20,7 @@ export default class StreamStatusService {
         private utilityService: Utility,
         private streamReviveService: StreamReviveService,
         private kafkaManager: KafkaManager
-    ) {}
+    ) { }
 
     public async getStatus(streamId: string) {
         try {
@@ -45,10 +45,10 @@ export default class StreamStatusService {
         }
     }
 
-    public async updateStatus(streamId: string, isActive: boolean, isStable: boolean, isPublishing: boolean) {
+    public async updateStatus(stream: any, isActive: boolean, isStable: boolean, isPublishing: boolean) {
         try {
             return await this.streamRepo.updateStream(
-                { streamId },
+                { streamId: stream.streamId, destinationServerId: stream.destinationServerId },
                 {
                     isActive,
                     isStable,
@@ -68,7 +68,7 @@ export default class StreamStatusService {
 
             for (const stream of streamsStat) {
                 await this.streamRepo.updateStream(
-                    { streamId: stream.streamId },
+                    { streamId: stream.streamId, destinationServerId: config.serverId },
                     {
                         totalClients: stream.nClients,
                         activeTime: parseInt(stream.time),
@@ -140,10 +140,10 @@ export default class StreamStatusService {
                 }
 
                 if (isActive) {
-                    await this.updateStatus(stream.streamId, isActive, true, isProcessActive);
+                    await this.updateStatus(stream, isActive, true, isProcessActive);
                     statusUpdated = true;
                 } else if (isActive !== stream.isActive) {
-                    await this.updateStatus(stream.streamId, isActive, false, isProcessActive);
+                    await this.updateStatus(stream, isActive, false, isProcessActive);
                     statusUpdated = true;
                 }
 
@@ -154,7 +154,16 @@ export default class StreamStatusService {
                 if ((statusUpdated || streamRevived) && config.host.type === 'LMS' && !config.isStandaloneLms) {
                     const streamData = await this.streamRepo.findStream({ streamId: stream.streamId });
                     const topic: string = config.serverId + '.upstream';
-                    const message: any = { taskIdentifier: 'updateStreamData', data: { query: { streamId: stream.streamId }, streamData } };
+                    const message: any = {
+                        taskIdentifier: 'updateStreamData',
+                        data: {
+                            query: {
+                                streamId: stream.streamId,
+                                destinationServerId: stream.destinationServerId
+                            },
+                            streamData,
+                        }
+                    };
                     await this.kafkaManager.publish(topic, message, KafkaMessageType.DB_REQUEST);
                 }
             }

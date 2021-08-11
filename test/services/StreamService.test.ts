@@ -136,28 +136,4 @@ describe('Stream Service Testing', () => {
         });
     });
 
-    describe('Get Playback url for a stream', () => {
-
-        test('Should return the stream url template if stream is active', async () => {
-            const expected: any = {
-                urlTemplate: expect.any(String),
-                isActive: expect.any(Boolean),
-            };
-            const streamId: string = '5';
-
-            await expect(streamService.playBackUrl(streamId)).resolves.toStrictEqual(expected);
-        });
-
-        test('Should return a message if stream is not active', async () => {
-            const expected: any = {
-                message: expect.any(String),
-                urlTemplate: expect.any(String),
-                isActive: expect.any(Boolean),
-            };
-            const streamId: string = '6';
-
-            await expect(streamService.playBackUrl(streamId)).resolves.toStrictEqual(expected);
-        });
-
-    });
 });
