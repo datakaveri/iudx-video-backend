@@ -37,7 +37,7 @@ export default (app: Router) => {
         (req, res, next) => StreamController.getStatus(req, res, next)
     );
 
-    route.get('/request/:streamId', ValidatePolicy,
+    route.get('/request/:streamId',
         (req, res, next) => StreamController.streamRequest(req, res, next)
     );
 }
