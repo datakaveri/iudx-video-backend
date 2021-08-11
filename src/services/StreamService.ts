@@ -145,19 +145,22 @@ export default class StreamService {
                 let isExistingStream = !!existingStreamRecord;
 
                 let lmsRtmpStream;
+                let isPublishing = false;
 
                 // Get LMS RTMP Stream using stream id and server ids
                 if (isExistingStream) {
                     lmsRtmpStream = await this.streamRepo.findStream({ streamId, destinationServerId: existingStreamRecord.sourceServerId });
+                    isPublishing = lmsRtmpStream.isPublishing;
                 } else {
                     lmsRtmpStream = await this.streamRepo.findStream({ streamId });
+                    isPublishing = false;
                 }
 
                 return {
                     apiResponse: {
                         urlTemplate: `rtmp://${config.rtmpServerConfig.publicServerIp}:${config.rtmpServerConfig.publicServerPort}/live/${streamId}?token=<TOKEN>`,
-                        isPublishing: !!lmsRtmpStream.isPublishing,
-                        ...(!lmsRtmpStream.isPublishing && { message: 'Stream will be available shortly, please check status API to know the status' }),
+                        isPublishing: isPublishing,
+                        ...(isPublishing && { message: 'Stream will be available shortly, please check status API to know the status' }),
                     },
                     kafkaRequestData: {
                         serverId: lmsRtmpStream.sourceServerId,

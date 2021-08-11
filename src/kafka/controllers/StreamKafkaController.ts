@@ -65,7 +65,7 @@ export default class StreamKafkaController {
             const result: any = await this.kafkaUtilService.getKafkaMessageResponse(messageId);
 
             const isExistingStream = data.isExistingStream;
-            if (isExistingStream) {
+            if (!isExistingStream) {
                 await this.streamRepo.registerStream(result);
             }
         } catch (err) {
