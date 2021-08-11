@@ -20,7 +20,9 @@ export default class StreamReviveService {
             if (provenanceStream.isActive) {
                 this.processService.addStreamProcess(provenanceStream.streamId, stream.streamId,
                     provenanceStream.streamUrl, stream.streamUrl);
+                return true;
             }
+            return false;
         }
         catch (err) {
             Logger.error(err);

@@ -37,5 +37,28 @@ export default class StreamKafkaController {
             throw err;
         }
     }
+
+    public async delete(serverId: string, streamId: string) {
+        try {
+            const topic: string = serverId + '.downstream';
+            const message: any = { taskIdentifier: 'deleteStream', data: { streamId } };
+            const { messageId } = await this.kafkaManager.publish(topic, message, KafkaMessageType.HTTP_REQUEST);
+            const result = await this.kafkaUtilService.getKafkaMessageResponse(messageId);
+
+            if (result) {
+                const streams = await this.streamRepo.getAllAssociatedStreams(streamId);
+                for (const stream of streams) {
+                    await this.streamRepo.deleteStream({ streamId: stream.streamId });
+                }
+            }
+
+            return result;
+        }
+        catch (err) {
+            Logger.error('error: %o', err);
+            throw err;
+        }
+    }
+
 }
 

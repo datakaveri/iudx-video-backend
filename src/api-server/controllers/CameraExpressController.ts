@@ -104,14 +104,22 @@ export default class CameraExpressController {
     async update(req: Request, res: Response, next: NextFunction) {
         const cameraId: string = req.params.cameraId;
         const params: any = req.body;
+        const serverId: string = (req.query as any)['serverId'];
+        let result: any;
 
         Logger.debug('Calling Update Camera endpoint with body: %o', params);
         try {
-            const result = await this.cameraService.update(cameraId, params);
+            if (serverId) {
+                result = await this.cameraKafkaController.update(serverId, cameraId, params);
+            }
+            else {
+                result = await this.cameraService.update(cameraId, params);
+            }
+
             const response = {
                 type: result ? 201 : 404,
                 title: result ? 'Success' : 'No Found',
-                result: result ? result : 'Camera Not Found',
+                result: result ? result : 'Camera Not Found | Request Timeout',
             }
             return res.status(response.type).json(response);
         } catch (e) {
@@ -122,14 +130,22 @@ export default class CameraExpressController {
 
     async delete(req: Request, res: Response, next: NextFunction) {
         const cameraId: string = req.params.cameraId;
+        const serverId: string = (req.query as any)['serverId'];
+        let result: any;
 
         Logger.debug('Calling Delete Camera endpoint of camera id: %s', cameraId);
         try {
-            const result = await this.cameraService.delete(cameraId);
+            if (serverId) {
+                result = await this.cameraKafkaController.delete(serverId, cameraId);
+            }
+            else {
+                result = await this.cameraService.delete(cameraId);
+            }
+
             const response = {
                 type: result ? 200 : 404,
                 title: result ? 'Success' : 'Not Found',
-                detail: result ? 'Camera deleted' : 'Camera Not Found',
+                detail: result ? 'Camera deleted' : 'Camera Not Found | Request Timeout',
             }
             return res.status(200).send(response);
         } catch (e) {
