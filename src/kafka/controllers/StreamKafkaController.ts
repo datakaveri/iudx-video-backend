@@ -62,10 +62,11 @@ export default class StreamKafkaController {
             const topic: string = serverId + '.downstream';
             const message: any = { taskIdentifier: 'requestStream', data };
             const { messageId } = await this.kafkaManager.publish(topic, message, KafkaMessageType.HTTP_REQUEST);
-            const result = await this.kafkaUtilService.getKafkaMessageResponse(messageId);
+            const result: any = await this.kafkaUtilService.getKafkaMessageResponse(messageId);
 
-            if (result) {
-                await this.streamRepo.upsertStream(result);
+            const isExistingStream = data.isExistingStream;
+            if (isExistingStream) {
+                await this.streamRepo.registerStream(result);
             }
         } catch (err) {
             Logger.error('error: %o', err);

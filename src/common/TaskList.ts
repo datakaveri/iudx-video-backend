@@ -150,7 +150,7 @@ export const taskList = {
             const topic: string = config.serverId + '.upstream';
             const { messageId, data } = payload;
 
-            let cmsStreamData = await streamService.publishStreamToCloud(data.cmsServerId, data.streamData);
+            let cmsStreamData = await streamService.publishStreamToCloud(data.cmsServerId, data.streamData, data.isExistingStream);
             await kafkaManager.publish(topic, { data: cmsStreamData }, KafkaMessageType.HTTP_RESPONSE, messageId);
         } catch (err) {
             Logger.error('error: %o', err);

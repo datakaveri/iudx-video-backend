@@ -196,7 +196,7 @@ export default class StreamService {
         }
     }
 
-    public async publishStreamToCloud(cmsServerId: string, lmsStreamData: any) {
+    public async publishStreamToCloud(cmsServerId: string, lmsStreamData: any, isExistingStream: boolean) {
         const rtmpStreamUrl = `rtmp://${config.rtmpServerConfig.cmsServerIp}:${config.rtmpServerConfig.cmsServerPort}/live/${lmsStreamData['streamId']}?token=${config.rtmpServerConfig.password}`;
         const cmsRtmpStreamData: any = {
             streamId: lmsStreamData['streamId'],
@@ -212,8 +212,9 @@ export default class StreamService {
             isPublic: lmsStreamData['isPublic'],
         };
 
-        // Using upsert to create or update the record
-        await this.streamRepo.upsertStream(cmsRtmpStreamData);
+        if (!isExistingStream) {
+            await this.streamRepo.registerStream(cmsRtmpStreamData);
+        }
 
         this.processService.addStreamProcess(lmsStreamData['streamId'], lmsStreamData['streamId'], lmsStreamData['sourceServerId'], cmsServerId, lmsStreamData['streamUrl'], rtmpStreamUrl);
         return cmsRtmpStreamData;
