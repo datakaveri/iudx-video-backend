@@ -170,7 +170,7 @@ export default class StreamService {
                                 userId: lmsRtmpStream['userId'],
                                 provenanceStreamId: lmsRtmpStream['streamId'],
                                 sourceServerId: lmsRtmpStream['sourceServerId'],
-                                destinationServerId: lmsRtmpStream['destinationServerId'],
+                                destinationServerId: config.serverId,
                                 streamName: lmsRtmpStream['streamName'],
                                 isPublic: lmsRtmpStream['isPublic'],
                                 streamUrl: lmsRtmpStream['streamUrl'],
