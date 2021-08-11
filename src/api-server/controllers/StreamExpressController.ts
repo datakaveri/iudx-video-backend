@@ -141,7 +141,7 @@ export default class StreamExpressController {
             };
 
             if (!data.apiResponse.isPublishing) {
-                this.streamKafkaController.streamRequest(data.kafkaRequestData.serverId, data.kafkaRequestData.data);
+                await this.streamKafkaController.streamRequest(data.kafkaRequestData.serverId, data.kafkaRequestData.data);
             }
             return res.status(200).send(response);
         } catch (e) {

@@ -182,9 +182,11 @@ export default class StreamService {
 
                 // TODO - server address needs to fetched
                 return {
-                    urlTemplate: `rtmp://localhost:1935/live/${streamId}?token=<TOKEN>`,
-                    isPublishing: !!stream.isPublishing,
-                    ...(!stream.isPublishing && { message: 'Stream will be available shortly, please check status API to know the status' }),
+                    apiResponse: {
+                        urlTemplate: `rtmp://localhost:1935/live/${streamId}?token=<TOKEN>`,
+                        isPublishing: !!stream.isPublishing,
+                        ...(!stream.isPublishing && { message: 'Stream will be available shortly, please check status API to know the status' }),
+                    }
                 };
             }
         } catch (e) {
