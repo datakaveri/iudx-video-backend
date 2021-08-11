@@ -173,6 +173,7 @@ export default class StreamService {
                                 destinationServerId: lmsRtmpStream['destinationServerId'],
                                 streamName: lmsRtmpStream['streamName'],
                                 isPublic: lmsRtmpStream['isPublic'],
+                                streamUrl: lmsRtmpStream['streamUrl'],
                             },
                         },
                     },
@@ -186,7 +187,7 @@ export default class StreamService {
                         urlTemplate: `rtmp://localhost:1935/live/${streamId}?token=<TOKEN>`,
                         isPublishing: !!stream.isPublishing,
                         ...(!stream.isPublishing && { message: 'Stream will be available shortly, please check status API to know the status' }),
-                    }
+                    },
                 };
             }
         } catch (e) {
@@ -195,7 +196,7 @@ export default class StreamService {
         }
     }
 
-    public async publishStreamToCloud(lmsStreamData: any, cmsServerId: string) {
+    public async publishStreamToCloud(cmsServerId: string, lmsStreamData: any) {
         const rtmpStreamUrl = `rtmp://${config.rtmpServerConfig.cmsServerIp}:${config.rtmpServerConfig.cmsServerPort}/live/${lmsStreamData['streamId']}?token=${config.rtmpServerConfig.password}`;
         const cmsRtmpStreamData: any = {
             streamId: lmsStreamData['streamId'],
