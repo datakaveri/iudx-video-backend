@@ -86,5 +86,21 @@ export const taskList = {
             console.log(err);
         }
     },
+    requestStream: async (payload, helpers) => {
+        try {
+            const streamService: StreamService = Container.get(StreamService);
+            const kafkaManager: KafkaManager = Container.get(KafkaManager);
+            
+            const topic: string = config.serverId + '.upstream';
+            const { messageId, data } = payload;
+            
+            let cmsStreamData = await streamService.publishStreamToCloud(data.cmsServerId, data.streamData);
 
+            await kafkaManager.publish(topic, { data: cmsStreamData }, KafkaMessageType.HTTP_RESPONSE, messageId);
+        }
+        catch (err) {
+            Logger.error('error: %o', err);
+            console.log(err);
+        }
+    }
 }

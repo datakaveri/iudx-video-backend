@@ -19,8 +19,8 @@ export default class StreamService {
         private cameraRepo: CameraRepo,
         private processService: ProcessService,
         private ffmpegService: FfmpegService,
-        private streamStatusService: StreamStatusService,
-    ) { }
+        private streamStatusService: StreamStatusService
+    ) {}
 
     public async publishRegisteredStreams(streamData: any) {
         const namespace: string = config.host.type + 'Stream';
@@ -41,7 +41,7 @@ export default class StreamService {
         };
 
         await this.streamRepo.registerStream(rtmpStreamData);
-        this.processService.addStreamProcess(streamData['streamId'], streamId, streamData['streamUrl'], rtmpStreamUrl);
+        this.processService.addStreamProcess(streamData['streamId'], streamId, rtmpStreamData.destinationServerId, rtmpStreamData.destinationServerId, streamData['streamUrl'], rtmpStreamUrl);
         return rtmpStreamData;
     }
 
@@ -63,7 +63,7 @@ export default class StreamService {
                 sourceServerId: config.serverId,
                 destinationServerId: config.serverId,
                 ...streamData,
-            }
+            };
 
             await this.streamRepo.registerStream(streamData);
             const rtmpStreamData = await this.publishRegisteredStreams(streamData);
@@ -76,16 +76,7 @@ export default class StreamService {
 
     public async findOne(streamId: string): Promise<any> {
         try {
-            const fields = [
-                'streamId',
-                'cameraId',
-                'streamName',
-                'streamType',
-                'streamUrl',
-                'streamType',
-                'type',
-                'isPublic',
-            ];
+            const fields = ['streamId', 'cameraId', 'streamName', 'streamType', 'streamUrl', 'streamType', 'type', 'isPublic'];
 
             return await this.streamRepo.findStream({ streamId }, fields);
         } catch (e) {
@@ -96,17 +87,7 @@ export default class StreamService {
 
     public async findAll(page: number, size: number) {
         try {
-            const fields = [
-                'streamId',
-                'cameraId',
-                'provenanceStreamId',
-                'streamName',
-                'streamType',
-                'streamUrl',
-                'streamType',
-                'type',
-                'isPublic',
-            ];
+            const fields = ['streamId', 'cameraId', 'provenanceStreamId', 'streamName', 'streamType', 'streamUrl', 'streamType', 'type', 'isPublic'];
             const { limit, offset } = this.utilityService.getPagination(page, size);
             const streams = await this.streamRepo.listAllStreams(limit, offset, fields);
             const response = this.utilityService.getPagingData(streams, page, limit);
@@ -155,24 +136,83 @@ export default class StreamService {
         }
     }
 
-    public async playBackUrl(streamId) {
+    public async streamRequest(streamId: string, requestType: any) {
         try {
-            const stream = await this.streamRepo.findStream({ streamId });
-            if (stream.isActive) {
-                return {
-                    urlTemplate: `rtmp://${config.rtmpServerConfig.publicServerIp}:${config.rtmpServerConfig.publicServerPort}/live/${streamId}?token=<TOKEN>`,
-                    isActive: true
+            if (requestType === 'cloud') {
+                // Checking if previously LMS to CMS stream was created, if its created we will have multiple records
+                let existingStreamRecord = await this.streamRepo.findStream({ streamId, destinationServerId: config.serverId });
+
+                let isExistingStream = !!existingStreamRecord;
+
+                let lmsRtmpStream;
+
+                // Get LMS RTMP Stream using stream id and server ids
+                if (isExistingStream) {
+                    lmsRtmpStream = await this.streamRepo.findStream({ streamId, destinationServerId: existingStreamRecord.sourceServerId });
+                } else {
+                    lmsRtmpStream = await this.streamRepo.findStream({ streamId });
                 }
-            } else {
+
                 return {
-                    isActive: false,
-                    message: 'Stream will be available shortly, please check status API to know the status',
-                    urlTemplate: `rtmp://${config.rtmpServerConfig.publicServerIp}:${config.rtmpServerConfig.publicServerPort}/live/${streamId}}?token=<TOKEN>`
-                }
+                    apiResponse: {
+                        urlTemplate: `rtmp://${config.rtmpServerConfig.publicServerIp}:${config.rtmpServerConfig.publicServerPort}/live/${streamId}?token=<TOKEN>`,
+                        isPublishing: !!lmsRtmpStream.isPublishing,
+                        ...(!lmsRtmpStream.isPublishing && { message: 'Stream will be available shortly, please check status API to know the status' }),
+                    },
+                    kafkaRequestData: {
+                        serverId: lmsRtmpStream.provenanceStreamId,
+                        data: {
+                            cmsServerId: config.serverId,
+                            isExistingStream,
+                            streamData: {
+                                streamId: lmsRtmpStream['streamId'],
+                                cameraId: lmsRtmpStream['cameraId'],
+                                userId: lmsRtmpStream['userId'],
+                                provenanceStreamId: lmsRtmpStream['streamId'],
+                                sourceServerId: lmsRtmpStream['sourceServerId'],
+                                destinationServerId: lmsRtmpStream['destinationServerId'],
+                                streamName: lmsRtmpStream['streamName'],
+                                isPublic: lmsRtmpStream['isPublic'],
+                            },
+                        },
+                    },
+                };
+            } else if (requestType === 'local') {
+                const stream = await this.streamRepo.findStream({ streamId });
+
+                // TODO - server address needs to fetched
+                return {
+                    urlTemplate: `rtmp://localhost:1935/live/${streamId}?token=<TOKEN>`,
+                    isPublishing: !!stream.isPublishing,
+                    ...(!stream.isPublishing && { message: 'Stream will be available shortly, please check status API to know the status' }),
+                };
             }
         } catch (e) {
             Logger.error(e);
             throw new ServiceError('Error getting playback url');
         }
+    }
+
+    public async publishStreamToCloud(lmsStreamData: any, cmsServerId: string) {
+        const rtmpStreamUrl = `rtmp://${config.rtmpServerConfig.cmsServerIp}:${config.rtmpServerConfig.cmsServerPort}/live/${lmsStreamData['streamId']}?token=${config.rtmpServerConfig.password}`;
+        const cmsRtmpStreamData: any = {
+            streamId: lmsStreamData['streamId'],
+            cameraId: lmsStreamData['cameraId'],
+            userId: lmsStreamData['userId'],
+            provenanceStreamId: lmsStreamData['streamId'],
+            sourceServerId: lmsStreamData['sourceServerId'],
+            destinationServerId: cmsServerId,
+            streamName: lmsStreamData['streamName'],
+            streamUrl: rtmpStreamUrl,
+            streamType: 'RTMP',
+            type: 'rtmp',
+            isPublic: lmsStreamData['isPublic'],
+        };
+
+        // Using upsert to create or update the record
+        await this.streamRepo.upsertStream(cmsRtmpStreamData);
+
+        this.processService.addStreamProcess(lmsStreamData['streamId'], lmsStreamData['streamId'], lmsStreamData['sourceServerId'], cmsServerId, lmsStreamData['streamUrl'], rtmpStreamUrl);
+        return cmsRtmpStreamData;
     }
 }

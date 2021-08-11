@@ -18,9 +18,9 @@ export default class KafkaManager {
             clientId: config.kafkaConfig.clientId,
             brokers: config.kafkaConfig.brokers,
             ssl: {
-                rejectUnauthorized: true,
-                ca: [fs.readFileSync(config.kafkaConfig.sslCAPath, 'utf-8')],
-                cert: [fs.readFileSync(config.kafkaConfig.sslCERTPath, 'utf-8')],
+                rejectUnauthorized: false,
+                // ca: [fs.readFileSync(config.kafkaConfig.sslCAPath, 'utf-8')],
+                // cert: [fs.readFileSync(config.kafkaConfig.sslCERTPath, 'utf-8')],
             },
             sasl: {
                 mechanism: 'plain',

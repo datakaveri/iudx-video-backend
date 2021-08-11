@@ -37,5 +37,22 @@ export default class StreamKafkaController {
             throw err;
         }
     }
+
+    public async streamRequest(serverId: string, data: any) {
+        try {
+            const topic: string = serverId + '.downstream';
+            const message: any = { taskIdentifier: 'requestStream', data };
+            const { messageId } = await this.kafkaManager.publish(topic, message, KafkaMessageType.HTTP_REQUEST);
+            const result = await this.kafkaUtilService.getKafkaMessageResponse(messageId);
+
+            if (result) {
+                await this.streamRepo.upsertStream(result);
+            }
+        }
+        catch (err) {
+            Logger.error('error: %o', err);
+            throw err;
+        }
+    }
 }
 

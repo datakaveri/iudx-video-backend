@@ -70,4 +70,8 @@ export default class StreamRepo {
             raw: true,
         });
     }
+
+    async upsertStream(streamData) {
+        await this.streamModel.upsert(streamData);
+    }
 }
