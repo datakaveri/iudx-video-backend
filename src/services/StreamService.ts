@@ -160,7 +160,7 @@ export default class StreamService {
                         ...(!lmsRtmpStream.isPublishing && { message: 'Stream will be available shortly, please check status API to know the status' }),
                     },
                     kafkaRequestData: {
-                        serverId: lmsRtmpStream.provenanceStreamId,
+                        serverId: lmsRtmpStream.sourceServerId,
                         data: {
                             cmsServerId: config.serverId,
                             isExistingStream,

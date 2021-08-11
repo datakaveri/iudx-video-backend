@@ -140,7 +140,7 @@ export default class StreamExpressController {
                 data: data.apiResponse,
             };
 
-            if (!data.apiResponse.isPublishing) {
+            if (!data.apiResponse.isPublishing && requestType !== 'local') {
                 await this.streamKafkaController.streamRequest(data.kafkaRequestData.serverId, data.kafkaRequestData.data);
             }
             return res.status(200).send(response);
