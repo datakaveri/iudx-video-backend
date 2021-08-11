@@ -4,6 +4,7 @@ import { run, Runner, WorkerEvents } from 'graphile-worker';
 import config from '../config';
 import { taskList } from '../common/TaskList';
 import Logger from '../common/Logger';
+import { JobPriority } from '../common/Constants';
 
 @Service()
 export default class JobQueueManager {
@@ -30,9 +31,9 @@ export default class JobQueueManager {
         }
     }
 
-    public async add(taskIdentifier: string, payload: any, maxAttempts: number = 1) {
+    public async add(taskIdentifier: string, payload: any, priority: number = JobPriority.HIGH, maxAttempts: number = 1) {
         try {
-            await this.runner.addJob(taskIdentifier, payload, { maxAttempts });
+            await this.runner.addJob(taskIdentifier, payload, { maxAttempts, priority });
         }
         catch (err) {
             Logger.error('error: %o', err);

@@ -14,7 +14,10 @@ export default class StreamReviveService {
             const provenanceStream = await this.streamRepo.findStream({ streamId: stream.provenanceStreamId });
             if (provenanceStream.isActive) {
                 this.processService.addStreamProcess(provenanceStream.streamId, stream.streamId, stream.destinationServerId, stream.destinationServerId, provenanceStream.streamUrl, stream.streamUrl);
+
+                return true;
             }
+            return false;
         } catch (err) {
             Logger.error(err);
             throw new Error();

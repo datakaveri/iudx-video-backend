@@ -11,7 +11,6 @@ export default class StreamKafkaController {
     private streamRepo: StreamRepo;
     private kafkaUtilService: KafkaUtilService;
 
-
     constructor() {
         this.kafkaManager = Container.get(KafkaManager);
         this.streamRepo = Container.get(StreamRepo);
@@ -31,8 +30,28 @@ export default class StreamKafkaController {
             }
 
             return result;
+        } catch (err) {
+            Logger.error('error: %o', err);
+            throw err;
         }
-        catch (err) {
+    }
+
+    public async delete(serverId: string, streamId: string) {
+        try {
+            const topic: string = serverId + '.downstream';
+            const message: any = { taskIdentifier: 'deleteStream', data: { streamId } };
+            const { messageId } = await this.kafkaManager.publish(topic, message, KafkaMessageType.HTTP_REQUEST);
+            const result = await this.kafkaUtilService.getKafkaMessageResponse(messageId);
+
+            if (result) {
+                const streams = await this.streamRepo.getAllAssociatedStreams(streamId);
+                for (const stream of streams) {
+                    await this.streamRepo.deleteStream({ streamId: stream.streamId });
+                }
+            }
+
+            return result;
+        } catch (err) {
             Logger.error('error: %o', err);
             throw err;
         }
@@ -48,11 +67,9 @@ export default class StreamKafkaController {
             if (result) {
                 await this.streamRepo.upsertStream(result);
             }
-        }
-        catch (err) {
+        } catch (err) {
             Logger.error('error: %o', err);
             throw err;
         }
     }
 }
-

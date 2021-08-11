@@ -82,7 +82,7 @@ export default class CameraService {
         }
     }
 
-    public async update(cameraId: string, params: any) {
+    public async update(cameraId: string, cameraData: any) {
         try {
             const fields = [
                 'cameraId',
@@ -93,7 +93,7 @@ export default class CameraService {
                 'cameraOrientation',
                 'city',
             ];
-            const [updated, result] = await this.cameraRepo.updateCamera(params, { cameraId }, fields);
+            const [updated, result] = await this.cameraRepo.updateCamera(cameraData, { cameraId }, fields);
 
             if (!updated) {
                 return null;

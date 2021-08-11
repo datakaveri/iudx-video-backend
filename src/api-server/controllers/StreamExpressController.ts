@@ -86,14 +86,21 @@ export default class StreamExpressController {
 
     async delete(req: Request, res: Response, next: NextFunction) {
         const streamId: string = req.params.streamId;
+        const serverId: string = (req.query as any)['serverId'];
+        let result: any;
 
         Logger.debug('Calling Delete Stream endpoint of stream id: %s', streamId);
         try {
-            const result = await this.streamService.delete(streamId);
+            if (serverId) {
+                result = await this.streamKafkaController.delete(serverId, streamId);
+            } else {
+                result = await this.streamService.delete(streamId);
+            }
+
             const response = {
                 type: result ? 200 : 404,
                 title: result ? 'Success' : 'Not Found',
-                detail: result ? 'Stream deleted' : 'Stream Not Found',
+                detail: result ? 'Stream deleted' : 'Stream Not Found | Request Timeout',
             };
             return res.status(response.type).send(response);
         } catch (e) {
