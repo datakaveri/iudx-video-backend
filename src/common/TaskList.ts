@@ -11,7 +11,6 @@ import UserRepo from '../repositories/UserRepo';
 import StreamRepo from '../repositories/StreamRepo';
 
 export const taskList = {
-
     // Auth related tasks
 
     signUp: async (payload, helpers) => {
@@ -23,8 +22,7 @@ export const taskList = {
 
             await userRepo.createUser(data);
             await kafkaManager.publish(topic, { data: { created: true } }, KafkaMessageType.HTTP_RESPONSE, messageId);
-        }
-        catch (err) {
+        } catch (err) {
             Logger.error('error: %o', err);
             console.log(err);
         }
@@ -38,8 +36,7 @@ export const taskList = {
 
             await userRepo.updateUser({ email: data.email }, { verified: true });
             await kafkaManager.publish(topic, { data: { updated: true } }, KafkaMessageType.HTTP_RESPONSE, messageId);
-        }
-        catch (err) {
+        } catch (err) {
             Logger.error('error: %o', err);
             console.log(err);
         }
@@ -53,8 +50,7 @@ export const taskList = {
 
             const result = await authService.approve(data.email);
             await kafkaManager.publish(topic, { data: result }, KafkaMessageType.HTTP_RESPONSE, messageId);
-        }
-        catch (err) {
+        } catch (err) {
             Logger.error('error: %o', err);
             console.log(err);
         }
@@ -71,8 +67,7 @@ export const taskList = {
 
             const result = await cameraService.register(data.userId, data.cameraData);
             await kafkaManager.publish(topic, { data: result }, KafkaMessageType.HTTP_RESPONSE, messageId);
-        }
-        catch (err) {
+        } catch (err) {
             Logger.error('error: %o', err);
             console.log(err);
         }
@@ -86,8 +81,7 @@ export const taskList = {
 
             const result = await cameraService.update(data.cameraId, data.cameraData);
             await kafkaManager.publish(topic, { data: result }, KafkaMessageType.HTTP_RESPONSE, messageId);
-        }
-        catch (err) {
+        } catch (err) {
             Logger.error('error: %o', err);
             console.log(err);
         }
@@ -101,8 +95,7 @@ export const taskList = {
 
             const result = await cameraService.delete(data.cameraId);
             await kafkaManager.publish(topic, { data: result }, KafkaMessageType.HTTP_RESPONSE, messageId);
-        }
-        catch (err) {
+        } catch (err) {
             Logger.error('error: %o', err);
             console.log(err);
         }
@@ -119,8 +112,7 @@ export const taskList = {
 
             const result = await streamService.register(data.userId, data.streamData);
             await kafkaManager.publish(topic, { data: result }, KafkaMessageType.HTTP_RESPONSE, messageId);
-        }
-        catch (err) {
+        } catch (err) {
             Logger.error('error: %o', err);
             console.log(err);
         }
@@ -134,8 +126,7 @@ export const taskList = {
 
             const result = await streamService.delete(data.streamId);
             await kafkaManager.publish(topic, { data: result }, KafkaMessageType.HTTP_RESPONSE, messageId);
-        }
-        catch (err) {
+        } catch (err) {
             Logger.error('error: %o', err);
             console.log(err);
         }
@@ -146,11 +137,24 @@ export const taskList = {
             const { data } = payload;
 
             await streamRepo.updateStream(data.query, data.streamData);
-        }
-        catch (err) {
+        } catch (err) {
             Logger.error('error: %o', err);
             console.log(err);
         }
     },
+    requestStream: async (payload, helpers) => {
+        try {
+            const streamService: StreamService = Container.get(StreamService);
+            const kafkaManager: KafkaManager = Container.get(KafkaManager);
 
-}
+            const topic: string = config.serverId + '.upstream';
+            const { messageId, data } = payload;
+
+            let cmsStreamData = await streamService.publishStreamToCloud(data.cmsServerId, data.streamData, data.isExistingStream);
+            await kafkaManager.publish(topic, { data: cmsStreamData }, KafkaMessageType.HTTP_RESPONSE, messageId);
+        } catch (err) {
+            Logger.error('error: %o', err);
+            console.log(err);
+        }
+    },
+};

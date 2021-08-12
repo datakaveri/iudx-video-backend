@@ -80,7 +80,9 @@ export default {
         password: process.env.RTMP_SERVER_PUBLISH_PASSWORD,
         statUrl: process.env.RTMP_STAT_URL,
         publicServerIp: process.env.RTMP_SERVER_PUBLIC_IP,
-        publicServerPort: process.env.RTMP_SERVER_PUBLIC_PORT
+        publicServerPort: process.env.RTMP_SERVER_PUBLIC_PORT,
+        cmsServerIp: process.env.CMS_RTMP_HOST,
+        cmsServerPort: process.env.CMS_RTMP_PORT,
     },
 
     schedulerConfig: {

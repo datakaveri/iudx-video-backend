@@ -11,7 +11,6 @@ export default class StreamKafkaController {
     private streamRepo: StreamRepo;
     private kafkaUtilService: KafkaUtilService;
 
-
     constructor() {
         this.kafkaManager = Container.get(KafkaManager);
         this.streamRepo = Container.get(StreamRepo);
@@ -31,8 +30,7 @@ export default class StreamKafkaController {
             }
 
             return result;
-        }
-        catch (err) {
+        } catch (err) {
             Logger.error('error: %o', err);
             throw err;
         }
@@ -53,12 +51,26 @@ export default class StreamKafkaController {
             }
 
             return result;
-        }
-        catch (err) {
+        } catch (err) {
             Logger.error('error: %o', err);
             throw err;
         }
     }
 
-}
+    public async streamRequest(serverId: string, data: any) {
+        try {
+            const topic: string = serverId + '.downstream';
+            const message: any = { taskIdentifier: 'requestStream', data };
+            const { messageId } = await this.kafkaManager.publish(topic, message, KafkaMessageType.HTTP_REQUEST);
+            const result: any = await this.kafkaUtilService.getKafkaMessageResponse(messageId);
 
+            const isExistingStream = data.isExistingStream;
+            if (!isExistingStream) {
+                await this.streamRepo.registerStream(result);
+            }
+        } catch (err) {
+            Logger.error('error: %o', err);
+            throw err;
+        }
+    }
+}

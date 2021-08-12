@@ -24,23 +24,22 @@ export default class StreamExpressController {
         try {
             if (serverId) {
                 result = await this.streamKafkaController.register(serverId, userId, params);
-            }
-            else {
+            } else {
                 result = await this.streamService.register(userId, params);
             }
 
             if (result) {
                 result = {
                     streamId: result.streamData.streamId,
-                    ...params
-                }
+                    ...params,
+                };
             }
 
             const response = {
                 type: result ? 201 : 400,
                 title: result ? 'Success' : 'Bad Request',
                 result: result ? result : 'Camera Not Registered | Stream Already Registered | Request Timeout',
-            }
+            };
             return res.status(response.type).json(response);
         } catch (e) {
             Logger.error('error: %o', e);
@@ -58,7 +57,7 @@ export default class StreamExpressController {
                 type: result ? 200 : 404,
                 title: result ? 'Success' : 'Not Found',
                 result: result ? result : 'Stream Not Found',
-            }
+            };
             return res.status(response.type).json(response);
         } catch (e) {
             Logger.error('error: %o', e);
@@ -76,8 +75,8 @@ export default class StreamExpressController {
             const response = {
                 type: 200,
                 title: 'Success',
-                results: result
-            }
+                results: result,
+            };
             return res.status(response.type).json(response);
         } catch (e) {
             Logger.error('error: %o', e);
@@ -94,8 +93,7 @@ export default class StreamExpressController {
         try {
             if (serverId) {
                 result = await this.streamKafkaController.delete(serverId, streamId);
-            }
-            else {
+            } else {
                 result = await this.streamService.delete(streamId);
             }
 
@@ -103,7 +101,7 @@ export default class StreamExpressController {
                 type: result ? 200 : 404,
                 title: result ? 'Success' : 'Not Found',
                 detail: result ? 'Stream deleted' : 'Stream Not Found | Request Timeout',
-            }
+            };
             return res.status(response.type).send(response);
         } catch (e) {
             Logger.error('error: %o', e);
@@ -120,8 +118,8 @@ export default class StreamExpressController {
             const response = {
                 type: 200,
                 title: 'Success',
-                results: result
-            }
+                results: result,
+            };
             return res.status(response.type).send(response);
         } catch (e) {
             Logger.error('error: %o', e);
@@ -129,16 +127,21 @@ export default class StreamExpressController {
         }
     }
 
-    async playBackUrl(req: Request, res: Response, next: NextFunction) {
+    async streamRequest(req: Request, res: Response, next: NextFunction) {
         const streamId: string = req.params.streamId;
+        const requestType = req.query.type;
 
-        Logger.debug('Calling Playback endpoint of stream id: %s', streamId);
+        Logger.debug('Calling Stream Request endpoint of stream id: %s', streamId);
         try {
-            const data = await this.streamService.playBackUrl(streamId);
+            const data = await this.streamService.streamRequest(streamId, requestType);
             const response = {
                 type: 200,
                 title: 'Success',
-                data
+                data: data.apiResponse,
+            };
+
+            if (!data.apiResponse.isPublishing && requestType !== 'local') {
+                await this.streamKafkaController.streamRequest(data.kafkaRequestData.serverId, data.kafkaRequestData.data);
             }
             return res.status(200).send(response);
         } catch (e) {

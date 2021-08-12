@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS "Streams"
   "lastActive"            TIMESTAMPTZ,
   "createdAt"             TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
   "updatedAt"             TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
-  PRIMARY KEY ("streamId"),
+  PRIMARY KEY ("streamId", "destinationServerId"),
   CONSTRAINT "userFK"
       FOREIGN KEY ("userId") 
 	  REFERENCES "Users" ("id"),

@@ -9,7 +9,16 @@ export default class ProcessService {
     @Inject('queue') private queue: typeof Queue;
     constructor(private ffmpegService: FfmpegService, private streamRepo: StreamRepo) { }
 
-    public addStreamProcess(streamInputId, streamOutputId, streamInputUrl, streamOutputUrl) {
+    /**
+     * 
+     * @param streamInputId - Input stream id (input and output stream id will be different during stream registration process)
+     * @param streamOutputId - Ouput stream id
+     * @param streamInputServerId - input stream id's server id ( input and output stream id will be different during LMS to CMS push stream)
+     * @param streamOutputServerId - output stream id's server id
+     * @param streamInputUrl - input stream url
+     * @param streamOutputUrl - output stream url
+     */
+    public addStreamProcess(streamInputId, streamOutputId, streamInputServerId, streamOutputServerId, streamInputUrl, streamOutputUrl) {
         Logger.debug(`Adding stream creation process to the queue for the stream ${streamInputId}`);
         this.queue.add(async () => {
             const isActiveStream = await this.ffmpegService.isStreamActive(streamInputUrl);
@@ -18,11 +27,11 @@ export default class ProcessService {
                 processId = await this.ffmpegService.createProcess(streamInputUrl, streamOutputUrl);
             }
             await this.streamRepo.updateStream(
-                { streamId: streamInputId },
+                { streamId: streamInputId, destinationServerId:  streamInputServerId },
                 { isPublishing: true, isActive: isActiveStream, isStable: isActiveStream }
             );
             await this.streamRepo.updateStream(
-                { streamId: streamOutputId },
+                { streamId: streamOutputId, destinationServerId:  streamOutputServerId },
                 { processId, isActive: isActiveStream, isStable: isActiveStream }
             );
         });
