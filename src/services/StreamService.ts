@@ -160,7 +160,7 @@ export default class StreamService {
                     apiResponse: {
                         urlTemplate: `rtmp://${config.rtmpServerConfig.publicServerIp}:${config.rtmpServerConfig.publicServerPort}/live/${streamId}?token=<TOKEN>`,
                         isPublishing: isPublishing,
-                        ...(isPublishing && { message: 'Stream will be available shortly, please check status API to know the status' }),
+                        ...(!isPublishing && { message: 'Stream will be available shortly, please check status API to know the status' }),
                     },
                     kafkaRequestData: {
                         serverId: lmsRtmpStream.sourceServerId,
