@@ -11,7 +11,7 @@ export default class StreamReviveService {
     public async reviveStream(stream: any) {
         Logger.debug(`Initiating stream revival for the stream ${stream.streamId}`);
         try {
-            const provenanceStream = await this.streamRepo.findStream({ streamId: stream.provenanceStreamId });
+            const provenanceStream = await this.streamRepo.findStream({ streamId: stream.provenanceStreamId, destinationServerId: stream.destinationServerId });
             if (provenanceStream.isActive) {
                 this.processService.addStreamProcess(provenanceStream.streamId, stream.streamId, stream.destinationServerId, stream.destinationServerId, provenanceStream.streamUrl, stream.streamUrl);
 

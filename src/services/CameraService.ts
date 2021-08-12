@@ -50,7 +50,10 @@ export default class CameraService {
         try {
             const fields = [
                 'streamId',
+                'cameraId',
                 'provenanceStreamId',
+                'sourceServerId',
+                'destinationServerId',
                 'streamName',
                 'streamUrl',
                 'streamType',

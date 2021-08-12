@@ -87,7 +87,7 @@ export default class StreamService {
 
     public async findAll(page: number, size: number) {
         try {
-            const fields = ['streamId', 'cameraId', 'provenanceStreamId', 'streamName', 'streamType', 'streamUrl', 'streamType', 'type', 'isPublic'];
+            const fields = ['streamId', 'cameraId', 'provenanceStreamId', 'sourceServerId', 'destinationServerId', 'streamName', 'streamType', 'streamUrl', 'streamType', 'type', 'isPublic'];
             const { limit, offset } = this.utilityService.getPagination(page, size);
             const streams = await this.streamRepo.listAllStreams(limit, offset, fields);
             const response = this.utilityService.getPagingData(streams, page, limit);
@@ -212,7 +212,7 @@ export default class StreamService {
             streamUrl: rtmpStreamUrl,
             streamType: 'RTMP',
             type: 'rtmp',
-            isPublic: lmsStreamData['isPublic'],
+            isPublic: true,
         };
 
         if (!isExistingStream) {

@@ -152,7 +152,7 @@ export default class StreamStatusService {
                 }
 
                 if ((statusUpdated || streamRevived) && config.host.type === 'LMS' && !config.isStandaloneLms) {
-                    const streamData = await this.streamRepo.findStream({ streamId: stream.streamId });
+                    const streamData = await this.streamRepo.findStream({ streamId: stream.streamId, destinationServerId: stream.destinationServerId });
                     const topic: string = config.serverId + '.upstream';
                     const message: any = {
                         taskIdentifier: 'updateStreamData',
