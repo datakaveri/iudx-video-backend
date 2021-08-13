@@ -46,7 +46,7 @@ export default class Utility {
     }
 
     public isValidStreamUrl(url) {
-        const regex = /^((rtmps?|rtsp?):\/\/.*\/?.*)/;
+        const regex = /^((rtmps?|rtsps?):\/\/.*\/?.*)/;
         if (regex.test(url)) {
             return true;
         }
