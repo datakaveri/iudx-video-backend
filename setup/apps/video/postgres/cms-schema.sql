@@ -24,6 +24,8 @@ CREATE TABLE IF NOT EXISTS "Servers"
 (
   "serverId"          UUID,
   "serverName"        TEXT         NOT NULL,
+  "serverHost"        TEXT         NOT NULL,
+  "serverRtmpPort"    INTEGER      NOT NULL,
   "serverType"        TEXT         NOT NULL,
   "upstreamTopic"     TEXT         NOT NULL,
   "downstreamTopic"   TEXT         NOT NULL,  

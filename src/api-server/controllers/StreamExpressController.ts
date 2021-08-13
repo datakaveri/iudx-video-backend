@@ -129,7 +129,7 @@ export default class StreamExpressController {
 
     async streamRequest(req: Request, res: Response, next: NextFunction) {
         const streamId: string = req.params.streamId;
-        const requestType = req.query.type;
+        const requestType = req.query.type || 'local' ;
 
         Logger.debug('Calling Stream Request endpoint of stream id: %s', streamId);
         try {
@@ -140,7 +140,7 @@ export default class StreamExpressController {
                 data: data.apiResponse,
             };
 
-            if (!data.apiResponse.isPublishing && requestType !== 'local') {
+            if (!data.apiResponse.isPublishing && requestType === 'cloud') {
                 await this.streamKafkaController.streamRequest(data.kafkaRequestData.serverId, data.kafkaRequestData.data);
             }
             return res.status(200).send(response);

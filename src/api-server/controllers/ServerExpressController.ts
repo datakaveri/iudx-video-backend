@@ -16,7 +16,7 @@ export default class ServerExpressController {
 
         Logger.debug('Calling register server endpoint with body: %o', params);
         try {
-            const result = await this.serverService.register(params.serverName, 'LMS');
+            const result = await this.serverService.register(params.serverName, params.serverHost, params.serverRtmpPort, 'LMS');
             return res.status(201).json(result);
         } catch (e) {
             Logger.error('error: %o', e);

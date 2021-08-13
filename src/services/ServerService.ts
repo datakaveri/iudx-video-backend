@@ -12,7 +12,7 @@ import BaseKafkaController from '../kafka/controllers/BaseKafkaController';
 export default class ServerService {
     constructor(private kafkaUtilService: KafkaUtilService, private serverRepo: ServerRepo) { }
 
-    public async register(serverName: string, serverType: string, serverId?: string, consumerGroupId?: string) {
+    public async register(serverName: string, serverHost: string, serverRtmpPort: number, serverType: string, serverId?: string, consumerGroupId?: string) {
         try {
             const newServerId: string = serverId || new UUID().generateUUIDv5(serverName);
 
@@ -36,6 +36,8 @@ export default class ServerService {
                 serverId: newServerId,
                 serverName,
                 serverType,
+                serverHost,
+                serverRtmpPort,
                 upstreamTopic: upstreamTopicName,
                 downstreamTopic: downstreamTopicName,
                 consumerGroupId: newConsumerGroupId,

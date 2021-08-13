@@ -82,7 +82,7 @@ export default {
         publicServerIp: process.env.RTMP_SERVER_PUBLIC_IP,
         publicServerPort: process.env.RTMP_SERVER_PUBLIC_PORT,
         cmsServerIp: process.env.CMS_RTMP_HOST,
-        cmsServerPort: process.env.CMS_RTMP_PORT,
+        cmsServerPort: process.env.CMS_RTMP_PORT ? parseInt(process.env.CMS_RTMP_PORT): 1935,
     },
 
     schedulerConfig: {

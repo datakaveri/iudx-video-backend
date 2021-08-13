@@ -109,13 +109,9 @@ export default async () => {
         const ServerServiceInstance = Container.get(ServerService);
         const found = await ServerServiceInstance.findServer(config.serverId);
         if (!found) {
-            const server = await ServerServiceInstance.register('cms-server', 'CMS', config.serverId, config.kafkaConfig.consumerGroupId);
+            const server = await ServerServiceInstance.register('cms-server', config.rtmpServerConfig.cmsServerIp, config.rtmpServerConfig.cmsServerPort, 'CMS', config.serverId, config.kafkaConfig.consumerGroupId);
         }
     }
-
-    // Server register in LMS standalone
-    // TODO
-
 
     // Start Express API Server
     apiServer();

@@ -10,6 +10,7 @@ import config from '../config';
 import ProcessService from './ProcessService';
 import FfmpegService from './FfmpegService';
 import StreamStatusService from './StreamStatusService';
+import ServerRepo from '../repositories/ServerRepo';
 
 @Service()
 export default class StreamService {
@@ -19,7 +20,8 @@ export default class StreamService {
         private cameraRepo: CameraRepo,
         private processService: ProcessService,
         private ffmpegService: FfmpegService,
-        private streamStatusService: StreamStatusService
+        private streamStatusService: StreamStatusService,
+        private serverRepo: ServerRepo,
     ) {}
 
     public async publishRegisteredStreams(streamData: any) {
@@ -183,11 +185,11 @@ export default class StreamService {
                 };
             } else if (requestType === 'local') {
                 const stream = await this.streamRepo.findStream({ streamId });
+                const server = await this.serverRepo.findServer(stream.sourceServerId);
 
-                // TODO - server address needs to fetched
                 return {
                     apiResponse: {
-                        urlTemplate: `rtmp://localhost:1935/live/${streamId}?token=<TOKEN>`,
+                        urlTemplate: `rtmp://${server.serverHost}:${server.serverRtmpPort}/live/${streamId}?token=<TOKEN>`,
                         isPublishing: !!stream.isPublishing,
                         ...(!stream.isPublishing && { message: 'Stream will be available shortly, please check status API to know the status' }),
                     },
