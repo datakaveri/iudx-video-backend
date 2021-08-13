@@ -8,11 +8,11 @@ export default class PolicyRepo {
         await this.policyModel.create(policyData);
     }
 
-    async findPolicy(userId: string, streamId: string): Promise<any> {
+    async findPolicy(userId: string, cameraId: string): Promise<any> {
         const policy = await this.policyModel.findOne({
             where: {
                 userId,
-                streamId
+                cameraId
             },
         });
         if (!policy) {
@@ -35,11 +35,11 @@ export default class PolicyRepo {
         return policies;
     }
 
-    async removePolicy(userId: string, streamId: string) {
+    async removePolicy(userId: string, cameraId: string) {
         const deleted = await this.policyModel.destroy({
             where: {
                 userId,
-                streamId,
+                cameraId,
             },
         });
         if (!deleted) {

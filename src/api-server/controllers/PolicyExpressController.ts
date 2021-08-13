@@ -17,7 +17,7 @@ export default class PolicyExpressController {
 
         Logger.debug('Calling create Policy endpoint with body: %o', params);
         try {
-            const result = await this.policyService.create(providerId, params.email, params.streamId);
+            const result = await this.policyService.create(providerId, params.email, params.cameraId);
             return res.status(201).json(result);
         } catch (e) {
             Logger.error('error: %o', e);
@@ -29,7 +29,7 @@ export default class PolicyExpressController {
         let params: any = req.body;
         Logger.debug('Calling delete policy endpoint of policy id: %s', params);
         try {
-            const result = await this.policyService.delete(params.email, params.streamId);
+            const result = await this.policyService.delete(params.email, params.cameraId);
             return res.status(200).json(result);
         } catch (e) {
             Logger.error('error: %o', e);

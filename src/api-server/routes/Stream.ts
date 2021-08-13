@@ -38,6 +38,7 @@ export default (app: Router) => {
     );
 
     route.get('/request/:streamId',
+        ValidatePolicy,
         (req, res, next) => StreamController.streamRequest(req, res, next)
     );
 }

@@ -120,7 +120,7 @@ CREATE TABLE IF NOT EXISTS "Policies"
 (
   "policyId"            UUID,
   "userId"              UUID        NOT NULL,
-  "streamId"            UUID,
+  "cameraId"            UUID,
   "providerId"          UUID,
   "createdAt"           TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
   "updatedAt"           TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
@@ -128,9 +128,9 @@ CREATE TABLE IF NOT EXISTS "Policies"
   CONSTRAINT "userFK"
       FOREIGN KEY ("userId") 
 	  REFERENCES "Users" ("id"),
-  CONSTRAINT "streamFK"
-      FOREIGN KEY("streamId") 
-	  REFERENCES "Streams" ("streamId"),
+  CONSTRAINT "cameraFK"
+      FOREIGN KEY("cameraId") 
+	  REFERENCES "Cameras" ("cameraId"),
   CONSTRAINT "userFK2"
       FOREIGN KEY("providerId") 
 	  REFERENCES "Users" ("id")

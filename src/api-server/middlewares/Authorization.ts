@@ -39,7 +39,9 @@ const ValidatePolicy = async (req: Request, res: Response, next: NextFunction) =
             return res.send(401).send('Authorization failed, stream id not provided');
         }
 
-        const policy = await policyRepo.findPolicy(userId, streamId);
+        const streamRepo = Container.get(StreamRepo);
+        const stream = await streamRepo.findStream({ streamId });
+        const policy = await policyRepo.findPolicy(userId, stream.cameraId);
 
         if (!policy) {
             return res.send(401).send('Authorization failed for requested resource');
@@ -69,7 +71,7 @@ const ValidateStreamAccess = async (req: Request, res: Response, next: NextFunct
         return res.status(401).send('Authorization failed');
     }
     /** TODO
-     *  
+     *  Validate if LMS admin can access to requested stream
      */
     if (role === 'lms-admin') {
         return next();

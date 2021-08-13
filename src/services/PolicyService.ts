@@ -11,12 +11,12 @@ import UserRepo from '../repositories/UserRepo';
 export default class PolicyService {
     constructor(private policyRepo: PolicyRepo, private userRepo: UserRepo) {}
 
-    public async create(providerId: string, email: string, streamId: string) {
+    public async create(providerId: string, email: string, cameraId: string) {
         try {
             const namespace: string = config.host.type + 'Policy';
             const policyId: string = new UUID().generateUUIDv5(namespace);
             const user = await this.userRepo.findUser({email});
-            await this.policyRepo.addPolicy({ policyId, providerId, userId: user.id, streamId });
+            await this.policyRepo.addPolicy({ policyId, providerId, userId: user.id, cameraId });
             return {
                 message: 'Created',
             };
@@ -36,10 +36,10 @@ export default class PolicyService {
         }
     }
 
-    public async delete(email: string, streamId: string) {
+    public async delete(email: string, cameraId: string) {
         try {
             const user = await this.userRepo.findUser({email});
-            await this.policyRepo.removePolicy(user.id, streamId);
+            await this.policyRepo.removePolicy(user.id, cameraId);
             return {
                 message: 'Deleted',
             };
