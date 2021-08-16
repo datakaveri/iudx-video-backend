@@ -209,7 +209,7 @@ export default class StreamService {
                 password: config.lmsAdminConfig.password,
             });
             const token = data.token;
-            const rtmpStreamUrl = `rtmp://${config.rtmpServerConfig.cmsServerIp}:${config.rtmpServerConfig.cmsServerPort}/live/${lmsStreamData['streamId']}?token=${token}`;
+            const rtmpStreamUrl = `rtmp://${config.rtmpServerConfig.cmsServerIp}:${config.rtmpServerConfig.cmsServerPort}/live/${lmsStreamData['streamId']}?token=${config.rtmpServerConfig.password}`;
             const cmsRtmpStreamData: any = {
                 streamId: lmsStreamData['streamId'],
                 cameraId: lmsStreamData['cameraId'],
@@ -228,7 +228,8 @@ export default class StreamService {
                 await this.streamRepo.registerStream(cmsRtmpStreamData);
             }
 
-            this.processService.addStreamProcess(lmsStreamData['streamId'], lmsStreamData['streamId'], lmsStreamData['sourceServerId'], cmsServerId, lmsStreamData['streamUrl'], rtmpStreamUrl);
+            const sourceUrl = lmsStreamData['streamUrl'].replace(/token=.*$/, `token=${token}`)
+            this.processService.addStreamProcess(lmsStreamData['streamId'], lmsStreamData['streamId'], lmsStreamData['sourceServerId'], cmsServerId, sourceUrl, rtmpStreamUrl);
             return cmsRtmpStreamData;
         } catch (e) {
             Logger.error('Failed to publish stream');
