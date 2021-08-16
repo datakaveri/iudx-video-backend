@@ -14,7 +14,7 @@ export function PolicyModel(Database: Sequelize) {
                 type: DataTypes.UUID,
                 allowNull: false,
             },
-            streamId: {
+            cameraId: {
                 type: DataTypes.UUID,
                 allowNull: false,
             },
