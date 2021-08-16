@@ -1,4 +1,5 @@
 import { Service } from 'typedi';
+import axios from 'axios';
 import Logger from '../common/Logger';
 
 import Utility from '../common/Utility';
@@ -21,7 +22,7 @@ export default class StreamService {
         private processService: ProcessService,
         private ffmpegService: FfmpegService,
         private streamStatusService: StreamStatusService,
-        private serverRepo: ServerRepo,
+        private serverRepo: ServerRepo
     ) {}
 
     public async publishRegisteredStreams(streamData: any) {
@@ -202,26 +203,36 @@ export default class StreamService {
     }
 
     public async publishStreamToCloud(cmsServerId: string, lmsStreamData: any, isExistingStream: boolean) {
-        const rtmpStreamUrl = `rtmp://${config.rtmpServerConfig.cmsServerIp}:${config.rtmpServerConfig.cmsServerPort}/live/${lmsStreamData['streamId']}?token=${config.rtmpServerConfig.password}`;
-        const cmsRtmpStreamData: any = {
-            streamId: lmsStreamData['streamId'],
-            cameraId: lmsStreamData['cameraId'],
-            userId: lmsStreamData['userId'],
-            provenanceStreamId: lmsStreamData['streamId'],
-            sourceServerId: lmsStreamData['sourceServerId'],
-            destinationServerId: cmsServerId,
-            streamName: lmsStreamData['streamName'],
-            streamUrl: rtmpStreamUrl,
-            streamType: 'RTMP',
-            type: 'rtmp',
-            isPublic: true,
-        };
+        try {
+            const { data } = await axios.post(config.cmsTokenApiUrl, {
+                email: config.lmsAdminConfig.email,
+                password: config.lmsAdminConfig.password,
+            });
+            const token = data.token;
+            const rtmpStreamUrl = `rtmp://${config.rtmpServerConfig.cmsServerIp}:${config.rtmpServerConfig.cmsServerPort}/live/${lmsStreamData['streamId']}?token=${token}`;
+            const cmsRtmpStreamData: any = {
+                streamId: lmsStreamData['streamId'],
+                cameraId: lmsStreamData['cameraId'],
+                userId: lmsStreamData['userId'],
+                provenanceStreamId: lmsStreamData['streamId'],
+                sourceServerId: lmsStreamData['sourceServerId'],
+                destinationServerId: cmsServerId,
+                streamName: lmsStreamData['streamName'],
+                streamUrl: rtmpStreamUrl,
+                streamType: 'RTMP',
+                type: 'rtmp',
+                isPublic: true,
+            };
 
-        if (!isExistingStream) {
-            await this.streamRepo.registerStream(cmsRtmpStreamData);
+            if (!isExistingStream) {
+                await this.streamRepo.registerStream(cmsRtmpStreamData);
+            }
+
+            this.processService.addStreamProcess(lmsStreamData['streamId'], lmsStreamData['streamId'], lmsStreamData['sourceServerId'], cmsServerId, lmsStreamData['streamUrl'], rtmpStreamUrl);
+            return cmsRtmpStreamData;
+        } catch (e) {
+            Logger.error('Failed to publish stream');
+            throw e;
         }
-
-        this.processService.addStreamProcess(lmsStreamData['streamId'], lmsStreamData['streamId'], lmsStreamData['sourceServerId'], cmsServerId, lmsStreamData['streamUrl'], rtmpStreamUrl);
-        return cmsRtmpStreamData;
     }
 }

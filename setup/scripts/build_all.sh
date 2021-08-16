@@ -17,15 +17,15 @@ then
 elif [[ $environment -eq 2 ]]
 then
     echo "Choose type of Nginx RTMP configuration:"
-    echo -e "\033[1;30m[1] SSL  [2] SSL + on-demand \033[0m"
+    echo -e "\033[1;30m[1] CMS  [2] LMS \033[0m"
     read nginxconf
     if [[ $nginxconf -eq 1 ]]
     then
-        cp $PROJECT_ROOT/setup/apps/video/nginx-rtmp/prod.nginx.conf \
+        cp $PROJECT_ROOT/setup/apps/video/nginx-rtmp/cmsprod.nginx.conf \
         $PROJECT_ROOT/setup/setup/nginx-rtmp/nginx.conf
     elif [[ $nginxconf -eq 2 ]]
     then
-        cp $PROJECT_ROOT/setup/apps/video/nginx-rtmp/prod.nginx.ondemand.conf \
+        cp $PROJECT_ROOT/setup/apps/video/nginx-rtmp/lmsprod.nginx.conf \
         $PROJECT_ROOT/setup/setup/nginx-rtmp/nginx.conf
     fi
 fi

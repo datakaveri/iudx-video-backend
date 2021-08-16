@@ -113,5 +113,7 @@ export default {
         email: process.env.LMS_ADMIN_EMAIL,
         password: process.env.LMS_ADMIN_PASSWORD,
         name: 'LMS Admin'
-    }
+    },
+
+    cmsTokenApiUrl: process.env.TOKEN_API_URL,
 };
