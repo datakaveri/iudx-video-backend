@@ -14,6 +14,14 @@ export function ServerModel(Database: Sequelize) {
                 type: DataTypes.TEXT,
                 allowNull: false,
             },
+            serverHost: {
+                type: DataTypes.TEXT,
+                allowNull: false,
+            },
+            serverPort: {
+                type: DataTypes.INTEGER,
+                allowNull: false,
+            },
             serverType: {
                 type: DataTypes.TEXT,
                 allowNull: false,
