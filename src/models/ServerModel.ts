@@ -18,7 +18,7 @@ export function ServerModel(Database: Sequelize) {
                 type: DataTypes.TEXT,
                 allowNull: false,
             },
-            serverPort: {
+            serverRtmpPort: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
             },
