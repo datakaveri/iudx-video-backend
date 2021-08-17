@@ -90,6 +90,7 @@ export default {
             enable: process.env.ENABLE_STATUS_CHECK === 'true' || false,
             jobInterval: 3, // in minutes
             lastActiveInterval: 5, // in minutes
+            streamDisconnectInterval: 60 // in minutes
         },
         metricsMonitor: {
             enable: process.env.ENABLE_METRICS_MONITOR === 'true' || false,

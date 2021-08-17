@@ -16,35 +16,31 @@ describe('Stream Status Service Testing', () => {
     describe('Update Stream Status', () => {
 
         test('Should resolve and update stream status', async () => {
-            const stream: any = {
-                streamId: '1',
-                destinationServerId: '1',
-            }
+            const streamId: string = '1';
+            const destinationServerId: string = '1';
             const isActive: boolean = true;
             const isStable: boolean = true;
             const isPublishing: boolean = true;
 
-            await expect(streamStatusService.updateStatus(stream, isActive, isStable, isPublishing)).resolves;
+            await expect(streamStatusService.updateStatus(streamId, destinationServerId, isActive, isStable, isPublishing)).resolves;
         });
 
         test('Should resolve an return 0 if stream not found', async () => {
             const expected: Array<number> = [0];
 
-            const stream: any = {
-                streamId: '10',
-                destinationServerId: '1',
-            }
+            const streamId: string = '10';
+            const destinationServerId: string = '1';
             const isActive: boolean = true;
             const isStable: boolean = true;
             const isPublishing: boolean = true;
 
-            await expect(streamStatusService.updateStatus(stream, isActive, isStable, isPublishing)).resolves.toEqual(expected);
+            await expect(streamStatusService.updateStatus(streamId, destinationServerId, isActive, isStable, isPublishing)).resolves.toEqual(expected);
         });
     });
 
     describe('Update RTMP Stream Stats', () => {
 
-        const streamsStat: any = [{
+        const streamsStat: any = {
             streamId: '1',
             nClients: '1',
             active: true,
@@ -61,7 +57,7 @@ describe('Stream Status Service Testing', () => {
                 height: '1280',
                 frameRate: '25',
             }
-        }];
+        };
 
         test('Should resolve and update stream stats', async () => {
             await expect(streamStatusService.updateStats(streamsStat)).resolves;

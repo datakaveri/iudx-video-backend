@@ -53,7 +53,7 @@ export default class Utility {
         return false;
     }
 
-    public parseNginxRtmpStat(response) {
+    public parseNginxRtmpStat(response): Promise<Array<any>> {
         return new Promise(async (resolve, reject) => {
             parseString(response.body, function (err, result) {
                 try {
@@ -89,8 +89,11 @@ export default class Utility {
                                 metaVideo: metaData,
                             };
                         });
+
+                        return resolve(streams);
                     }
-                    return resolve(streams);
+
+                    return resolve([]);
                 }
                 catch (err) {
                     reject(err);

@@ -23,5 +23,6 @@ export interface StreamInterface {
     bytesIn: number,
     bytesOut: number,
     activeTime: number,
+    lastAccessed: Date,
     lastActive: Date;
 }

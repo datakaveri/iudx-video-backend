@@ -1,17 +1,19 @@
 import { Service } from 'typedi';
 import axios from 'axios';
-import Logger from '../common/Logger';
 
-import Utility from '../common/Utility';
-import StreamRepo from '../repositories/StreamRepo';
-import ServiceError from '../common/Error';
-import CameraRepo from '../repositories/CameraRepo';
-import UUID from '../common/UUID';
 import config from '../config';
+import Logger from '../common/Logger';
+import Utility from '../common/Utility';
+import ServiceError from '../common/Error';
+import UUID from '../common/UUID';
+import { KafkaMessageType } from '../common/Constants';
+import StreamRepo from '../repositories/StreamRepo';
+import CameraRepo from '../repositories/CameraRepo';
 import ProcessService from './ProcessService';
 import FfmpegService from './FfmpegService';
 import StreamStatusService from './StreamStatusService';
 import ServerRepo from '../repositories/ServerRepo';
+import KafkaManager from '../managers/Kafka';
 
 @Service()
 export default class StreamService {
@@ -22,8 +24,9 @@ export default class StreamService {
         private processService: ProcessService,
         private ffmpegService: FfmpegService,
         private streamStatusService: StreamStatusService,
-        private serverRepo: ServerRepo
-    ) {}
+        private serverRepo: ServerRepo,
+        private kafkaManager: KafkaManager,
+    ) { }
 
     public async publishRegisteredStreams(streamData: any) {
         const namespace: string = config.host.type + 'Stream';
@@ -81,7 +84,7 @@ export default class StreamService {
         try {
             const fields = ['streamId', 'cameraId', 'streamName', 'streamType', 'streamUrl', 'streamType', 'type', 'isPublic'];
 
-            return await this.streamRepo.findStream({ streamId }, fields);
+            return await this.streamRepo.findStream({ streamId, destinationServerId: config.serverId }, fields);
         } catch (e) {
             Logger.error(e);
             throw new ServiceError('Error fetching the data');
@@ -92,7 +95,7 @@ export default class StreamService {
         try {
             const fields = ['streamId', 'cameraId', 'provenanceStreamId', 'sourceServerId', 'destinationServerId', 'streamName', 'streamType', 'streamUrl', 'streamType', 'type', 'isPublic'];
             const { limit, offset } = this.utilityService.getPagination(page, size);
-            const streams = await this.streamRepo.listAllStreams(limit, offset, fields);
+            const streams = await this.streamRepo.listAllStreams(limit, offset, { type: 'rtmp' }, fields);
             const response = this.utilityService.getPagingData(streams, page, limit);
             return response;
         } catch (e) {
@@ -149,11 +152,18 @@ export default class StreamService {
 
                 let lmsRtmpStream;
                 let isPublishing = false;
+                const lastAccessed = Date.now();
 
                 // Get LMS RTMP Stream using stream id and server ids
                 if (isExistingStream) {
                     lmsRtmpStream = await this.streamRepo.findStream({ streamId, destinationServerId: existingStreamRecord.sourceServerId });
-                    isPublishing = lmsRtmpStream.isPublishing;
+                    isPublishing = lmsRtmpStream.isPublishing && existingStreamRecord.isActive;
+
+                    // Sync stream last access data
+                    const streamQuery: any = { streamId, destinationServerId: config.serverId };
+                    const message: any = { taskIdentifier: 'updateStreamData', data: { query: streamQuery, streamData: { lastAccessed } } };
+                    await this.kafkaManager.publish(`${existingStreamRecord.sourceServerId}.downstream`, message, KafkaMessageType.DB_REQUEST);
+                    await this.streamRepo.updateStream(streamQuery, { lastAccessed });
                 } else {
                     lmsRtmpStream = await this.streamRepo.findStream({ streamId });
                     isPublishing = false;
@@ -178,8 +188,8 @@ export default class StreamService {
                                 sourceServerId: lmsRtmpStream['sourceServerId'],
                                 destinationServerId: config.serverId,
                                 streamName: lmsRtmpStream['streamName'],
-                                isPublic: lmsRtmpStream['isPublic'],
                                 streamUrl: lmsRtmpStream['streamUrl'],
+                                lastAccessed,
                             },
                         },
                     },
@@ -222,6 +232,7 @@ export default class StreamService {
                 streamType: 'RTMP',
                 type: 'rtmp',
                 isPublic: true,
+                lastAccessed: lmsStreamData['lastAccessed'],
             };
 
             if (!isExistingStream) {

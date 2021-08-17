@@ -86,6 +86,9 @@ export function StreamModel(Database: Sequelize) {
             activeTime: {
                 type: DataTypes.INTEGER,
             },
+            lastAccessed: {
+                type: DataTypes.DATE,
+            },
             lastActive: {
                 type: DataTypes.DATE,
             }

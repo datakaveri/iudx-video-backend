@@ -72,7 +72,10 @@ describe('Camera Service Testing', () => {
         test('Should return the streams data', async () => {
             const expected: any = {
                 streamId: expect.any(String),
+                cameraId: expect.any(String),
                 provenanceStreamId: expect.any(String),
+                sourceServerId: expect.any(String),
+                destinationServerId: expect.any(String),
                 streamName: expect.any(String),
                 streamUrl: expect.any(String),
                 streamType: expect.any(String),

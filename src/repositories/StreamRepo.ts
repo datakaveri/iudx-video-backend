@@ -16,8 +16,8 @@ export default class StreamRepo {
         return await this.streamModel.findOne({ where: query, attributes: columns });
     }
 
-    async listAllStreams(limit: number, offset: number, columns: Array<string> = null): Promise<any> {
-        return await this.streamModel.findAndCountAll({ limit, offset, attributes: columns });
+    async listAllStreams(limit: number, offset: number, query: any = {}, columns: Array<string> = null): Promise<any> {
+        return await this.streamModel.findAndCountAll({ where: query, limit, offset, attributes: columns });
     }
 
     async deleteStream(query: any) {
@@ -54,6 +54,7 @@ export default class StreamRepo {
 
         return await this.streamModel.findAll({
             where: {
+                destinationServerId: config.serverId,
                 [Op.or]: [
                     {
                         lastActive: {

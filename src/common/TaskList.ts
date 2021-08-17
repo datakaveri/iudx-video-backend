@@ -9,6 +9,7 @@ import StreamService from '../services/StreamService';
 import AuthService from '../services/AuthService';
 import UserRepo from '../repositories/UserRepo';
 import StreamRepo from '../repositories/StreamRepo';
+import FfmpegService from '../services/FfmpegService';
 
 export const taskList = {
     // Auth related tasks
@@ -157,4 +158,27 @@ export const taskList = {
             console.log(err);
         }
     },
+    unpublishStream: async (payload, helpers) => {
+        try {
+            const streamRepo: StreamRepo = Container.get(StreamRepo);
+            const ffmpegService: FfmpegService = Container.get(FfmpegService);
+            const { data } = payload;
+            const queryData = { streamId: data.streamId, destinationServerId: data.destinationServerId };
+
+            const stream = await streamRepo.findStream(queryData);
+            if (stream.processId) {
+                const isProcessRunning = await ffmpegService.isProcessRunning(stream.processId);
+
+                if (isProcessRunning) {
+                    await ffmpegService.killProcess(stream.processId);
+                }
+            }
+
+            await streamRepo.updateStream(queryData, { isActive: false, isStable: false, lastActive: Date.now(), processId: null })
+        } catch (err) {
+            Logger.error('error: %o', err);
+            console.log(err);
+        }
+    },
+
 };

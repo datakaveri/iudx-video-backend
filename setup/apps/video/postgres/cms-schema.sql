@@ -80,6 +80,7 @@ CREATE TABLE IF NOT EXISTS "Streams"
   "bytesIn"               BIGINT,
   "bytesOut"              BIGINT,
   "activeTime"            INTEGER,
+  "lastAccessed"          TIMESTAMPTZ,
   "lastActive"            TIMESTAMPTZ,
   "createdAt"             TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
   "updatedAt"             TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
