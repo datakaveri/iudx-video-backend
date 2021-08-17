@@ -83,6 +83,7 @@ CREATE TABLE IF NOT EXISTS "Archives"
   "fileId"              UUID,
   "userId"              UUID        NOT NULL,
   "streamId"            UUID        NOT NULL,
+  "serverId"            UUID        NOT NULL,
   "fileName"            TEXT        NOT NULL,
   "fileSize"            TEXT,
   "fileDuration"        INTEGER,
@@ -91,9 +92,9 @@ CREATE TABLE IF NOT EXISTS "Archives"
   CONSTRAINT "userFK"
       FOREIGN KEY ("userId") 
 	  REFERENCES "Users" ("id"),
-  CONSTRAINT "streamFK"
-      FOREIGN KEY("streamId") 
-	  REFERENCES "Streams" ("streamId")
+  CONSTRAINT "streamServerFK"
+      FOREIGN KEY("streamId", "serverId") 
+	  REFERENCES "Streams" ("streamId", "destinationServerId")
 );
 
 CREATE TABLE IF NOT EXISTS "Policies" 
