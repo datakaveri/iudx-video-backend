@@ -72,8 +72,10 @@ export default class StreamKafkaController {
                 await this.streamRepo.registerStream(result);
             }
 
-            await this.streamRepo.updateStream({ streamId: result.streamId, destinationServerId: result.sourceServerId }, { isPublishing: true });
-            await this.streamRepo.updateStream({ streamId: result.streamId, destinationServerId: result.destinationServerId }, { isActive: true, isStable: true });
+            if (result) {
+                await this.streamRepo.updateStream({ streamId: result.streamId, destinationServerId: result.sourceServerId }, { isPublishing: true });
+                await this.streamRepo.updateStream({ streamId: result.streamId, destinationServerId: result.destinationServerId }, { isActive: true, isStable: true });
+            }
         } catch (err) {
             Logger.error('error: %o', err);
             throw err;

@@ -104,15 +104,13 @@ export default class StreamService {
         }
     }
 
-    public async delete(streamId: string) {
+    public async deleteAssociatedStreams(streamId: string) {
         try {
-            const streamData = await this.streamRepo.findStream({ streamId, type: 'camera' });
-
-            if (!streamData) {
-                return 0;
-            }
-
             const streams = await this.streamRepo.getAllAssociatedStreams(streamId);
+
+            if (Array.isArray(streams)) {
+                streams.reverse();
+            }
 
             for (const stream of streams) {
                 if (stream.processId) {
@@ -124,7 +122,21 @@ export default class StreamService {
                 }
                 await this.streamRepo.deleteStream({ streamId: stream.streamId });
             }
+        } catch (e) {
+            Logger.error(e);
+            throw new ServiceError('Error deleting streams');
+        }
+    }
 
+    public async delete(streamId: string) {
+        try {
+            const streamData = await this.streamRepo.findStream({ streamId, type: 'camera' });
+
+            if (!streamData) {
+                return 0;
+            }
+
+            await this.deleteAssociatedStreams(streamData.streamId);
             return 1;
         } catch (e) {
             Logger.error(e);

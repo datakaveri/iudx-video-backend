@@ -46,4 +46,12 @@ export default class PolicyRepo {
             throw new Error();
         }
     }
+
+    async removePolicyByCamera(cameraId: string) {
+        await this.policyModel.destroy({
+            where: {
+                cameraId,
+            }
+        });
+    }
 }

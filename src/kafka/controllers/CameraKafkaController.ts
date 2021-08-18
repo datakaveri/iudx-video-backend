@@ -5,18 +5,21 @@ import { KafkaMessageType } from '../../common/Constants';
 import KafkaManager from '../../managers/Kafka';
 import CameraRepo from '../../repositories/CameraRepo';
 import StreamRepo from '../../repositories/StreamRepo';
+import PolicyRepo from '../../repositories/PolicyRepo';
 import KafkaUtilService from '../../services/KafkaUtilService';
 
 export default class CameraKafkaController {
     private kafkaManager: KafkaManager;
     private cameraRepo: CameraRepo;
     private streamRepo: StreamRepo;
+    private policyRepo: PolicyRepo;
     private kafkaUtilService: KafkaUtilService;
 
     constructor() {
         this.kafkaManager = Container.get(KafkaManager);
         this.cameraRepo = Container.get(CameraRepo);
         this.streamRepo = Container.get(StreamRepo);
+        this.policyRepo = Container.get(PolicyRepo);
         this.kafkaUtilService = Container.get(KafkaUtilService);
     }
 
@@ -64,6 +67,8 @@ export default class CameraKafkaController {
             const message: any = { taskIdentifier: 'deleteCamera', data: { cameraId } };
             const { messageId } = await this.kafkaManager.publish(topic, message, KafkaMessageType.HTTP_REQUEST);
             const result = await this.kafkaUtilService.getKafkaMessageResponse(messageId);
+
+            await this.policyRepo.removePolicyByCamera(cameraId);
 
             if (result) {
                 await this.streamRepo.deleteStream({ cameraId });

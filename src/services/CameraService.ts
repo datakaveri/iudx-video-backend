@@ -2,12 +2,13 @@ import { Service } from 'typedi';
 import Logger from '../common/Logger';
 
 import Utility from '../common/Utility';
-import CameraRepo from '../repositories/CameraRepo';
 import ServiceError from '../common/Error';
 import UUID from '../common/UUID';
 import config from '../config';
+import CameraRepo from '../repositories/CameraRepo';
 import StreamRepo from '../repositories/StreamRepo';
-import FfmpegService from './FfmpegService';
+import PolicyRepo from '../repositories/PolicyRepo';
+import StreamService from './StreamService';
 
 @Service()
 export default class CameraService {
@@ -15,7 +16,8 @@ export default class CameraService {
         private utilityService: Utility,
         private cameraRepo: CameraRepo,
         private streamRepo: StreamRepo,
-        private ffmpegService: FfmpegService,
+        private policyRepo: PolicyRepo,
+        private streamService: StreamService,
     ) { }
 
     public async register(userId: string, cameraData: any) {
@@ -111,19 +113,13 @@ export default class CameraService {
 
     public async delete(cameraId: string) {
         try {
-            const streams: Array<any> = await this.streamRepo.findAllStreams({ cameraId });
+            const streams = await this.streamRepo.findAllStreams({ cameraId, type: 'camera' });
 
-            if (streams.length > 0) {
-                for (const stream of streams) {
-                    if (!stream.processId) continue;
-                    const isProcessRunning = await this.ffmpegService.isProcessRunning(stream.processId);
-
-                    if (isProcessRunning) {
-                        await this.ffmpegService.killProcess(stream.processId);
-                    }
-                }
-                await this.streamRepo.deleteStream({ cameraId });
+            for (const stream of streams) {
+                await this.streamService.deleteAssociatedStreams(stream.streamId);
             }
+
+            await this.policyRepo.removePolicyByCamera(cameraId);
 
             return await this.cameraRepo.deleteCamera({ cameraId });
         } catch (e) {
