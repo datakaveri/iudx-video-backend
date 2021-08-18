@@ -25,6 +25,9 @@ export default class StreamKafkaController {
             const result = await this.kafkaUtilService.getKafkaMessageResponse(messageId);
 
             if (result) {
+                result['streamData'].isPublishing = true;
+                result['rtmpStreamData'].isActive = true;
+                result['rtmpStreamData'].isStable = true;
                 await this.streamRepo.registerStream(result['streamData']);
                 await this.streamRepo.registerStream(result['rtmpStreamData']);
             }
@@ -68,6 +71,9 @@ export default class StreamKafkaController {
             if (!isExistingStream) {
                 await this.streamRepo.registerStream(result);
             }
+
+            await this.streamRepo.updateStream({ streamId: result.streamId, destinationServerId: result.sourceServerId }, { isPublishing: true });
+            await this.streamRepo.updateStream({ streamId: result.streamId, destinationServerId: result.destinationServerId }, { isActive: true, isStable: true });
         } catch (err) {
             Logger.error('error: %o', err);
             throw err;
