@@ -53,10 +53,10 @@ export default class AuthKafkaController {
         }
     }
 
-    public async approveUser(serverId: string, email: string) {
+    public async approveUser(serverId: string, email: string, role: string) {
         try {
             const topic: string = serverId + '.downstream';
-            const message: any = { taskIdentifier: 'approveUser', data: { email } };
+            const message: any = { taskIdentifier: 'approveUser', data: { email, role } };
             const { messageId } = await this.kafkaManager.publish(topic, message, KafkaMessageType.HTTP_REQUEST);
             const result = await this.kafkaUtilService.getKafkaMessageResponse(messageId);
 

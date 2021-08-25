@@ -18,15 +18,21 @@ export default class AuthService {
         }
     }
 
-    public async approve(email) {
+    public async approve(email, role) {
         try {
             let user = await this.userRepo.findUser({ email });
             if (user) {
                 if (user.role === 'provider' || user.role === 'lms-admin') {
-                    await this.userRepo.updateUser({ email }, { approved: true });
-                    return {
-                        message: 'User approved',
-                    };
+                    if (user.role === role) {
+                        await this.userRepo.updateUser({ email }, { approved: true });
+                        return {
+                            message: 'User approved',
+                        };
+                    } else {
+                        return {
+                            message: 'User registered role and provided role for approval not matching',
+                        };
+                    }
                 } else {
                     return {
                         message: 'Approval not required',
