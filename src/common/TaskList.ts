@@ -49,7 +49,7 @@ export const taskList = {
             const topic: string = config.serverId + '.upstream';
             const { messageId, data } = payload;
 
-            const result = await authService.approve(data.email);
+            const result = await authService.approve(data.email, data.role);
             await kafkaManager.publish(topic, { data: result }, KafkaMessageType.HTTP_RESPONSE, messageId);
         } catch (err) {
             Logger.error('error: %o', err);

@@ -155,10 +155,10 @@ export default class AuthExpressController {
         let response: any;
         try {
             if (serverId) {
-                response = await this.authKafkaController.approveUser(serverId, req.body.email);
+                response = await this.authKafkaController.approveUser(serverId, req.body.email, req.body.role);
             }
             else {
-                response = await this.authService.approve(req.body.email);
+                response = await this.authService.approve(req.body.email, req.body.role);
             }
             return res.status(200).send(response);
         } catch(e) {

@@ -13,6 +13,6 @@ services:
       - "4000"
     depends_on:
       - postgres
-    command: "npm start"
+    command: "node build/app.js"
 
 
