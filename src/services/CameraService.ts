@@ -82,6 +82,10 @@ export default class CameraService {
             let data: any;
 
             switch (role) {
+                case 'cms-admin':
+                    data = await this.cameraRepo.listAllCameras(limit, offset, null, fields);
+                    break;
+
                 case 'lms-admin':
                 case 'provider':
                     data = await this.cameraRepo.listAllCameras(limit, offset, { userId }, fields);
@@ -90,6 +94,9 @@ export default class CameraService {
                 case 'consumer':
                     data = await this.cameraRepo.listCamerasBasedOnUserPolicy(limit, offset, userId, fields);
                     break;
+
+                default:
+                    throw new Error();
             }
 
             const cameras = this.utilityService.getPagingData(data, page, limit);
