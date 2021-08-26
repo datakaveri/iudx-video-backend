@@ -6,7 +6,7 @@ services:
     container_name: ui_nginx
     network_mode: host
     build:
-      dockerfile: ${PROJECT_ROOT}/setup/setup/video-server/Dockerfile
+      dockerfile: ${PROJECT_ROOT}/setup/setup/ui/Dockerfile
       context: ${PROJECT_ROOT}/setup/setup/
       args:
         ui_path: ${UI_PROJECT_PATH}
