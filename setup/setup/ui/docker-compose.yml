@@ -7,8 +7,7 @@ services:
     network_mode: host
     build:
       dockerfile: ${PROJECT_ROOT}/setup/setup/ui/Dockerfile
-      context: ${PROJECT_ROOT}/setup/setup/
-      args:
-        ui_path: ${UI_PROJECT_PATH}
+      context: ${UI_PROJECT_PATH}
     volumes:
       - ${PROJECT_ROOT}/setup/certificates:/certificates
+      - ${PROJECT_ROOT}/setup/setup/nginx/nginx.conf:/etc/nginx/conf.d/default.conf

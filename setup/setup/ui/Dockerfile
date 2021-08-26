@@ -2,11 +2,9 @@ FROM node:12 as ui-build
 
 WORKDIR /app
 
-ARG ui_path=/home/ubuntu/iudx-video-frontend
-
-COPY ${ui_path}/package*.json .
+COPY ./package*.json .
 RUN npm i 
-COPY ${ui_path} .
+COPY . .
 RUN npm run build
 
 FROM nginx
