@@ -1,10 +1,12 @@
 #!/bin/bash
 
 PROJECT_ROOT="$PWD/../../"
+UI_PROJECT_ROOT="$PWD/../../../"
 
 export PROJECT_ROOT=$PROJECT_ROOT
 export TOPICS_FILE="$PROJECT_ROOT/setup/apps/video/kafka/topics.json"
 export SCHEMA_FILE="$PROJECT_ROOT/setup/apps/video/postgres/schema.sql"
+export UI_PROJECT_PATH="$UI_PROJECT_ROOT/iudx-video-frontend"
 
 echo "Choose the build environment:"
 echo -e "\033[1;30m[1] Development  [2] Production \033[0m"
@@ -37,5 +39,6 @@ docker-compose \
     -f $PROJECT_ROOT/setup/setup/nginx-rtmp/docker-compose.yml \
     -f $PROJECT_ROOT/setup/setup/postgres/docker-compose.yml \
     -f $PROJECT_ROOT/setup/setup/video-server/docker-compose.yml \
+    -f $PROJECT_ROOT/setup/setup/ui/docker-compose.yml \
     --env-file $PROJECT_ROOT/.env \
-    build zook kafka kafkainit nginxrtmp postgres videoserver
+    build zook kafka kafkainit nginxrtmp postgres videoserver nginx
