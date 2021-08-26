@@ -105,10 +105,12 @@ describe('Camera Service Testing', () => {
                 totalPages: expect.any(Number),
                 results: expect.any(Array)
             };
+            const userId: string = '1';
+            const role: string = 'provider';
             const page: number = 0;
             const size: number = 0;
 
-            const response = await cameraService.findAll(page, size);
+            const response = await cameraService.findAll(userId, role, page, size);
 
             expect(response).toEqual(
                 expect.objectContaining(expected)
@@ -117,10 +119,12 @@ describe('Camera Service Testing', () => {
         });
 
         test('Should return correct page and size', async () => {
+            const userId: string = '1';
+            const role: string = 'provider';
             const page: number = 1;
             const size: number = 4;
 
-            const response = await cameraService.findAll(page, size);
+            const response = await cameraService.findAll(userId, role, page, size);
 
             expect(response['currentPage']).toBe(page);
             expect(response['results']).toHaveLength(size);

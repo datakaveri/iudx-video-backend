@@ -75,10 +75,23 @@ export default class CameraService {
         }
     }
 
-    public async findAll(page: number, size: number) {
+    public async findAll(userId: string, role: string, page: number, size: number) {
         try {
+            const fields = ['cameraId', 'cameraNum', 'cameraName', 'cameraType', 'cameraUsage', 'cameraOrientation', 'city', 'location'];
             const { limit, offset } = this.utilityService.getPagination(page, size);
-            const data = await this.cameraRepo.listAllCameras(limit, offset);
+            let data: any;
+
+            switch (role) {
+                case 'lms-admin':
+                case 'provider':
+                    data = await this.cameraRepo.listAllCameras(limit, offset, { userId }, fields);
+                    break;
+
+                case 'consumer':
+                    data = await this.cameraRepo.listCamerasBasedOnUserPolicy(limit, offset, userId, fields);
+                    break;
+            }
+
             const cameras = this.utilityService.getPagingData(data, page, limit);
             return cameras;
         } catch (e) {

@@ -83,12 +83,14 @@ export default class CameraExpressController {
     }
 
     async findAll(req: Request, res: Response, next: NextFunction) {
+        const userId: string = req.user['userId'];
+        const role: string = req.user['role'];
         const page: number = +req.query.page;
         const size: number = +req.query.size;
 
         Logger.debug('Calling Find all Camera endpoint');
         try {
-            const result = await this.cameraService.findAll(page, size);
+            const result = await this.cameraService.findAll(userId, role, page, size);
             const response = {
                 type: 200,
                 title: 'Success',
