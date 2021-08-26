@@ -2,17 +2,14 @@ FROM node:12 as ui-build
 
 WORKDIR /app
 
-COPY ./package*.json .
+COPY ./package*.json /app/
 RUN npm i 
-COPY . .
+COPY . /app/
 RUN npm run build
 
 FROM nginx
 
 COPY --from=ui-build /app/build /usr/share/nginx/html/ui
-
-RUN rm /etc/nginx/conf.d/default.conf
-COPY ./nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80 443 4040
 CMD ["nginx", "-g", "daemon off;"]
