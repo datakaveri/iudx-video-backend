@@ -91,11 +91,11 @@ export default class StreamService {
         }
     }
 
-    public async findAll(page: number, size: number) {
+    public async findAll(page: number, size: number, cameraId) {
         try {
             const fields = ['streamId', 'cameraId', 'provenanceStreamId', 'sourceServerId', 'destinationServerId', 'streamName', 'streamType', 'streamUrl', 'streamType', 'type', 'isPublic'];
             const { limit, offset } = this.utilityService.getPagination(page, size);
-            const streams = await this.streamRepo.listAllStreams(limit, offset, { type: 'rtmp' }, fields);
+            const streams = await this.streamRepo.listAllStreams(limit, offset, { type: 'rtmp', ...(cameraId && { cameraId }) }, fields);
             const response = this.utilityService.getPagingData(streams, page, limit);
             return response;
         } catch (e) {
@@ -183,6 +183,7 @@ export default class StreamService {
 
                 return {
                     apiResponse: {
+                        streamId,
                         urlTemplate: `rtmp://${config.rtmpServerConfig.publicServerIp}:${config.rtmpServerConfig.publicServerPort}/live/${streamId}?token=<TOKEN>`,
                         isPublishing: isPublishing,
                         ...(!isPublishing && { message: 'Stream will be available shortly, please check status API to know the status' }),
@@ -212,6 +213,7 @@ export default class StreamService {
 
                 return {
                     apiResponse: {
+                        streamId,
                         urlTemplate: `rtmp://${server.serverHost}:${server.serverRtmpPort}/live/${streamId}?token=<TOKEN>`,
                         isPublishing: !!stream.isPublishing,
                         ...(!stream.isPublishing && { message: 'Stream will be available shortly, please check status API to know the status' }),
