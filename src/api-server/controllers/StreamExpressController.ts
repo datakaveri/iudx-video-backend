@@ -68,10 +68,11 @@ export default class StreamExpressController {
     async findAll(req: Request, res: Response, next: NextFunction) {
         const page: number = +req.query.page;
         const size: number = +req.query.size;
+        const cameraId = req.query.cameraId || null;
 
         Logger.debug('Calling Find all Stream endpoint');
         try {
-            const result = await this.streamService.findAll(page, size);
+            const result = await this.streamService.findAll(page, size, cameraId);
             const response = {
                 type: 200,
                 title: 'Success',
