@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS "Cameras"
 (
   "cameraId"            UUID,
   "userId"              UUID          NOT NULL,
+  "serverId"            UUID          NOT NULL,
   "cameraNum"           INTEGER       NOT NULL,
   "cameraName"          TEXT          NOT NULL,
   "cameraType"          TEXT,
@@ -51,7 +52,10 @@ CREATE TABLE IF NOT EXISTS "Cameras"
   PRIMARY KEY ("cameraId"),
   CONSTRAINT "userFK"
       FOREIGN KEY ("userId") 
-	  REFERENCES "Users" ("id")
+	  REFERENCES "Users" ("id"),
+  CONSTRAINT "serverFK"
+      FOREIGN KEY ("serverId") 
+	  REFERENCES "Servers" ("serverId") 
 );
 
 CREATE TABLE IF NOT EXISTS "Streams" 

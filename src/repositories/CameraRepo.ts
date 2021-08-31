@@ -25,11 +25,12 @@ export default class CameraRepo {
         return await this.cameraModel.destroy({ where: query });
     }
 
-    async listCamerasBasedOnUserPolicy(limit: number, offset: number, userId: string, columns: Array<string> = null) {
+    async listCamerasBasedOnUserPolicy(limit: number, offset: number, userId: string, query: any = null, columns: Array<string> = null) {
         this.cameraModel.hasMany(this.policyModel, { foreignKey: 'cameraId' });
 
         return await this.cameraModel.findAndCountAll(
             {
+                where: query,
                 include: [{ model: this.policyModel, where: { userId }, attributes: [] }],
                 limit,
                 offset,

@@ -1,6 +1,7 @@
 export interface CameraInterface {
     cameraId: string,
     userId: string,
+    serverId: string,
     cameraNum: number;
     cameraName: string;
     cameraType: string;

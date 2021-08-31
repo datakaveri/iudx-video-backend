@@ -87,10 +87,11 @@ export default class CameraExpressController {
         const role: string = req.user['role'];
         const page: number = +req.query.page;
         const size: number = +req.query.size;
+        const serverId: string = (req.query as any)['serverId'];
 
         Logger.debug('Calling Find all Camera endpoint');
         try {
-            const result = await this.cameraService.findAll(userId, role, page, size);
+            const result = await this.cameraService.findAll(userId, role, page, size, serverId);
             const response = {
                 type: 200,
                 title: 'Success',

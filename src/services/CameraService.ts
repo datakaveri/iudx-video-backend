@@ -30,7 +30,7 @@ export default class CameraService {
                 return null;
             }
 
-            cameraData = { cameraId, userId, ...cameraData };
+            cameraData = { cameraId, userId, serverId: config.serverId, ...cameraData };
             await this.cameraRepo.registerCamera(cameraData);
             return cameraData;
         } catch (e) {
@@ -75,24 +75,24 @@ export default class CameraService {
         }
     }
 
-    public async findAll(userId: string, role: string, page: number, size: number) {
+    public async findAll(userId: string, role: string, page: number, size: number, serverId?: string) {
         try {
-            const fields = ['cameraId', 'cameraNum', 'cameraName', 'cameraType', 'cameraUsage', 'cameraOrientation', 'city', 'location'];
+            const fields = ['cameraId', 'serverId', 'cameraNum', 'cameraName', 'cameraType', 'cameraUsage', 'cameraOrientation', 'city', 'location'];
             const { limit, offset } = this.utilityService.getPagination(page, size);
             let data: any;
 
             switch (role) {
                 case 'cms-admin':
-                    data = await this.cameraRepo.listAllCameras(limit, offset, null, fields);
+                    data = await this.cameraRepo.listAllCameras(limit, offset, { ...(serverId && { serverId }) }, fields);
                     break;
 
                 case 'lms-admin':
                 case 'provider':
-                    data = await this.cameraRepo.listAllCameras(limit, offset, { userId }, fields);
+                    data = await this.cameraRepo.listAllCameras(limit, offset, { userId, ...(serverId && { serverId }) }, fields);
                     break;
 
                 case 'consumer':
-                    data = await this.cameraRepo.listCamerasBasedOnUserPolicy(limit, offset, userId, fields);
+                    data = await this.cameraRepo.listCamerasBasedOnUserPolicy(limit, offset, userId, { ...(serverId && { serverId }) }, fields);
                     break;
 
                 default:

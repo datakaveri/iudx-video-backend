@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS "Cameras"
 (
   "cameraId"            UUID,
   "userId"              UUID          NOT NULL,
+  "serverId"            UUID          NOT NULL,
   "cameraNum"           INTEGER       NOT NULL,
   "cameraName"          TEXT          NOT NULL,
   "cameraType"          TEXT,

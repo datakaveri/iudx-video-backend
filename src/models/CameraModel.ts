@@ -15,6 +15,10 @@ export function CameraModel(Database: Sequelize) {
                 type: DataTypes.UUID,
                 allowNull: false,
             },
+            serverId: {
+                type: DataTypes.UUID,
+                allowNull: false,
+            },
             cameraNum: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
