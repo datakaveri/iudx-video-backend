@@ -12,4 +12,6 @@ export default (app: Router) => {
 
     route.post('/', (req, res, next) => ServerController.registerServer(req, res, next));
 
+    route.get('/', (req, res, next) => ServerController.listAllServers(req, res, next));
+
 };

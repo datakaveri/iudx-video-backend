@@ -71,4 +71,14 @@ export default class ServerService {
             throw new ServiceError('Error fetching server data');
         }
     }
+
+    public async listAllServers() {
+        try {
+            const server = await this.serverRepo.findAllLmsServers();
+            return server;
+        } catch (e) {
+            Logger.error(e);
+            throw new ServiceError('Error fetching server data');
+        }
+    }
 }

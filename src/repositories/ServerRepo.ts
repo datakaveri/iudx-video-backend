@@ -17,4 +17,14 @@ export default class ServerRepo {
 
         return server;
     }
+
+    async findAllLmsServers(): Promise<any> {
+        const servers = await this.serverModel.findAll({
+            where: {
+                serverType: 'LMS'
+            },
+            attributes: ['serverId', 'serverName']
+        });
+        return servers;
+    }
 }

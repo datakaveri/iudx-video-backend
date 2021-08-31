@@ -23,4 +23,15 @@ export default class ServerExpressController {
             return next(e);
         }
     }
+
+    async listAllServers(req: Request, res: Response, next: NextFunction) {
+        Logger.debug('Calling list all server endpoint with body');
+        try {
+            const result = await this.serverService.listAllServers();
+            return res.status(200).json(result);
+        } catch (e) {
+            Logger.error('error: %o', e);
+            return next(e);
+        }
+    }
 }
