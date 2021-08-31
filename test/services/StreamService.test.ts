@@ -78,7 +78,7 @@ describe('Stream Service Testing', () => {
             const page: number = 0;
             const size: number = 0;
 
-            const response = await streamService.findAll(page, size);
+            const response = await streamService.findAll(page, size, null);
 
             expect(response).toStrictEqual((expected));
             expect(response['results']).toHaveLength(2);
@@ -88,7 +88,7 @@ describe('Stream Service Testing', () => {
             const page: number = 1;
             const size: number = 3;
 
-            const response = await streamService.findAll(page, size);
+            const response = await streamService.findAll(page, size, null);
 
             expect(response['currentPage']).toBe(page);
             expect(response['results']).toHaveLength(size);

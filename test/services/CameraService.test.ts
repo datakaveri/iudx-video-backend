@@ -9,6 +9,9 @@ import CameraService from '../../src/services/CameraService';
 jest.mock('../../src/repositories/CameraRepo');
 jest.mock('../../src/services/FfmpegService.ts');
 jest.mock('../../src/repositories/StreamRepo');
+jest.mock('../../src/repositories/PolicyRepo');
+jest.mock('../../src/services/ProcessService');
+jest.mock('../../src/repositories/ServerRepo');
 
 const cameraService = Container.get(CameraService);
 
