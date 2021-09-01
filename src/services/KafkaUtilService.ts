@@ -3,6 +3,7 @@ import { Service } from 'typedi';
 import config from '../config';
 import eventEmitter from '../common/EventEmitter';
 import KafkaManager from '../managers/Kafka';
+import Logger from '../common/Logger';
 
 @Service()
 export default class KafkaUtilService {
@@ -83,11 +84,14 @@ export default class KafkaUtilService {
 
     public getKafkaMessageResponse(messageId: string) {
         setTimeout(() => {
+            Logger.error("Message timed out", messageId);
             eventEmitter.emit(messageId, null);
         }, config.kafkaConfig.messageWaitTime * 1000);
 
         return new Promise((resolve, reject) => {
             eventEmitter.once(messageId, data => {
+                Logger.info("Message Received", messageId);
+                Logger.debug("Message Received data", data);
                 return resolve(data);
             });
         });
