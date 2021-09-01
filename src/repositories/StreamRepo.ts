@@ -17,7 +17,7 @@ export default class StreamRepo {
     }
 
     async listAllStreams(limit: number, offset: number, query: any = {}, columns: Array<string> = null): Promise<any> {
-        return await this.streamModel.findAndCountAll({ where: query, limit, offset, attributes: columns });
+        return await this.streamModel.findAndCountAll({ where: query, limit, offset, attributes: columns, raw: true });
     }
 
     async deleteStream(query: any) {

@@ -93,10 +93,24 @@ export default class StreamService {
 
     public async findAll(page: number, size: number, cameraId) {
         try {
-            const fields = ['streamId', 'cameraId', 'streamName', 'streamType', 'isPublic', 'isActive', 'isPublishing'];
+            const fields = ['streamId', 'cameraId', 'sourceServerId', 'destinationServerId', 'streamName', 'streamType', 'isPublic', 'isActive', 'isPublishing'];
             const { limit, offset } = this.utilityService.getPagination(page, size);
-            const streams = await this.streamRepo.listAllStreams(limit, offset, { type: 'rtmp', ...(cameraId && { cameraId }) }, fields);
-            const response = this.utilityService.getPagingData(streams, page, limit);
+            let streams = await this.streamRepo.listAllStreams(limit, offset, { type: 'rtmp', ...(cameraId && { cameraId }) }, fields);
+
+            let response = this.utilityService.getPagingData(streams, page, limit);
+
+            // TODO this change will break pagination
+            response.results = response.results.reduce((res, stream) => {
+                if (!res[stream.streamId]) {
+                    res[stream.streamId] = stream;
+                } else if(res[stream.streamId].sourceServerId !== stream.sourceServerId) {
+                    res[stream.streamId] = stream;
+                }
+                return res;
+            }, {});
+
+            response.results = Object.values(response.results);
+            
             return response;
         } catch (e) {
             Logger.error(e);
