@@ -19,7 +19,7 @@ export default class FfmpegService {
                 throw new ServiceError('Invalid output url provided');
             }
             const command = 'ffmpeg';
-            const ffmpegArgs = ['-i', streamInputUrl, '-c', 'copy', '-f', 'flv', streamOutputUrl];
+            const ffmpegArgs = ['-rtsp_transport', 'tcp', '-i', streamInputUrl, '-c', 'copy', '-f', 'flv', streamOutputUrl];
             const proc = spawn(command, ffmpegArgs, { stdio: 'ignore' });
             return proc.pid;
         } catch (err) {

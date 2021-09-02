@@ -112,7 +112,7 @@ export default class StreamService {
             response.results = Object.values(response.results);
 
             response.results = response.results.map((stream) => {
-                if (stream.destinationServerId === config.serverId) {
+                if (stream.isActive && stream.destinationServerId === config.serverId) {
                     return {
                         ...stream,
                         playbackUrlTemplate: `rtmp://${config.rtmpServerConfig.publicServerIp}:${config.rtmpServerConfig.publicServerPort}/live/${stream.streamId}?token=<TOKEN>`
