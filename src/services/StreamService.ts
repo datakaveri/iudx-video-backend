@@ -103,7 +103,7 @@ export default class StreamService {
             response.results = response.results.reduce((res, stream) => {
                 if (!res[stream.streamId]) {
                     res[stream.streamId] = stream;
-                } else if(res[stream.streamId].sourceServerId !== stream.sourceServerId) {
+                } else if(res[stream.streamId].destinationServerId !== config.serverId) {
                     res[stream.streamId] = stream;
                 }
                 return res;
@@ -112,7 +112,7 @@ export default class StreamService {
             response.results = Object.values(response.results);
 
             response.results = response.results.map((stream) => {
-                if (stream.isPublishing) {
+                if (stream.isPublishing && stream.destinationServerId === config.serverId) {
                     return {
                         ...stream,
                         playbackUrlTemplate: `rtmp://${config.rtmpServerConfig.publicServerIp}:${config.rtmpServerConfig.publicServerPort}/live/${stream.streamId}?token=<TOKEN>`
