@@ -8,7 +8,7 @@ import ServiceError from '../common/Error';
 
 @Service()
 export default class FfmpegService {
-    constructor(private utility: Utility) { }
+    constructor(private utility: Utility) {}
 
     public async createProcess(streamInputUrl: string, streamOutputUrl: string) {
         try {
@@ -19,7 +19,7 @@ export default class FfmpegService {
                 throw new ServiceError('Invalid output url provided');
             }
             const command = 'ffmpeg';
-            const ffmpegArgs = [...(streamInputUrl.startsWith('rtsp') && ['-rtsp_transport', 'tcp']), '-i', streamInputUrl, '-c', 'copy', '-f', 'flv', streamOutputUrl];
+            const ffmpegArgs = [...(streamInputUrl.startsWith('rtsp') ? ['-rtsp_transport', 'tcp'] : []), '-i', streamInputUrl, '-c', 'copy', '-f', 'flv', streamOutputUrl];
             const proc = spawn(command, ffmpegArgs, { stdio: 'ignore' });
             return proc.pid;
         } catch (err) {
