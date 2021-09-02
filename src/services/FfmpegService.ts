@@ -10,7 +10,7 @@ import ServiceError from '../common/Error';
 export default class FfmpegService {
     constructor(private utility: Utility) { }
 
-    public async createProcess(streamInputUrl, streamOutputUrl) {
+    public async createProcess(streamInputUrl: string, streamOutputUrl: string) {
         try {
             if (!this.utility.isValidStreamUrl(streamInputUrl)) {
                 throw new ServiceError('Invalid input url provided');
@@ -19,7 +19,7 @@ export default class FfmpegService {
                 throw new ServiceError('Invalid output url provided');
             }
             const command = 'ffmpeg';
-            const ffmpegArgs = ['-rtsp_transport', 'tcp', '-i', streamInputUrl, '-c', 'copy', '-f', 'flv', streamOutputUrl];
+            const ffmpegArgs = [...(streamInputUrl.startsWith('rtsp') && ['-rtsp_transport', 'tcp']), '-i', streamInputUrl, '-c', 'copy', '-f', 'flv', streamOutputUrl];
             const proc = spawn(command, ffmpegArgs, { stdio: 'ignore' });
             return proc.pid;
         } catch (err) {
@@ -65,7 +65,7 @@ export default class FfmpegService {
         return new Promise((resolve, reject) => {
             proc.on('close', async (code) => {
                 let streamPresent = false;
-                if (result !== '') {
+                if (result && result !== '') {
                     streamPresent = Object.keys(JSON.parse(result)).length > 0;
                 }
                 if (code === 0 && streamPresent) {
