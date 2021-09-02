@@ -110,6 +110,16 @@ export default class StreamService {
             }, {});
 
             response.results = Object.values(response.results);
+
+            response.results = response.results.map((stream) => {
+                if (stream.isPublishing) {
+                    return {
+                        ...stream,
+                        playbackUrlTemplate: `rtmp://${config.rtmpServerConfig.publicServerIp}:${config.rtmpServerConfig.publicServerPort}/live/${stream.streamId}?token=<TOKEN>`
+                    }
+                }
+                return stream;
+            })
             
             return response;
         } catch (e) {
@@ -198,7 +208,7 @@ export default class StreamService {
                 return {
                     apiResponse: {
                         streamId,
-                        urlTemplate: `rtmp://${config.rtmpServerConfig.publicServerIp}:${config.rtmpServerConfig.publicServerPort}/live/${streamId}?token=<TOKEN>`,
+                        playbackUrlTemplate: `rtmp://${config.rtmpServerConfig.publicServerIp}:${config.rtmpServerConfig.publicServerPort}/live/${streamId}?token=<TOKEN>`,
                         isPublishing: isPublishing,
                         ...(!isPublishing && { message: 'Stream will be available shortly, please check status API to know the status' }),
                     },
@@ -228,7 +238,7 @@ export default class StreamService {
                 return {
                     apiResponse: {
                         streamId,
-                        urlTemplate: `rtmp://${server.serverHost}:${server.serverRtmpPort}/live/${streamId}?token=<TOKEN>`,
+                        playbackUrlTemplate: `rtmp://${server.serverHost}:${server.serverRtmpPort}/live/${streamId}?token=<TOKEN>`,
                         isPublishing: !!stream.isPublishing,
                         ...(!stream.isPublishing && { message: 'Stream will be available shortly, please check status API to know the status' }),
                     },
