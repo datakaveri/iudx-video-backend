@@ -22,4 +22,4 @@ docker-compose \
     -f $PROJECT_ROOT/setup/setup/nginx/docker-compose-cms.yml \
     --env-file $PROJECT_ROOT/.env \
     -p iudx_vs \
-    up -d zook kafka kafkainit nginxrtmp postgres pgadmin loki promtail pushgateway prometheus grafana videoserver nginx
+    up -d zook kafka kafkainit nginxrtmp postgres pgadmin loki promtail pushgateway prometheus grafana videoserver vsnginx

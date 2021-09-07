@@ -1,10 +1,11 @@
 version: "3.8"
 
 services: 
-  nginx:
+  vsnginx:
     restart: always
-    container_name: nginx
+    container_name: vsnginx
     network_mode: host
+    image: vsnginx
     build:
       dockerfile: ${PROJECT_ROOT}/setup/setup/ui/Dockerfile
       context: ${UI_PROJECT_PATH}

@@ -16,4 +16,4 @@ docker-compose \
     -f $PROJECT_ROOT/setup/setup/nginx/docker-compose-lms.yml \
     --env-file $PROJECT_ROOT/.env \
     -p iudx_vs \
-    up -d nginxrtmp postgres pgadmin videoserver promtail nginx
+    up -d nginxrtmp postgres pgadmin videoserver promtail vsnginx

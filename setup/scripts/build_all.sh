@@ -45,4 +45,4 @@ docker-compose \
     -f $PROJECT_ROOT/setup/setup/video-server/docker-compose.yml \
     -f $NGINX_DOCKER \
     --env-file $PROJECT_ROOT/.env \
-    build zook kafka kafkainit nginxrtmp postgres videoserver nginx
+    build zook kafka kafkainit nginxrtmp postgres videoserver vsnginx
