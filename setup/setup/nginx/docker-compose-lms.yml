@@ -1,0 +1,11 @@
+version: "3.8"
+
+services: 
+  nginx:
+    restart: always
+    container_name: nginx
+    network_mode: host
+    build:
+      dockerfile: ${PROJECT_ROOT}/setup/setup/nginx/Dockerfile
+    volumes:
+      - ${PROJECT_ROOT}/setup/setup/nginx/nginx-lms.conf:/etc/nginx/conf.d/default.conf

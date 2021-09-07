@@ -19,7 +19,7 @@ docker-compose \
     -f $PROJECT_ROOT/setup/setup/postgres/docker-compose.yml \
     -f $PROJECT_ROOT/setup/setup/monitoring/docker-compose.yml \
     -f $PROJECT_ROOT/setup/setup/video-server/docker-compose.yml \
-    -f $PROJECT_ROOT/setup/setup/ui/docker-compose.yml \
+    -f $PROJECT_ROOT/setup/setup/nginx/docker-compose-cms.yml \
     --env-file $PROJECT_ROOT/.env \
     -p iudx_vs \
     up -d zook kafka kafkainit nginxrtmp postgres pgadmin loki promtail pushgateway prometheus grafana videoserver nginx
