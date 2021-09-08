@@ -19,13 +19,12 @@ export function CameraModel(Database: Sequelize) {
                 type: DataTypes.UUID,
                 allowNull: false,
             },
-            cameraNum: {
-                type: DataTypes.INTEGER,
-                allowNull: false,
-            },
             cameraName: {
                 type: DataTypes.TEXT,
                 allowNull: false,
+            },
+            cameraNum: {
+                type: DataTypes.TEXT,
             },
             cameraType: {
                 type: DataTypes.TEXT,
@@ -37,6 +36,9 @@ export function CameraModel(Database: Sequelize) {
                 type: DataTypes.TEXT,
             },
             city: {
+                type: DataTypes.TEXT,
+            },
+            junction: {
                 type: DataTypes.TEXT,
             },
             location: {

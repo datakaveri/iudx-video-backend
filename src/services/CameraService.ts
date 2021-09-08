@@ -77,7 +77,7 @@ export default class CameraService {
 
     public async findAll(userId: string, role: string, page: number, size: number, serverId?: string) {
         try {
-            const fields = ['cameraId', 'serverId', 'cameraNum', 'cameraName', 'cameraType', 'cameraUsage', 'cameraOrientation', 'city', 'location'];
+            const fields = ['cameraId', 'serverId', 'cameraName', 'cameraNum', 'cameraType', 'cameraUsage', 'cameraOrientation', 'city', 'junction', 'location'];
             const { limit, offset } = this.utilityService.getPagination(page, size);
             let data: any;
 
@@ -111,12 +111,13 @@ export default class CameraService {
         try {
             const fields = [
                 'cameraId',
-                'cameraNum',
                 'cameraName',
+                'cameraNum',
                 'cameraType',
                 'cameraUsage',
                 'cameraOrientation',
                 'city',
+                'junction',
             ];
             const [updated, result] = await this.cameraRepo.updateCamera(cameraData, { cameraId }, fields);
 
