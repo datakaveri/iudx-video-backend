@@ -107,13 +107,17 @@ CREATE TABLE IF NOT EXISTS "Streams"
 CREATE TABLE IF NOT EXISTS "Archives" 
 (
   "fileId"              UUID,
-  "userId"              UUID        NOT NULL,
-  "streamId"            UUID        NOT NULL,
-  "serverId"            UUID        NOT NULL,
-  "fileName"            TEXT        NOT NULL,
+  "userId"              UUID          NOT NULL,
+  "streamId"            UUID          NOT NULL,
+  "serverId"            UUID          NOT NULL,
+  "fileName"            TEXT          NOT NULL,
+  "startTime"           TIMESTAMPTZ,
+  "endTime"             TIMESTAMPTZ,
+  "codec"               TEXT,
+  "resolution"          TEXT,
   "fileSize"            TEXT,
   "fileDuration"        INTEGER,
-  "createdDate"         TIMESTAMP,
+  "createdDate"         TIMESTAMPTZ,
   PRIMARY KEY ("fileId"),
   CONSTRAINT "userFK"
       FOREIGN KEY ("userId") 
