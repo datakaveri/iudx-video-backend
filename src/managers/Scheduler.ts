@@ -22,6 +22,8 @@ export default class SchedulerManager {
     public async startStatusCheck() {
         const cronTime: string = `*/${config.schedulerConfig.statusCheck.jobInterval} * * * *`;
 
+        await this.streamStatusService.checkStatus();
+
         this.checkStatusJob = new CronJob(
             cronTime,
             async () => {
