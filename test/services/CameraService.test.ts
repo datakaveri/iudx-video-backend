@@ -20,12 +20,13 @@ describe('Camera Service Testing', () => {
     describe('Register Camera', () => {
 
         const mockCameraData = {
-            cameraNum: 15,
             cameraName: 'camera_1',
+            cameraNum: '15',
             cameraType: 'DOME',
             cameraUsage: 'RLVD',
             cameraOrientation: 'NORTH-EAST',
             city: 'Bangalore',
+            junction: 'IISC',
             location: 'lat/long',
         };
 
@@ -37,7 +38,7 @@ describe('Camera Service Testing', () => {
 
         test('Should resolve and return null if the camera already registered', async () => {
             const userId: string = '3';
-            mockCameraData['cameraNum'] = 15758;
+            mockCameraData['cameraNum'] = '15758';
 
             await expect(cameraService.register(userId, mockCameraData)).resolves.toBeNull();
         });
@@ -48,12 +49,13 @@ describe('Camera Service Testing', () => {
         test('Should return the camera data', async () => {
             const expected: any = {
                 cameraId: expect.any(String),
-                cameraNum: expect.any(Number),
                 cameraName: expect.any(String),
+                cameraNum: expect.any(String),
                 cameraType: expect.any(String),
                 cameraUsage: expect.any(String),
                 cameraOrientation: expect.any(String),
                 city: expect.any(String),
+                junction: expect.any(String),
                 location: expect.any(String)
             };
 
@@ -145,12 +147,13 @@ describe('Camera Service Testing', () => {
         test('Should resolve promise and updates the camera', async () => {
             const expected: any = {
                 cameraId: expect.any(String),
-                cameraNum: expect.any(Number),
                 cameraName: expect.any(String),
+                cameraNum: expect.any(String),
                 cameraType: expect.any(String),
                 cameraUsage: expect.any(String),
                 cameraOrientation: expect.any(String),
                 city: expect.any(String),
+                junction: expect.any(String),
                 location: expect.any(String)
             };
             const cameraId: string = '1';

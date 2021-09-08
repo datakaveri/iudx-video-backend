@@ -76,12 +76,13 @@ EOF
 getCameraData() {
     cat <<EOF
 {
-    "cameraNum": 15,
     "cameraName" : "camera_5",
+    "cameraNum": "15",
     "cameraType" : "DOME",
     "cameraUsage" : "RLVD",
     "cameraOrientation" : "NORTH-EAST",
     "city" : "Bangalore",
+    "junction": "IISC"
     "location" : "lat/long"
 }
 EOF
