@@ -17,7 +17,7 @@ export default class PolicyExpressController {
 
         Logger.debug('Calling create Policy endpoint with body: %o', params);
         try {
-            const result = await this.policyService.create(providerId, params.email, params.cameraId);
+            const result = await this.policyService.create(providerId, params.email, params.cameraId, params.constraints);
             return res.status(201).json(result);
         } catch (e) {
             Logger.error('error: %o', e);

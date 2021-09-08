@@ -126,9 +126,10 @@ CREATE TABLE IF NOT EXISTS "Archives"
 CREATE TABLE IF NOT EXISTS "Policies" 
 (
   "policyId"            UUID,
-  "userId"              UUID        NOT NULL,
+  "userId"              UUID          NOT NULL,
   "cameraId"            UUID,
   "providerId"          UUID,
+  "constraints"         JSONB         NOT NULL, 
   "createdAt"           TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
   "updatedAt"           TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
   PRIMARY KEY ("policyId"),

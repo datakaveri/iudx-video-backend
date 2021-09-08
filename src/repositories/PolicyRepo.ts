@@ -1,4 +1,5 @@
 import { Service, Inject } from 'typedi';
+import { Op } from 'sequelize';
 
 @Service()
 export default class PolicyRepo {
@@ -18,6 +19,22 @@ export default class PolicyRepo {
         if (!policy) {
             throw new Error();
         }
+
+        return policy;
+    }
+
+    async findPolicyByConstraints(userId: string, cameraId: string, accessType): Promise<any> {
+        const policy = await this.policyModel.findOne({
+            where: {
+                userId,
+                cameraId,
+                constraints: {
+                    [Op.contains]: {
+                        accessType: [accessType]
+                    }
+                }
+            },
+        });
 
         return policy;
     }

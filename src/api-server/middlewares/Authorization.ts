@@ -14,14 +14,14 @@ const AuthorizeRole = (allowedRoles) => {
         if (config.isStandaloneLms) {
             allowedRoles.push('lms-admin');
         }
-        
+
         if (!role) {
-            return res.send(401).send('Authorization failed, invalid token provided');
+            return res.status(401).send('Authorization failed, invalid token provided');
         }
         if (allowedRoles.includes(role)) {
             return next();
         } else {
-            return res.send(403).send('Forbidden');
+            return res.status(403).send('Forbidden');
         }
     };
 };
@@ -31,20 +31,21 @@ const ValidatePolicy = async (req: Request, res: Response, next: NextFunction) =
     try {
         const userId = req.user['userId'];
         if (!userId) {
-            return res.send(401).send('Authorization failed, invalid token provided');
+            return res.status(401).send('Authorization failed, invalid token provided');
         }
         const streamId = req.params.streamId || req.query.streamId || req.body.streamId;
 
         if (!streamId) {
-            return res.send(401).send('Authorization failed, stream id not provided');
+            return res.status(401).send('Authorization failed, stream id not provided');
         }
 
+        const requestType = req.query.type || 'local';
         const streamRepo = Container.get(StreamRepo);
         const stream = await streamRepo.findStream({ streamId });
-        const policy = await policyRepo.findPolicy(userId, stream.cameraId);
+        const policy = await policyRepo.findPolicyByConstraints(userId, stream.cameraId, requestType);
 
         if (!policy) {
-            return res.send(401).send('Authorization failed for requested resource');
+            return res.status(401).send('Authorization failed for requested resource');
         }
 
         return next();
@@ -77,19 +78,19 @@ const ValidateStreamAccess = async (req: Request, res: Response, next: NextFunct
         return next();
     }
     if (!userId) {
-        return res.send(401).send('Authorization failed, invalid token provided');
+        return res.status(401).send('Authorization failed, invalid token provided');
     }
     const streamId = req.params.streamId || req.query.streamId || req.body.streamId;
 
     if (!streamId) {
-        return res.send(401).send('Authorization failed, stream id not provided');
+        return res.status(401).send('Authorization failed, stream id not provided');
     }
 
     const streamRepo = Container.get(StreamRepo);
     try {
         let stream = await streamRepo.findStream({ userId, streamId });
         if (!stream) {
-            return res.send(401).send('Authorization failed');
+            return res.status(401).send('Authorization failed');
         }
         return next();
     } catch (err) {

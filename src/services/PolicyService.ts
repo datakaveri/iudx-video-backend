@@ -11,12 +11,12 @@ import UserRepo from '../repositories/UserRepo';
 export default class PolicyService {
     constructor(private policyRepo: PolicyRepo, private userRepo: UserRepo) {}
 
-    public async create(providerId: string, email: string, cameraId: string) {
+    public async create(providerId: string, email: string, cameraId: string, constraints: any) {
         try {
             const namespace: string = config.host.type + 'Policy';
             const policyId: string = new UUID().generateUUIDv5(namespace);
             const user = await this.userRepo.findUser({email});
-            await this.policyRepo.addPolicy({ policyId, providerId, userId: user.id, cameraId });
+            await this.policyRepo.addPolicy({ policyId, providerId, userId: user.id, cameraId, constraints });
             return {
                 message: 'Created',
             };

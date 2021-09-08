@@ -5,4 +5,5 @@ export interface PolicyInterface extends Model {
     userId: string;
     streamId: string;
     providerId: string;
+    constraints: object;
 }

@@ -22,6 +22,10 @@ export function PolicyModel(Database: Sequelize) {
                 type: DataTypes.UUID,
                 allowNull: false,
             },
+            constraints: {
+                type: DataTypes.JSONB,
+                allowNull: false,
+            },
         },
         {
             timestamps: true,
