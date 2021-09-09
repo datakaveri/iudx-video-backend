@@ -29,6 +29,16 @@ const AuthorizeRole = (allowedRoles) => {
 const ValidatePolicy = async (req: Request, res: Response, next: NextFunction) => {
     const policyRepo = Container.get(PolicyRepo);
     try {
+        const role = req.user['role'];
+        if (role === 'cms-admin') {
+            return next();
+        }
+        /** TODO
+         *  Validate if LMS admin can access to requested stream
+         */
+        if (role === 'lms-admin') {
+            return next();
+        }
         const userId = req.user['userId'];
         if (!userId) {
             return res.status(401).send('Authorization failed, invalid token provided');
