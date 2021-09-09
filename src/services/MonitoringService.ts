@@ -1,37 +1,36 @@
 import { Service } from 'typedi';
-import prometheusClient, { Registry } from 'prom-client';
+import promClient from 'prom-client';
 
 import Logger from '../common/Logger';
 import config from '../config';
 
 @Service()
 export default class MonitoringService {
+    private promRegister;
 
     constructor() { }
 
-    public registerPrometheusMetrics() {
-        try {
-            const register = new prometheusClient.Registry();
-            prometheusClient.collectDefaultMetrics({ register });
-            const registers = prometheusClient.Registry.merge([register, prometheusClient.register]);
-            registers.setDefaultLabels({
-                app: 'video-server',
-                serverId: config.serverId,
-            });
-            return registers;
-        }
-        catch (err) {
-            Logger.error(err);
-            throw err;
-        }
+    public init() {
+        this.registerPromMetrics();
+        Object.freeze(this);
     }
 
-    public pushMetricsToPrometheus(register: Registry) {
+    private registerPromMetrics() {
+        const register = new promClient.Registry();
+        this.promRegister = promClient.Registry.merge([register, promClient.register]);
+        this.promRegister.setDefaultLabels({
+            app: 'video-server',
+            serverId: config.serverId,
+        });
+        promClient.collectDefaultMetrics({ register: this.promRegister });
+    }
+
+    public pushMetricsToPrometheus() {
         try {
-            const gateway = new prometheusClient.Pushgateway(
+            const gateway = new promClient.Pushgateway(
                 config.prometheusConfig.pushGatewayUrl,
                 { timeout: config.prometheusConfig.requestTimeout * 1000 },
-                register
+                this.promRegister
             );
 
             gateway.push({ jobName: 'lms-metrics' }, (err, resp, body) => {
@@ -42,5 +41,13 @@ export default class MonitoringService {
             Logger.error(err);
             throw err;
         }
+    }
+
+    public async getPromMetrics() {
+        return await this.promRegister.metrics();
+    }
+
+    public getPromRegisterContentType() {
+        return this.promRegister.contentType;
     }
 }

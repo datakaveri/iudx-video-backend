@@ -6,7 +6,7 @@ import routes from './routes';
 import config from '../config';
 import passport from '../common/Passport';
 import ServiceError from '../common/Error';
-// import apiMetrics from './middlewares/apiMetrics';
+import apiMetrics from './middlewares/apiMetrics';
 
 export default () => {
     const app = express();
@@ -27,8 +27,8 @@ export default () => {
     app.use(passport.initialize());
 
     // Enable collection of API metrics
-    // app.use(apiMetrics.requestCounters);
-    // app.use(apiMetrics.requestDetailsAndDuration);
+    app.use(apiMetrics.requestCounters);
+    app.use(apiMetrics.requestDetailsAndDuration);
 
     // Load API routes
     app.use(config.api.prefix, routes());

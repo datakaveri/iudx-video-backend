@@ -59,8 +59,7 @@ export default class SchedulerManager {
             cronTime,
             async () => {
                 try {
-                    const register = this.monitoringService.registerPrometheusMetrics();
-                    this.monitoringService.pushMetricsToPrometheus(register);
+                    this.monitoringService.pushMetricsToPrometheus();
                 } catch (err) {
                     Logger.error(err);
                     console.log(err)

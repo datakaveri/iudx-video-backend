@@ -13,9 +13,9 @@ export default class MonitoringExpressController {
 
     public async getPromMetrics(req: Request, res: Response, next: NextFunction) {
         try {
-            const register = this.monitoringService.registerPrometheusMetrics();
-            const metrics = await register.metrics();
-            res.setHeader('Content-Type', register.contentType);
+            const metrics = await this.monitoringService.getPromMetrics();
+            const contentType = this.monitoringService.getPromRegisterContentType();
+            res.setHeader('Content-Type', contentType);
             res.end(metrics);
         } catch (e) {
             Logger.error('error: %o', e);

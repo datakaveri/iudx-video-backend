@@ -12,7 +12,7 @@ export default () => {
 	Camera(app);
 	Stream(app);
 	Policy(app);
-	// Monitor(app);
+	Monitor(app);
 	Server(app);
 
 	return app;

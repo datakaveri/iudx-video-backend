@@ -15,6 +15,7 @@ import kafkaService from '../kafka';
 import UserRepo from '../repositories/UserRepo';
 import Utility from '../common/Utility';
 import ServerService from '../services/ServerService';
+import MonitoringService from '../services/MonitoringService';
 
 export default async () => {
     // Initialize Database connection and load model injector
@@ -62,6 +63,10 @@ export default async () => {
     }
 
     // Initialize Monitoring Service
+    const monitoringService: MonitoringService = Container.get(MonitoringService);
+    monitoringService.init();
+
+    // Start Monitoring Service for LMS
     if (config.schedulerConfig.metricsMonitor.enable && config.host.type === 'LMS' && !config.isStandaloneLms) {
         schedulerManager.startMetricsMonitoring();
         Logger.info('Monitoring service started.');
