@@ -8,9 +8,9 @@ const route = Router();
 export default (app: Router) => {
     const ServerController = new ServerExpressController();
 
-    app.use('/server', passport.authenticate('jwt', { session: true }), AuthorizeRole(['lms-admin']), route);
+    app.use('/server', passport.authenticate('jwt', { session: true }), route);
 
-    route.post('/', (req, res, next) => ServerController.registerServer(req, res, next));
+    route.post('/', AuthorizeRole(['lms-admin']), (req, res, next) => ServerController.registerServer(req, res, next));
 
     route.get('/', (req, res, next) => ServerController.listAllServers(req, res, next));
 
