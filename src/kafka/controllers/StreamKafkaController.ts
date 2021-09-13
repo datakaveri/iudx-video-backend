@@ -68,13 +68,13 @@ export default class StreamKafkaController {
             const result: any = await this.kafkaUtilService.getKafkaMessageResponse(messageId);
 
             const isExistingStream = data.isExistingStream;
-            if (!isExistingStream && result && !result.isExistingStream) {
-                await this.streamRepo.registerStream(result.streamData);
+            if (!isExistingStream && result) {
+                await this.streamRepo.registerStream(result);
             }
 
             if (result) {
-                await this.streamRepo.updateStream({ streamId: result.streamData.streamId, destinationServerId: result.streamData.sourceServerId }, { isPublishing: true });
-                await this.streamRepo.updateStream({ streamId: result.streamData.streamId, destinationServerId: result.streamData.destinationServerId }, { isActive: true, isStable: true });
+                await this.streamRepo.updateStream({ streamId: result.streamId, destinationServerId: result.sourceServerId }, { isPublishing: true });
+                await this.streamRepo.updateStream({ streamId: result.streamId, destinationServerId: result.destinationServerId }, { isActive: true, isStable: true });
             }
         } catch (err) {
             Logger.error('error: %o', err);
