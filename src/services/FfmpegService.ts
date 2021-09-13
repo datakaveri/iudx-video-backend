@@ -75,7 +75,9 @@ export default class FfmpegService {
                         return resolve(false);
                     }
                 } catch(err) {
-                    Logger.error(`${err} -- data received for parsing - ${result}`)
+                    Logger.error('Error in stream active check');
+                    Logger.error(err);
+                    Logger.info("FFprobe data", result);
                     reject(err);
                 }
             });
