@@ -78,7 +78,7 @@ export default class FfmpegService {
                     Logger.error('Error in stream active check');
                     Logger.error(err);
                     Logger.info("FFprobe data", result);
-                    reject(err);
+                    return reject(false);
                 }
             });
         });
