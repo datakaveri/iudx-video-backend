@@ -83,7 +83,7 @@ export default class KafkaUtilService {
     }
 
     public getKafkaMessageResponse(messageId: string) {
-        setTimeout(() => {
+        const timer = setTimeout(() => {
             Logger.error("Message timed out", messageId);
             eventEmitter.emit(messageId, null);
         }, config.kafkaConfig.messageWaitTime * 1000);
@@ -92,6 +92,7 @@ export default class KafkaUtilService {
             eventEmitter.once(messageId, data => {
                 Logger.info("Message Received", messageId);
                 Logger.debug("Message Received data", data);
+                clearTimeout(timer);
                 return resolve(data);
             });
         });

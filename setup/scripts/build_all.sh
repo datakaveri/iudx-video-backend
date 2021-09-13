@@ -18,6 +18,7 @@ if [[ $environment -eq 1 ]]
 then
     cp $PROJECT_ROOT/setup/apps/video/nginx-rtmp/dev.nginx.conf \
        $PROJECT_ROOT/setup/setup/nginx-rtmp/nginx.conf
+    NGINX_DOCKER="$PROJECT_ROOT/setup/setup/nginx/docker-compose-lms.yml"
 elif [[ $environment -eq 2 ]]
 then
     echo "Choose type of Nginx RTMP configuration:"
