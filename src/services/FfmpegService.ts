@@ -65,13 +65,18 @@ export default class FfmpegService {
         return new Promise((resolve, reject) => {
             proc.on('close', async (code) => {
                 let streamPresent = false;
-                if (result && result !== '') {
-                    streamPresent = Object.keys(JSON.parse(result)).length > 0;
-                }
-                if (code === 0 && streamPresent) {
-                    return resolve(true);
-                } else {
-                    return resolve(false);
+                try {
+                    if (result && result !== '' && result.trim() !== '') {
+                        streamPresent = Object.keys(JSON.parse(result)).length > 0;
+                    }
+                    if (code === 0 && streamPresent) {
+                        return resolve(true);
+                    } else {
+                        return resolve(false);
+                    }
+                } catch(err) {
+                    Logger.error(`${err} -- data received for parsing - ${result}`)
+                    reject(err);
                 }
             });
         });

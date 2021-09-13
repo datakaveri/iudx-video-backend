@@ -25,8 +25,8 @@ export default class StreamService {
         private ffmpegService: FfmpegService,
         private streamStatusService: StreamStatusService,
         private serverRepo: ServerRepo,
-        private kafkaManager: KafkaManager,
-    ) { }
+        private kafkaManager: KafkaManager
+    ) {}
 
     public async publishRegisteredStreams(streamData: any) {
         const namespace: string = config.host.type + 'Stream';
@@ -39,7 +39,7 @@ export default class StreamService {
             provenanceStreamId: streamData['streamId'],
             sourceServerId: config.serverId,
             destinationServerId: config.serverId,
-            streamName: streamData['streamName'],
+            streamName: 'Local Stream',
             streamUrl: rtmpStreamUrl,
             streamType: 'RTMP',
             type: 'rtmp',
@@ -103,7 +103,7 @@ export default class StreamService {
             response.results = response.results.reduce((res, stream) => {
                 if (!res[stream.streamId]) {
                     res[stream.streamId] = stream;
-                } else if(res[stream.streamId].destinationServerId !== config.serverId) {
+                } else if (res[stream.streamId].destinationServerId !== config.serverId) {
                     res[stream.streamId] = stream;
                 }
                 return res;
@@ -115,12 +115,12 @@ export default class StreamService {
                 if (stream.isActive && stream.destinationServerId === config.serverId) {
                     return {
                         ...stream,
-                        playbackUrlTemplate: `rtmp://${config.rtmpServerConfig.publicServerIp}:${config.rtmpServerConfig.publicServerPort}/live/${stream.streamId}?token=<TOKEN>`
-                    }
+                        playbackUrlTemplate: `rtmp://${config.rtmpServerConfig.publicServerIp}:${config.rtmpServerConfig.publicServerPort}/live/${stream.streamId}?token=<TOKEN>`,
+                    };
                 }
                 return stream;
-            })
-            
+            });
+
             return response;
         } catch (e) {
             Logger.error(e);
@@ -224,7 +224,7 @@ export default class StreamService {
                                 provenanceStreamId: lmsRtmpStream['streamId'],
                                 sourceServerId: lmsRtmpStream['sourceServerId'],
                                 destinationServerId: config.serverId,
-                                streamName: lmsRtmpStream['streamName'],
+                                streamName: 'Cloud Stream',
                                 streamUrl: lmsRtmpStream['streamUrl'],
                                 lastAccessed,
                             },
@@ -273,11 +273,17 @@ export default class StreamService {
                 lastAccessed: lmsStreamData['lastAccessed'],
             };
 
-            if (!isExistingStream) {
+            // confirm if stream already present in DB
+            const foundStream = await this.streamRepo.findStream({
+                streamId: cmsRtmpStreamData.streamId,
+                destinationServerId: cmsRtmpStreamData.destinationServerId,
+            });
+
+            if (!isExistingStream && !foundStream) {
                 await this.streamRepo.registerStream(cmsRtmpStreamData);
             }
 
-            const sourceUrl = lmsStreamData['streamUrl'].replace(/token=.*$/, `token=${token}`)
+            const sourceUrl = lmsStreamData['streamUrl'].replace(/token=.*$/, `token=${token}`);
             this.processService.addStreamProcess(lmsStreamData['streamId'], lmsStreamData['streamId'], lmsStreamData['sourceServerId'], cmsServerId, sourceUrl, rtmpStreamUrl);
             return cmsRtmpStreamData;
         } catch (e) {
