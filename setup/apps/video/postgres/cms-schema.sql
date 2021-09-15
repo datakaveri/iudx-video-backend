@@ -31,7 +31,8 @@ CREATE TABLE IF NOT EXISTS "Servers"
   "downstreamTopic"   TEXT         NOT NULL,  
   "consumerGroupId"   TEXT         NOT NULL,
   "createdAt"         TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
-  "updatedAt"         TIMESTAMPTZ  NOT NULL DEFAULT NOW(),  
+  "updatedAt"         TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+  "lastPingTime"      TIMESTAMPTZ, 
   PRIMARY KEY ("serverId")
 );
 

@@ -96,6 +96,9 @@ export default {
             enable: process.env.ENABLE_METRICS_MONITOR === 'true' || false,
             jobInterval: 5, // in seconds
         },
+        hearbeat: {
+            jobInterval: 60,// in seconds
+        }
     },
 
     prometheusConfig: {

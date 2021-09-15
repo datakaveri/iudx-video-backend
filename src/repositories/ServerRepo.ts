@@ -27,4 +27,8 @@ export default class ServerRepo {
         });
         return servers;
     }
+
+    async updateServerData(query: any, updateData: any) {
+        return await this.serverModel.update(updateData, { where: query });
+    }
 }

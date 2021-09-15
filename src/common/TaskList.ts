@@ -10,6 +10,7 @@ import AuthService from '../services/AuthService';
 import UserRepo from '../repositories/UserRepo';
 import StreamRepo from '../repositories/StreamRepo';
 import FfmpegService from '../services/FfmpegService';
+import ServerRepo from '../repositories/ServerRepo';
 
 export const taskList = {
     // Auth related tasks
@@ -174,11 +175,21 @@ export const taskList = {
                 }
             }
 
-            await streamRepo.updateStream(queryData, { isActive: false, isStable: false, lastActive: Date.now(), processId: null })
+            await streamRepo.updateStream(queryData, { isActive: false, isStable: false, lastActive: Date.now(), processId: null });
         } catch (err) {
             Logger.error('error: %o', err);
             console.log(err);
         }
     },
+    heartbeat: async (payload, helpers) => {
+        try {
+            const serverRepo: ServerRepo = Container.get(ServerRepo);
+            const { data } = payload;
 
+            await serverRepo.updateServerData({ serverId: data.serverId }, { lastPingTime: data.pingTime });
+        } catch (err) {
+            Logger.error('error: %o', err);
+            console.log(err);
+        }
+    },
 };
