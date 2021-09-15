@@ -23,7 +23,7 @@ export default class ServerRepo {
             where: {
                 serverType: 'LMS'
             },
-            attributes: ['serverId', 'serverName']
+            attributes: ['serverId', 'serverName', 'lastPingTime']
         });
         return servers;
     }
