@@ -7,4 +7,5 @@ export interface ServerInterface extends Model {
     upstreamTopic: string;
     downstreamTopic: string;
     consumerGroupId: string;
+    lastPingTime: Date;
 }

@@ -38,6 +38,9 @@ export function ServerModel(Database: Sequelize) {
                 type: DataTypes.TEXT,
                 allowNull: false,
             },
+            lastPingTime: {
+                type: DataTypes.DATE,
+            },
         },
         {
             timestamps: true,
