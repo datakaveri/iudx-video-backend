@@ -72,16 +72,16 @@ export default async () => {
         Logger.info('Monitoring service started.');
     }
 
-    // start heartbeat service for LMS
-    if (config.host.type === 'LMS' && !config.isStandaloneLms) {
-        schedulerManager.startHeartbeatService();
-        Logger.info('Heartbeat service started.');
-    }
-
     // Start Kafka Service
     if (!config.isStandaloneLms) {
         await kafkaService();
         Logger.info('Connected to Kafka successfully.');
+    }
+
+    // start heartbeat service for LMS
+    if (config.host.type === 'LMS' && !config.isStandaloneLms) {
+        schedulerManager.startHeartbeatService();
+        Logger.info('Heartbeat service started.');
     }
 
     // Creating CMS admin

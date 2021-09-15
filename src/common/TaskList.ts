@@ -186,6 +186,7 @@ export const taskList = {
             const serverRepo: ServerRepo = Container.get(ServerRepo);
             const { data } = payload;
 
+            Logger.info(`Ping received from ${data.serverId}`);
             await serverRepo.updateServerData({ serverId: data.serverId }, { lastPingTime: data.pingTime });
         } catch (err) {
             Logger.error('error: %o', err);

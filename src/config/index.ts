@@ -97,7 +97,7 @@ export default {
             jobInterval: 5, // in seconds
         },
         hearbeat: {
-            jobInterval: 60,// in seconds
+            jobInterval: 1,// in minutes
         }
     },
 
