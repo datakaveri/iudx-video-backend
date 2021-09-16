@@ -23,8 +23,16 @@ export default class Utility {
     }
 
     public getPagination(page: number, size: number) {
-        const limit = size ? size : 2;
-        const offset = page ? (page - 1) * limit : 0;
+        const defaultLimit: number = 2;
+        const defaultOffset: number = 0;
+
+        let limit: number = null;
+        let offset: number = null;
+
+        if (page || size) {
+            limit = size ? size : defaultLimit;
+            offset = page ? (page - 1) * limit : defaultOffset;
+        }
 
         return {
             limit,
@@ -35,7 +43,7 @@ export default class Utility {
     public getPagingData(data: any, page: number, limit: number) {
         const { count: totalItems, rows: results } = data;
         const currentPage = page ? page : 1;
-        const totalPages = Math.ceil(totalItems / limit);
+        const totalPages = Math.ceil(totalItems / (limit ? limit : totalItems));
 
         return {
             currentPage,
