@@ -44,14 +44,14 @@ export default class StreamStatusService {
         }
     }
 
-    public async updateStatus(streamId: string, destinationServerId: string, isActive: boolean, isStable: boolean, isPublishing: boolean) {
+    public async updateStatus(streamId: string, destinationServerId: string, isActive: boolean, isStable: boolean) {
         try {
             return await this.streamRepo.updateStream(
                 { streamId, destinationServerId },
                 {
                     isActive,
                     isStable,
-                    ...(!isPublishing && { processId: null }),
+                    ...(!isActive && { processId: null }),
                     ...(isActive && { lastActive: Date.now() }),
                 }
             );
@@ -147,7 +147,6 @@ export default class StreamStatusService {
 
             for (const stream of streams) {
                 let isActive: boolean = false;
-                let isProcessActive: any = false;
                 let statusUpdated: any = false;
                 let streamRevived: boolean = false;
 
@@ -158,10 +157,9 @@ export default class StreamStatusService {
                     case 'rtmp':
                         const rtmpStream: any = rtmpStreams.find((streamData) => streamData.streamId === stream.streamId);
 
-                        if (rtmpStream) {
-                            // Status will be updated inactive if stream unpublished
+                        if (rtmpStream && rtmpStream.active) {
                             const isUnpublished: boolean = await this.unpublishIfStreamIdle(stream, rtmpStream);
-                            isActive = rtmpStream.active && !isUnpublished;
+                            isActive = !isUnpublished; // Status will be updated inactive if stream unpublished
                             await this.updateStats(rtmpStream);
                         }
                         break;
@@ -169,18 +167,13 @@ export default class StreamStatusService {
                         throw new Error();
                 }
 
-                if (stream.processId) {
-                    isProcessActive = await this.ffmpegService.isProcessRunning(stream.processId);
-                }
-
-                if (isActive) {
-                    [statusUpdated] = await this.updateStatus(stream.streamId, stream.destinationServerId, isActive, true, isProcessActive);
-                } else if (isActive !== stream.isActive) {
-                    [statusUpdated] = await this.updateStatus(stream.streamId, stream.destinationServerId, isActive, false, isProcessActive);
+                // Updates stream status in DB
+                if (isActive || (isActive !== stream.isActive)) {
+                    [statusUpdated] = await this.updateStatus(stream.streamId, stream.destinationServerId, isActive, isActive);
                 }
 
                 // Revive only local rtmp streams
-                if (stream.streamId !== stream.provenanceStreamId && !isProcessActive) {
+                if (stream.streamId !== stream.provenanceStreamId && !isActive) {
                     streamRevived = await this.streamReviveService.reviveStream(stream);
                 }
 
