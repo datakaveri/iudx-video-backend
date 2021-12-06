@@ -1,0 +1,2665 @@
+{
+    "openapi": "3.0.2",
+    "info": {
+        "title": "IUDX Video Server APIs",
+        "version": "1.0.0",
+        "description": "The API specification for IUDX Video Server. These APIs are used by users to register cameras/streams, request streams, policy, etc. \n\nThe IUDX Video Server allows streaming video from IP cameras. It enables providers to register cameras and streams. It allows consumers to search available streams and play the streams.\n\n"
+    },
+    "servers": [
+        {
+            "url": "https://localhost:4000",
+            "description": "Video server localhost"
+        }
+    ],
+    "paths": {
+        "/auth/signup": {
+            "servers": [
+                {
+                    "url": "https://localhost:4000/api",
+                    "description": ""
+                }
+            ],
+            "post": {
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RegisterUserRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "tags": [
+                    "Auth APIs"
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RegisterUserResponse200"
+                                }
+                            }
+                        },
+                        "description": "User registeration success"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/response_detail_object"
+                                },
+                                "examples": {
+                                    "response": {
+                                        "value": {
+                                            "type": 500,
+                                            "title": "Internal Server Error",
+                                            "detail": "<message>"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "description": "<ul>\n    <li>User already exists</li>\n    <li>Invalid role provided in request</li>\n</ul>"
+                    }
+                },
+                "summary": "Create a user",
+                "description": "Creates a new user profile. A user profile is needed to interact with the IUDX video server. During creation, they may specify what roles they would like to obtain. Current valid roles are:\n\n- `consumer`, which allows users to access video streams via tokens.\n- `lms-admin`/`provider`, which allows users to manage their resources.\n\nOnce the user has registered successfully, they can verify their account using the <b> verification API </b>.\n"
+            }
+        },
+        "/auth/token": {
+            "servers": [
+                {
+                    "url": "https://localhost:4000/api",
+                    "description": ""
+                }
+            ],
+            "post": {
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/tokenRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "tags": [
+                    "Auth APIs"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/tokenResponse"
+                                }
+                            }
+                        },
+                        "description": "Token fetched successfully"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/response_detail_object"
+                                },
+                                "examples": {
+                                    "response": {
+                                        "value": {
+                                            "type": 500,
+                                            "title": "Internal Server Error",
+                                            "detail": "<message>"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "description": "<ul>\n    <li>User not found</li>\n    <li>Wrong Password</li>\n    <li>User is not verified</li>\n    <li>User registration not approved, contact admin</li>\n</ul>"
+                    }
+                },
+                "summary": "Request a token",
+                "description": "The approved user may get a token by using his `credentials` for managing and accessing the resources.\n\n<b>The same token can be used with the playback url. </b>"
+            }
+        },
+        "/auth/approve": {
+            "servers": [
+                {
+                    "url": "https://localhost:4000/api",
+                    "description": ""
+                }
+            ],
+            "post": {
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ApproveUserRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "tags": [
+                    "Auth APIs"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "examples": {
+                                    "response": {
+                                        "value": {
+                                            "message": "<message>"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "description": "<ul>\n    <li>User approved</li>\n    <li>User registered role and provided role for approval not matching</li>\n    <li>Approval not required</li>\n</ul>"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/UnauthorizedRole"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    }
+                },
+                "summary": "Approve user",
+                "description": "Approve the user request. This operation can only be performed by `cms-admin`.\n\nOnce the approval is done, a `producer` can onboard cameras and a `consumer` can request for a token and access the streams using <b> stream request API </b>."
+            },
+            "parameters": [
+                {
+                    "name": "Authorization",
+                    "description": "Authorization Token",
+                    "schema": {
+                        "maxLength": 3000,
+                        "minLength": 1,
+                        "type": "string",
+                        "example": [
+                            "Bearer <JWT>"
+                        ]
+                    },
+                    "in": "header",
+                    "required": true
+                }
+            ]
+        },
+        "/cameras": {
+            "servers": [
+                {
+                    "url": "https://localhost:4000/api",
+                    "description": ""
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Camera APIs"
+                ],
+                "parameters": [
+                    {
+                        "name": "page",
+                        "description": "The number of records that need to be skipped",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "in": "query"
+                    },
+                    {
+                        "name": "size",
+                        "description": "Configure the maximum results to be returned",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ListCamerasResponse"
+                                }
+                            }
+                        },
+                        "description": "Successfully listed cameras"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/response_detail_object"
+                                },
+                                "examples": {
+                                    "response": {
+                                        "value": {
+                                            "type": 400,
+                                            "title": "Bad Request",
+                                            "detail": "Bad query"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                },
+                "summary": "List all cameras",
+                "description": "This API will list all the available cameras. \n\nCameras are listed based on the role of the user,\n\n- `cms-admin` - All cameras will be listed.\n- `lms-admin`/`provider` - Cameras registered by them.\n- `consumer` - Cameras for which policy is set.\n\n<b>Pagination can be used to limit the number of records to be returned.</b>"
+            },
+            "post": {
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RegisterCameraRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "tags": [
+                    "Camera APIs"
+                ],
+                "parameters": [
+                    {
+                        "name": "serverId",
+                        "description": "The ID of the registered server",
+                        "schema": {
+                            "$ref": "#/components/schemas/uuid"
+                        },
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RegisterCameraResponse"
+                                }
+                            }
+                        },
+                        "description": "Registered camera successfully"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/response_result_object"
+                                },
+                                "examples": {
+                                    "Bad Request": {
+                                        "value": {
+                                            "type": 400,
+                                            "title": "Bad Request",
+                                            "result": "Camera Already Registered | Request Timeout"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/UnauthorizedRole"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    }
+                },
+                "summary": "Register a camera",
+                "description": "Register a camera. This operation cannot be performed by the `consumer`.\n\n`cameraId` is returned in response which will be used for registering the streams for the particular camera.\n\n`serverId` param is <b>required</b> if the LMS is not configred as standalone. \n\n<b> NOTE: The `cameraName` field is mandatory. </b>"
+            },
+            "parameters": [
+                {
+                    "name": "Authorization",
+                    "description": "Authorization Token",
+                    "schema": {
+                        "maxLength": 3000,
+                        "minLength": 1,
+                        "type": "string",
+                        "example": [
+                            "Bearer <JWT>"
+                        ]
+                    },
+                    "in": "header",
+                    "required": true
+                }
+            ]
+        },
+        "/cameras/{cameraId}": {
+            "servers": [
+                {
+                    "url": "https://localhost:4000/api",
+                    "description": ""
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Camera APIs"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FindCameraResponse"
+                                }
+                            }
+                        },
+                        "description": "Fetched camera details successfully"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/response_result_object"
+                                },
+                                "examples": {
+                                    "response": {
+                                        "value": {
+                                            "type": 404,
+                                            "title": "Not Found",
+                                            "result": "Camera Not Found"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Camera not Found"
+                    }
+                },
+                "summary": "Get camera details",
+                "description": "Get details of a specific camera."
+            },
+            "put": {
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateCameraRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "tags": [
+                    "Camera APIs"
+                ],
+                "parameters": [
+                    {
+                        "name": "serverId",
+                        "description": "The ID of the registered server",
+                        "schema": {
+                            "$ref": "#/components/schemas/uuid"
+                        },
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UpdateCameraResponse"
+                                }
+                            }
+                        },
+                        "description": "Camera data updated successfully"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/UnauthorizedRole"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/response_result_object"
+                                },
+                                "examples": {
+                                    "response": {
+                                        "value": {
+                                            "type": 404,
+                                            "title": "No Found",
+                                            "result": "Camera Not Found | Request Timeout"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Camera Not Found"
+                    }
+                },
+                "summary": "Update a camera",
+                "description": "A <b>provider</b> or <b>admin</b> can update camera details. All or any of the below mentioned fields in the schema can be updated."
+            },
+            "delete": {
+                "tags": [
+                    "Camera APIs"
+                ],
+                "parameters": [
+                    {
+                        "name": "serverId",
+                        "description": "The ID of the registered server",
+                        "schema": {
+                            "$ref": "#/components/schemas/uuid"
+                        },
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/response_detail_object"
+                                },
+                                "examples": {
+                                    "response": {
+                                        "value": {
+                                            "type": 200,
+                                            "title": "Success",
+                                            "detail": "Camera deleted"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Camera deleted successfully"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/UnauthorizedRole"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/response_detail_object"
+                                },
+                                "examples": {
+                                    "response": {
+                                        "value": {
+                                            "type": 404,
+                                            "title": "Not Found",
+                                            "detail": "Camera Not Found | Request Timeout"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Camera not Found"
+                    }
+                },
+                "summary": "Delete a camera",
+                "description": "A <b>provider</b> or <b>admin</b> can delete cameras. <b> Deleting cameras will delete all its associated streams and policies. </b>\n\n`serverId` param is <b>required</b> if the LMS is not configred as standalone. "
+            },
+            "parameters": [
+                {
+                    "name": "Authorization",
+                    "description": "Authorization Token",
+                    "schema": {
+                        "maxLength": 3000,
+                        "minLength": 1,
+                        "type": "string",
+                        "example": [
+                            "Bearer <JWT>"
+                        ]
+                    },
+                    "in": "header",
+                    "required": true
+                },
+                {
+                    "name": "cameraId",
+                    "schema": {
+                        "$ref": "#/components/schemas/uuid"
+                    },
+                    "in": "path",
+                    "required": true
+                }
+            ]
+        },
+        "/policy": {
+            "servers": [
+                {
+                    "url": "https://localhost:4000/api",
+                    "description": ""
+                }
+            ],
+            "post": {
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AddPolicyRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "tags": [
+                    "Policy APIs"
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "examples": {
+                                    "response": {
+                                        "value": {
+                                            "message": "Created"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Policy added successfully"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/UnauthorizedStreamAccess"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    }
+                },
+                "summary": "Add a policy",
+                "description": "Create new policies for an authenticated User. <b>NOTE: A `consumer` cannot set policies</b>\n\n`cameraId` is required for which the user will be given access. <b> The user can able to access all streams of a camera. </b> \n\nValid access type - `cloud` and `local`."
+            },
+            "delete": {
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeletePolicyRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "tags": [
+                    "Policy APIs"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "examples": {
+                                    "response": {
+                                        "value": {
+                                            "message": "Deleted"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Policy deleted successfully"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/UnauthorizedStreamAccess"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    }
+                },
+                "summary": "Remove a policy",
+                "description": "Remove policies for an authenticated user. \n\n\n- `cameraId` of the camera. This will remove access to all streams registered to the particular camera. The user can use the <b> list camera API </b> to get the camera id.\n- `email` of the user for whom the policy is to be removed.\n\n\n<b> NOTE: A `consumer` cannot delete policies </b>\n"
+            },
+            "parameters": [
+                {
+                    "name": "Authorization",
+                    "description": "Authorization Token",
+                    "schema": {
+                        "maxLength": 3000,
+                        "minLength": 1,
+                        "type": "string",
+                        "example": [
+                            "Bearer <JWT>"
+                        ]
+                    },
+                    "in": "header",
+                    "required": true
+                }
+            ]
+        },
+        "/policy/{userId}": {
+            "servers": [
+                {
+                    "url": "https://localhost:4000/api",
+                    "description": ""
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Policy APIs"
+                ],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "schema": {
+                            "$ref": "#/components/schemas/uuid"
+                        },
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetPolicyResponse"
+                                }
+                            }
+                        },
+                        "description": "Policy fetched successfully"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/UnauthorizedRole"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    }
+                },
+                "summary": "Get policy for a user",
+                "description": "The API will list all policies set for the user."
+            },
+            "parameters": [
+                {
+                    "name": "Authorization",
+                    "description": "Authorization Token",
+                    "schema": {
+                        "maxLength": 3000,
+                        "minLength": 1,
+                        "type": "string",
+                        "example": [
+                            "Bearer <JWT>"
+                        ]
+                    },
+                    "in": "header",
+                    "required": true
+                }
+            ]
+        },
+        "/server": {
+            "servers": [
+                {
+                    "url": "https://localhost:4000/api",
+                    "description": ""
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Server APIs"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetServerResponse"
+                                }
+                            }
+                        },
+                        "description": "Successfully listed server details"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                },
+                "summary": "List all servers",
+                "description": "This API will list all Local Media Servers (`LMS`)."
+            },
+            "post": {
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RegisterServerRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "tags": [
+                    "Server APIs"
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RegisterServerResponse"
+                                }
+                            }
+                        },
+                        "description": "Server registration success"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/UnauthorizedRole"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    }
+                },
+                "summary": "Register a  server",
+                "description": "Register a Local Media Server. This operation can be performed only by the `lms-admin` of the video server. \n\nThe API takes in the `IP` of the particular server and the `RTMP port` for publishing the requested streams.\n\nThe response will contain the Kafka credentials and an <b>ID</b> named `serverId` for the registered server.  The lms-admin can use these credentials for configuring <b>LMS</b>."
+            },
+            "parameters": [
+                {
+                    "name": "Authorization",
+                    "description": "Authorization Token",
+                    "schema": {
+                        "maxLength": 3000,
+                        "minLength": 1,
+                        "type": "string",
+                        "example": [
+                            "Bearer <JWT>"
+                        ]
+                    },
+                    "in": "header",
+                    "required": true
+                }
+            ]
+        },
+        "/streams/{streamId}": {
+            "servers": [
+                {
+                    "url": "https://localhost:4000/api",
+                    "description": ""
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Stream APIs"
+                ],
+                "parameters": [
+                    {
+                        "name": "streamId",
+                        "schema": {
+                            "$ref": "#/components/schemas/uuid"
+                        },
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FindStreamResponse"
+                                }
+                            }
+                        },
+                        "description": "Fetched stream details successfully"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/response_result_object"
+                                },
+                                "examples": {
+                                    "response": {
+                                        "value": {
+                                            "type": 404,
+                                            "title": "Not Found",
+                                            "result": "Stream Not Found"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Stream not Found"
+                    }
+                },
+                "summary": "Get stream details",
+                "description": "Get details of a specific stream."
+            },
+            "delete": {
+                "tags": [
+                    "Stream APIs"
+                ],
+                "parameters": [
+                    {
+                        "name": "serverId",
+                        "description": "The ID of the registered server",
+                        "schema": {
+                            "$ref": "#/components/schemas/uuid"
+                        },
+                        "in": "query"
+                    },
+                    {
+                        "name": "streamId",
+                        "schema": {
+                            "$ref": "#/components/schemas/uuid"
+                        },
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/response_detail_object"
+                                },
+                                "examples": {
+                                    "response": {
+                                        "value": {
+                                            "type": 200,
+                                            "title": "Success",
+                                            "detail": "Stream deleted"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Stream deleted successfully"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/UnauthorizedStreamAccess"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/response_detail_object"
+                                },
+                                "examples": {
+                                    "response": {
+                                        "value": {
+                                            "type": 404,
+                                            "title": "Not Found",
+                                            "detail": "Stream Not Found | Request Timeout"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Stream not Found"
+                    }
+                },
+                "summary": "Delete a stream",
+                "description": "A <b>provider</b> or <b>admin</b> may delete streams created by them. Providing the stream id of the camera stream will delete all associated streams.\n\n<b> NOTE: Only the stream of type `camera` is valid for deletion. The operation does not delete the camera.</b>\n\n`serverId` param is <b>required</b> if the LMS is not configred as standalone. "
+            },
+            "parameters": [
+                {
+                    "name": "Authorization",
+                    "description": "Authorization Token",
+                    "schema": {
+                        "maxLength": 3000,
+                        "minLength": 1,
+                        "type": "string",
+                        "example": [
+                            "Bearer <JWT>"
+                        ]
+                    },
+                    "in": "header",
+                    "required": true
+                },
+                {
+                    "name": "streamId",
+                    "schema": {
+                        "$ref": "#/components/schemas/uuid"
+                    },
+                    "in": "path",
+                    "required": true
+                }
+            ]
+        },
+        "/streams/status/{streamId}": {
+            "servers": [
+                {
+                    "url": "https://localhost:4000/api",
+                    "description": ""
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Stream APIs"
+                ],
+                "parameters": [
+                    {
+                        "name": "streamId",
+                        "schema": {
+                            "$ref": "#/components/schemas/uuid"
+                        },
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StreamStatusResponse"
+                                }
+                            }
+                        },
+                        "description": "Fetched stream status"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                },
+                "summary": "Get stream status",
+                "description": "The API will return an array of streams that are associated with the given stream. The `isActive` field describes the status of the stream."
+            },
+            "parameters": [
+                {
+                    "name": "Authorization",
+                    "description": "Authorization Token",
+                    "schema": {
+                        "maxLength": 3000,
+                        "minLength": 1,
+                        "type": "string",
+                        "example": [
+                            "Bearer <JWT>"
+                        ]
+                    },
+                    "in": "header",
+                    "required": true
+                },
+                {
+                    "name": "streamId",
+                    "schema": {
+                        "$ref": "#/components/schemas/uuid"
+                    },
+                    "in": "path",
+                    "required": true
+                }
+            ]
+        },
+        "/streams/request/{streamId}": {
+            "servers": [
+                {
+                    "url": "https://localhost:4000/api",
+                    "description": ""
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Stream APIs"
+                ],
+                "parameters": [
+                    {
+                        "name": "streamId",
+                        "schema": {
+                            "$ref": "#/components/schemas/uuid"
+                        },
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StreamRequestResponse"
+                                }
+                            }
+                        },
+                        "description": "Requested for a stream successfully"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/UnauthorizedStream"
+                    }
+                },
+                "summary": "Request a stream",
+                "description": "A user may request a `local` or `cloud` stream based on the policy set. <b> A consumer must need a policy for requesting a stream. </b>\n\nThis API requires a valid `streamId` as a parameter and a `playbackUrlTemplate` will be returned as part of the response which is used for playing the stream. The <b> token </b> can be put in the TOKEN placeholder.\n\nThe available streams can be checked using the <b> list API </b>."
+            },
+            "parameters": [
+                {
+                    "name": "Authorization",
+                    "description": "Authorization Token",
+                    "schema": {
+                        "maxLength": 3000,
+                        "minLength": 1,
+                        "type": "string",
+                        "example": [
+                            "Bearer <JWT>"
+                        ]
+                    },
+                    "in": "header",
+                    "required": true
+                },
+                {
+                    "name": "type",
+                    "description": "",
+                    "schema": {
+                        "default": [
+                            "local"
+                        ],
+                        "enum": [
+                            "local",
+                            "cloud"
+                        ],
+                        "type": "string"
+                    },
+                    "in": "query"
+                },
+                {
+                    "name": "streamId",
+                    "schema": {
+                        "$ref": "#/components/schemas/uuid"
+                    },
+                    "in": "path",
+                    "required": true
+                }
+            ]
+        },
+        "/streams": {
+            "servers": [
+                {
+                    "url": "https://localhost:4000/api",
+                    "description": ""
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Stream APIs"
+                ],
+                "parameters": [
+                    {
+                        "name": "page",
+                        "description": "The number of records that need to be skipped",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "in": "query"
+                    },
+                    {
+                        "name": "size",
+                        "description": "Configure the maximum results to be returned",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ListStreamsResponse"
+                                }
+                            }
+                        },
+                        "description": "Successfully listed streams"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/response_detail_object"
+                                },
+                                "examples": {
+                                    "response": {
+                                        "value": {
+                                            "type": 400,
+                                            "title": "Bad Request",
+                                            "detail": "Bad query"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                },
+                "summary": "List all streams",
+                "description": "List all available streams. The streams of only type `rtmp` are returned.\n\n<b>Pagination can be used to limit the number of records to be returned.</b>"
+            },
+            "post": {
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RegisterStreamRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "tags": [
+                    "Stream APIs"
+                ],
+                "parameters": [
+                    {
+                        "name": "serverId",
+                        "description": "The ID of the registered server",
+                        "schema": {
+                            "$ref": "#/components/schemas/uuid"
+                        },
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RegisterStreamResponse"
+                                }
+                            }
+                        },
+                        "description": "Stream Registered successfully"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/response_result_object"
+                                },
+                                "examples": {
+                                    "response": {
+                                        "value": {
+                                            "type": 400,
+                                            "title": "Bad Request",
+                                            "result": "Camera Not Registered | Stream Already Registered | Request Timeout"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/UnauthorizedRole"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    }
+                },
+                "summary": "Register a stream",
+                "description": "Register a stream for a camera. This operation cannot be performed by the `consumer`. This API takes care of onboarding the <b>Local Stream</b> automatically during registration.\n\nThe API accepts `cameraId` to which the stream needs to be registered. It will return an <b> ID </b> for the stream, which can be used for the following,\n\n<ul>\n    <li> Stream operations. </li>\n    <li> Requesting a stream. </li>\n    <li> Get the status of the stream.  </li>\n</ul>\n\n`serverId` param is <b>required</b> if the LMS is not configred as standalone. \n\n<b> NOTE: The stream `type` must be provided as `camera` when registering a stream for a camera. </b>\n"
+            },
+            "parameters": [
+                {
+                    "name": "Authorization",
+                    "description": "Authorization Token",
+                    "schema": {
+                        "maxLength": 3000,
+                        "minLength": 1,
+                        "type": "string",
+                        "example": [
+                            "Bearer <JWT>"
+                        ]
+                    },
+                    "in": "header",
+                    "required": true
+                }
+            ]
+        },
+        "/cameras/{cameraId}/streams": {
+            "servers": [
+                {
+                    "url": "https://localhost:4000/api",
+                    "description": ""
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Camera APIs"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CameraStreamsResponse"
+                                }
+                            }
+                        },
+                        "description": "Successfully listed all associated streams."
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/UnauthorizedRole"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/response_result_object"
+                                },
+                                "examples": {
+                                    "response": {
+                                        "value": {
+                                            "type": 404,
+                                            "title": "Not Found",
+                                            "results": "Camera Not Found | Streams Not Registered"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Camera Not Found"
+                    }
+                },
+                "summary": "Get all associated streams",
+                "description": "Get details of all associated streams for a camera by providing `cameraId`. This API will return the streams hierarchically.\n\nThe order of the streams returned are as follows:\n- camera stream\n- local streams\n- cloud streams"
+            },
+            "parameters": [
+                {
+                    "name": "Authorization",
+                    "description": "Authorization Token",
+                    "schema": {
+                        "maxLength": 3000,
+                        "minLength": 1,
+                        "type": "string",
+                        "example": [
+                            "Bearer <JWT>"
+                        ]
+                    },
+                    "in": "header",
+                    "required": true
+                },
+                {
+                    "name": "cameraId",
+                    "schema": {
+                        "$ref": "#/components/schemas/uuid"
+                    },
+                    "in": "path",
+                    "required": true
+                }
+            ]
+        },
+        "/auth/verify": {
+            "servers": [
+                {
+                    "url": "https://localhost:4000/api",
+                    "description": ""
+                }
+            ],
+            "get": {
+                "tags": [
+                    "Auth APIs"
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "text/html": {
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "examples": {
+                                    "response": {
+                                        "value": "Verification successful"
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Verified user successfully"
+                    },
+                    "400": {
+                        "content": {
+                            "text/html": {
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "examples": {
+                                    "response": {
+                                        "value": "Wrong verification code provided"
+                                    }
+                                }
+                            }
+                        },
+                        "description": "Bad Request"
+                    }
+                },
+                "summary": "Verify user",
+                "description": "Verification of the user. A user can call this API and verify his email by attaching the <b> verification code </b> sent to their email.\n\nOnce the verification is done, a user can contact the admin for the approval."
+            },
+            "parameters": [
+                {
+                    "name": "verificationCode",
+                    "description": "Verification code sent to email",
+                    "schema": {
+                        "maxLength": 25,
+                        "minLength": 25,
+                        "type": "string"
+                    },
+                    "in": "query",
+                    "required": true
+                }
+            ]
+        }
+    },
+    "components": {
+        "schemas": {
+            "RegisterUserRequest": {
+                "title": "Root Type for register_user_request",
+                "description": "",
+                "required": [
+                    "email",
+                    "name",
+                    "password",
+                    "role"
+                ],
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    },
+                    "role": {
+                        "enum": [
+                            "lms-admin",
+                            "provider",
+                            "consumer"
+                        ],
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "name": "user_1",
+                    "email": "user@datakaveri.org",
+                    "password": "user@123",
+                    "role": "lms-admin"
+                }
+            },
+            "RegisterUserResponse200": {
+                "title": "Root Type for RegisterUserResponse200",
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "userId": {
+                        "type": "string"
+                    },
+                    "message": {
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "userId": "b3d7c8f2-2ea4-4f76-9ec8-2a289705e0df",
+                    "message": "User account created, please verify your email"
+                }
+            },
+            "ApproveUserRequest": {
+                "title": "Root Type for ApproveUserRequest",
+                "description": "",
+                "required": [
+                    "email",
+                    "role"
+                ],
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string"
+                    },
+                    "role": {
+                        "enum": [
+                            "lms-admin",
+                            "provider",
+                            "consumer"
+                        ],
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "email": "user@datakaveri.org",
+                    "role": "lms-admin"
+                }
+            },
+            "tokenRequest": {
+                "title": "Root Type for tokenRequest",
+                "description": "",
+                "required": [
+                    "email",
+                    "password"
+                ],
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "email": "user@datakaveri.org",
+                    "password": "user@123"
+                }
+            },
+            "tokenResponse": {
+                "title": "Root Type for tokenResponse",
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "token": {
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "token": "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjM2Y1MDZmOS04Y2NiLTQxMDYtOTUyYy0xNDJlNDA5MWZiYmEiLCJuYW1lIjoiTE1TIEFkbWluIiwiZW1haWwiOiJsbXMtYWRtaW5AZGF0YWthdmVyaS5vcmciLCJyb2xlIjoibG1zLWFkbWluIiwiaWF0IjoxNjM4MzU4MTA4LCJleHAiOjE2MzgzNjE3MDh9.M_jMgBwkA3Cccs7Qg4HHlY0krCduXoE_bhAnVzPwXOJ4yDksE1KETDchdF961XsWNsKhF2z1clsFspM-ujz0rg"
+                }
+            },
+            "RegisterCameraRequest": {
+                "title": "Root Type for RegisterCamera",
+                "description": "",
+                "required": [
+                    "cameraName"
+                ],
+                "type": "object",
+                "properties": {
+                    "cameraName": {
+                        "type": "string"
+                    },
+                    "cameraNum": {
+                        "type": "string"
+                    },
+                    "cameraType": {
+                        "type": "string"
+                    },
+                    "cameraUsage": {
+                        "type": "string"
+                    },
+                    "cameraOrientation": {
+                        "type": "string"
+                    },
+                    "city": {
+                        "type": "string"
+                    },
+                    "junction": {
+                        "type": "string"
+                    },
+                    "location": {
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "cameraName": "camera 1",
+                    "cameraNum": "123456",
+                    "cameraType": "DOME",
+                    "cameraUsage": "RLVD",
+                    "cameraOrientation": "NORTH-EAST",
+                    "city": "Bangalore",
+                    "junction": "IISC",
+                    "location": "lat/long"
+                }
+            },
+            "RegisterCameraResponse": {
+                "title": "Root Type for RegisterCameraResponse",
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "format": "int32",
+                        "type": "integer"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "result": {
+                        "type": "object",
+                        "properties": {
+                            "cameraId": {
+                                "type": "string"
+                            },
+                            "serverId": {
+                                "type": "string"
+                            },
+                            "cameraName": {
+                                "type": "string"
+                            },
+                            "cameraNum": {
+                                "type": "string"
+                            },
+                            "cameraType": {
+                                "type": "string"
+                            },
+                            "cameraUsage": {
+                                "type": "string"
+                            },
+                            "cameraOrientation": {
+                                "type": "string"
+                            },
+                            "city": {
+                                "type": "string"
+                            },
+                            "junction": {
+                                "type": "string"
+                            },
+                            "location": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "example": {
+                    "type": 201,
+                    "title": "Success",
+                    "result": {
+                        "cameraId": "63062b40-fafc-59b7-9dbd-eb33cc9e1c42",
+                        "serverId": "ee014f48-dbd1-5122-904a-f643b7efe9fa",
+                        "cameraName": "camera 1",
+                        "cameraNum": "123456",
+                        "cameraType": "DOME",
+                        "cameraUsage": "RLVD",
+                        "cameraOrientation": "NORTH-EAST",
+                        "city": "Bangalore",
+                        "junction": "IISC",
+                        "location": "lat/long"
+                    }
+                }
+            },
+            "ListCamerasResponse": {
+                "title": "Root Type for ListCamerasResponse",
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "format": "int32",
+                        "type": "integer"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "results": {
+                        "type": "object",
+                        "properties": {
+                            "currentPage": {
+                                "format": "int32",
+                                "type": "integer"
+                            },
+                            "totalItems": {
+                                "format": "int32",
+                                "type": "integer"
+                            },
+                            "totalPages": {
+                                "format": "int32",
+                                "type": "integer"
+                            },
+                            "results": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "cameraId": {
+                                            "type": "string"
+                                        },
+                                        "serverId": {
+                                            "type": "string"
+                                        },
+                                        "cameraName": {
+                                            "type": "string"
+                                        },
+                                        "cameraNum": {
+                                            "type": "string"
+                                        },
+                                        "cameraType": {
+                                            "type": "string"
+                                        },
+                                        "cameraUsage": {
+                                            "type": "string"
+                                        },
+                                        "cameraOrientation": {
+                                            "type": "string"
+                                        },
+                                        "city": {
+                                            "type": "string"
+                                        },
+                                        "junction": {
+                                            "type": "string"
+                                        },
+                                        "location": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "example": {
+                    "type": 200,
+                    "title": "Success",
+                    "results": {
+                        "currentPage": 1,
+                        "totalItems": 1,
+                        "totalPages": 1,
+                        "results": [
+                            {
+                                "cameraId": "63062b40-fafc-59b7-9dbd-eb33cc9e1c42",
+                                "serverId": "ee014f48-dbd1-5122-904a-f643b7efe9fa",
+                                "cameraName": "camera 1",
+                                "cameraNum": "123456",
+                                "cameraType": "DOME",
+                                "cameraUsage": "RLVD",
+                                "cameraOrientation": "NORTH-EAST",
+                                "city": "Bangalore",
+                                "junction": "IISC",
+                                "location": "lat/long"
+                            }
+                        ]
+                    }
+                }
+            },
+            "FindCameraResponse": {
+                "title": "Root Type for FindCameraResponse",
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "format": "int32",
+                        "type": "integer"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "result": {
+                        "type": "object",
+                        "properties": {
+                            "cameraId": {
+                                "type": "string"
+                            },
+                            "userId": {
+                                "type": "string"
+                            },
+                            "serverId": {
+                                "type": "string"
+                            },
+                            "cameraName": {
+                                "type": "string"
+                            },
+                            "cameraNum": {
+                                "type": "string"
+                            },
+                            "cameraType": {
+                                "type": "string"
+                            },
+                            "cameraUsage": {
+                                "type": "string"
+                            },
+                            "cameraOrientation": {
+                                "type": "string"
+                            },
+                            "city": {
+                                "type": "string"
+                            },
+                            "junction": {
+                                "type": "string"
+                            },
+                            "location": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "example": {
+                    "type": 200,
+                    "title": "Success",
+                    "result": {
+                        "cameraId": "63062b40-fafc-59b7-9dbd-eb33cc9e1c42",
+                        "userId": "b3d7c8f2-2ea4-4f76-9ec8-2a289705e0df",
+                        "serverId": "ee014f48-dbd1-5122-904a-f643b7efe9fa",
+                        "cameraName": "camera 1",
+                        "cameraNum": "123456",
+                        "cameraType": "DOME",
+                        "cameraUsage": "RLVD",
+                        "cameraOrientation": "NORTH-EAST",
+                        "city": "Bangalore",
+                        "junction": "IISC",
+                        "location": "lat/long"
+                    }
+                }
+            },
+            "UpdateCameraRequest": {
+                "title": "Root Type for UpdateCameraRequest",
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "cameraName": {
+                        "type": "string"
+                    },
+                    "cameraNum": {
+                        "type": "string"
+                    },
+                    "cameraType": {
+                        "type": "string"
+                    },
+                    "cameraUsage": {
+                        "type": "string"
+                    },
+                    "cameraOrientation": {
+                        "type": "string"
+                    },
+                    "city": {
+                        "type": "string"
+                    },
+                    "junction": {
+                        "type": "string"
+                    },
+                    "location": {
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "cameraName": "camera 1",
+                    "cameraNum": "234545",
+                    "cameraType": "DOME",
+                    "cameraUsage": "RLVD",
+                    "cameraOrientation": "NORTH-EAST",
+                    "city": "Bangalore",
+                    "junction": "IISC",
+                    "location": "lat/long"
+                }
+            },
+            "UpdateCameraResponse": {
+                "title": "Root Type for UpdateCameraResponse",
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "format": "int32",
+                        "type": "integer"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "result": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "cameraId": {
+                                    "type": "string"
+                                },
+                                "cameraName": {
+                                    "type": "string"
+                                },
+                                "cameraNum": {
+                                    "type": "string"
+                                },
+                                "cameraType": {
+                                    "type": "string"
+                                },
+                                "cameraUsage": {
+                                    "type": "string"
+                                },
+                                "cameraOrientation": {
+                                    "type": "string"
+                                },
+                                "city": {
+                                    "type": "string"
+                                },
+                                "junction": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                },
+                "example": {
+                    "type": 201,
+                    "title": "Success",
+                    "result": [
+                        {
+                            "cameraId": "63062b40-fafc-59b7-9dbd-eb33cc9e1c42",
+                            "cameraName": "camera 1",
+                            "cameraNum": "234545",
+                            "cameraType": "DOME",
+                            "cameraUsage": "RLVD",
+                            "cameraOrientation": "NORTH-EAST",
+                            "city": "Bangalore",
+                            "junction": "IISC"
+                        }
+                    ]
+                }
+            },
+            "AddPolicyRequest": {
+                "title": "Root Type for AddPolicyRequest",
+                "description": "",
+                "required": [
+                    "cameraId",
+                    "constraints",
+                    "email"
+                ],
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string"
+                    },
+                    "cameraId": {
+                        "$ref": "#/components/schemas/uuid"
+                    },
+                    "constraints": {
+                        "properties": {
+                            "accessType": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                },
+                "example": {
+                    "email": "user@datakaveri.org",
+                    "cameraId": "63062b40-fafc-59b7-9dbd-eb33cc9e1c42",
+                    "constraints": {
+                        "accessType": [
+                            "local",
+                            "cloud"
+                        ]
+                    }
+                }
+            },
+            "GetPolicyResponse": {
+                "title": "Root Type for GetPolicyResponse",
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "format": "int32",
+                        "type": "integer"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "policyId": {
+                                    "type": "string"
+                                },
+                                "userId": {
+                                    "type": "string"
+                                },
+                                "cameraId": {
+                                    "type": "string"
+                                },
+                                "providerId": {
+                                    "type": "string"
+                                },
+                                "constraints": {
+                                    "type": "object",
+                                    "properties": {
+                                        "accessType": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                },
+                                "createdAt": {
+                                    "format": "date-time",
+                                    "type": "string"
+                                },
+                                "updatedAt": {
+                                    "format": "date-time",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                },
+                "example": {
+                    "type": 200,
+                    "title": "Success",
+                    "results": [
+                        {
+                            "policyId": "2f6189b2-a650-54a4-9356-97c95b24b9c1",
+                            "userId": "b3d7c8f2-2ea4-4f76-9ec8-2a289705e0df",
+                            "cameraId": "63062b40-fafc-59b7-9dbd-eb33cc9e1c42",
+                            "providerId": "c3f506f9-8ccb-4106-952c-142e4091fbba",
+                            "constraints": {
+                                "accessType": [
+                                    "local",
+                                    "cloud"
+                                ]
+                            },
+                            "createdAt": "2021-12-01T13:07:47.406Z",
+                            "updatedAt": "2021-12-01T13:07:47.406Z"
+                        }
+                    ]
+                }
+            },
+            "DeletePolicyRequest": {
+                "title": "Root Type for DeletePolicyRequest",
+                "description": "",
+                "required": [
+                    "cameraId",
+                    "email"
+                ],
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string"
+                    },
+                    "cameraId": {
+                        "$ref": "#/components/schemas/uuid"
+                    }
+                },
+                "example": {
+                    "email": "user@datakaveri.org",
+                    "cameraId": "63062b40-fafc-59b7-9dbd-eb33cc9e1c42"
+                }
+            },
+            "RegisterServerRequest": {
+                "title": "Root Type for RegisterServerRequest",
+                "description": "",
+                "required": [
+                    "serverHost",
+                    "serverName",
+                    "serverRtmpPort"
+                ],
+                "type": "object",
+                "properties": {
+                    "serverName": {
+                        "description": "A name for identifying the server",
+                        "type": "string"
+                    },
+                    "serverHost": {
+                        "description": "IP of the server to be registered",
+                        "type": "string"
+                    },
+                    "serverRtmpPort": {
+                        "format": "int32",
+                        "description": "The port of the RTMP server. Typically the <b>Nginx RTMP port</b>.",
+                        "type": "integer"
+                    }
+                },
+                "example": {
+                    "serverName": "My Video Server",
+                    "serverHost": "localhost",
+                    "serverRtmpPort": 1935
+                }
+            },
+            "RegisterServerResponse": {
+                "title": "Root Type for RegisterServerResponse",
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "serverId": {
+                        "type": "string"
+                    },
+                    "serverName": {
+                        "type": "string"
+                    },
+                    "serverType": {
+                        "type": "string"
+                    },
+                    "upstreamTopic": {
+                        "type": "string"
+                    },
+                    "downstreamTopic": {
+                        "type": "string"
+                    },
+                    "consumerGroupId": {
+                        "type": "string"
+                    },
+                    "consumerUsername": {
+                        "type": "string"
+                    },
+                    "consumerPassword": {
+                        "type": "string"
+                    },
+                    "producerUsername": {
+                        "type": "string"
+                    },
+                    "producerPassword": {
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "serverId": "7c96e085-34c1-56a6-aac4-c456352ee6ca",
+                    "serverName": "My Video Server",
+                    "serverType": "LMS",
+                    "upstreamTopic": "7c96e085-34c1-56a6-aac4-c456352ee6ca.upstream",
+                    "downstreamTopic": "7c96e085-34c1-56a6-aac4-c456352ee6ca.downstream",
+                    "consumerGroupId": "7c96e085-34c1-56a6-aac4-c456352ee6ca-group",
+                    "consumerUsername": "user",
+                    "consumerPassword": "user-secret",
+                    "producerUsername": "user",
+                    "producerPassword": "user-secret"
+                }
+            },
+            "GetServerResponse": {
+                "title": "Root Type for GetServerResponse",
+                "description": "",
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "serverId": {
+                            "type": "string"
+                        },
+                        "serverName": {
+                            "type": "string"
+                        },
+                        "lastPingTime": {
+                            "format": "date-time",
+                            "type": "string"
+                        }
+                    }
+                },
+                "example": [
+                    {
+                        "serverId": "7c96e085-34c1-56a6-aac4-c456352ee6ca",
+                        "serverName": "My Video Server",
+                        "lastPingTime": "2021-12-01T14:32:01.784Z"
+                    }
+                ]
+            },
+            "RegisterStreamRequest": {
+                "title": "Root Type for RegisterStreamRequest",
+                "description": "",
+                "required": [
+                    "cameraId",
+                    "streamName",
+                    "streamType",
+                    "streamUrl",
+                    "type"
+                ],
+                "type": "object",
+                "properties": {
+                    "cameraId": {
+                        "$ref": "#/components/schemas/uuid",
+                        "description": "The ID given after the camera registration"
+                    },
+                    "streamName": {
+                        "description": "The name of the stream",
+                        "type": "string"
+                    },
+                    "streamUrl": {
+                        "description": "Url for accessing the stream",
+                        "type": "string"
+                    },
+                    "streamType": {
+                        "description": "Type of the stream protocol",
+                        "enum": [
+                            "RTSP",
+                            "RTMP"
+                        ],
+                        "type": "string"
+                    },
+                    "type": {
+                        "description": "Type of the stream",
+                        "enum": [
+                            "camera",
+                            "rtsp",
+                            "rtmp"
+                        ],
+                        "type": "string"
+                    },
+                    "isPublic": {
+                        "description": "Is public or private stream",
+                        "type": "boolean"
+                    }
+                },
+                "example": {
+                    "cameraId": "63062b40-fafc-59b7-9dbd-eb33cc9e1c42",
+                    "streamName": "camera stream 1",
+                    "streamUrl": "rtsp://localhost:8554/stream1",
+                    "streamType": "RTSP",
+                    "type": "camera",
+                    "isPublic": false
+                }
+            },
+            "RegisterStreamResponse": {
+                "title": "Root Type for RegisterStreamResponse",
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "format": "int32",
+                        "type": "integer"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "result": {
+                        "type": "object",
+                        "properties": {
+                            "streamId": {
+                                "type": "string"
+                            },
+                            "cameraId": {
+                                "type": "string"
+                            },
+                            "streamName": {
+                                "type": "string"
+                            },
+                            "streamUrl": {
+                                "type": "string"
+                            },
+                            "streamType": {
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string"
+                            },
+                            "isPublic": {
+                                "type": "boolean"
+                            }
+                        }
+                    }
+                },
+                "example": {
+                    "type": 201,
+                    "title": "Success",
+                    "result": {
+                        "streamId": "8c8c9e8c-1c91-5401-97b7-70f442b1e21b",
+                        "cameraId": "63062b40-fafc-59b7-9dbd-eb33cc9e1c42",
+                        "streamName": "camera stream 1",
+                        "streamUrl": "rtsp://localhost:8554/stream1",
+                        "streamType": "RTSP",
+                        "type": "camera",
+                        "isPublic": false
+                    }
+                }
+            },
+            "ListStreamsResponse": {
+                "title": "Root Type for ListStreamsResponse",
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "format": "int32",
+                        "type": "integer"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "results": {
+                        "type": "object",
+                        "properties": {
+                            "currentPage": {
+                                "format": "int32",
+                                "type": "integer"
+                            },
+                            "totalItems": {
+                                "format": "int32",
+                                "type": "integer"
+                            },
+                            "totalPages": {
+                                "format": "int32",
+                                "type": "integer"
+                            },
+                            "results": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "streamId": {
+                                            "type": "string"
+                                        },
+                                        "cameraId": {
+                                            "type": "string"
+                                        },
+                                        "sourceServerId": {
+                                            "type": "string"
+                                        },
+                                        "destinationServerId": {
+                                            "type": "string"
+                                        },
+                                        "streamName": {
+                                            "type": "string"
+                                        },
+                                        "streamType": {
+                                            "type": "string"
+                                        },
+                                        "isPublic": {
+                                            "type": "boolean"
+                                        },
+                                        "isActive": {
+                                            "type": "boolean"
+                                        },
+                                        "isPublishing": {
+                                            "type": "string"
+                                        },
+                                        "playbackUrlTemplate": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "example": {
+                    "type": 200,
+                    "title": "Success",
+                    "results": {
+                        "currentPage": 1,
+                        "totalItems": 1,
+                        "totalPages": 1,
+                        "results": [
+                            {
+                                "streamId": "712a18d2-6bc8-5501-ba76-f89b24bcf10c",
+                                "cameraId": "63062b40-fafc-59b7-9dbd-eb33cc9e1c42",
+                                "sourceServerId": "ee014f48-dbd1-5122-904a-f643b7efe9fa",
+                                "destinationServerId": "ee014f48-dbd1-5122-904a-f643b7efe9fa",
+                                "streamName": "Local Stream",
+                                "streamType": "RTMP",
+                                "isPublic": false,
+                                "isActive": true,
+                                "playbackUrlTemplate": "rtmp://localhost:1935/live/712a18d2-6bc8-5501-ba76-f89b24bcf10c?token=<TOKEN>"
+                            }
+                        ]
+                    }
+                }
+            },
+            "FindStreamResponse": {
+                "title": "Root Type for FindStreamResponse",
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "format": "int32",
+                        "type": "integer"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "result": {
+                        "type": "object",
+                        "properties": {
+                            "streamId": {
+                                "type": "string"
+                            },
+                            "cameraId": {
+                                "type": "string"
+                            },
+                            "streamName": {
+                                "type": "string"
+                            },
+                            "streamType": {
+                                "type": "string"
+                            },
+                            "streamUrl": {
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string"
+                            },
+                            "isPublic": {
+                                "type": "boolean"
+                            }
+                        }
+                    }
+                },
+                "example": {
+                    "type": 200,
+                    "title": "Success",
+                    "result": {
+                        "streamId": "712a18d2-6bc8-5501-ba76-f89b24bcf10c",
+                        "cameraId": "63062b40-fafc-59b7-9dbd-eb33cc9e1c42",
+                        "streamName": "Local Stream",
+                        "streamType": "RTMP",
+                        "streamUrl": "rtmp://localhost:1935/live/712a18d2-6bc8-5501-ba76-f89b24bcf10c?token=admin123",
+                        "type": "rtmp",
+                        "isPublic": false
+                    }
+                }
+            },
+            "StreamStatusResponse": {
+                "title": "Root Type for StreamStatusResponse",
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "format": "int32",
+                        "type": "integer"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "streamId": {
+                                    "type": "string"
+                                },
+                                "cameraId": {
+                                    "type": "string"
+                                },
+                                "provenanceStreamId": {
+                                    "type": "string"
+                                },
+                                "streamName": {
+                                    "type": "string"
+                                },
+                                "streamUrl": {
+                                    "type": "string"
+                                },
+                                "type": {
+                                    "type": "string"
+                                },
+                                "isActive": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    }
+                },
+                "example": {
+                    "type": 200,
+                    "title": "Success",
+                    "results": [
+                        {
+                            "streamId": "712a18d2-6bc8-5501-ba76-f89b24bcf10c",
+                            "cameraId": "63062b40-fafc-59b7-9dbd-eb33cc9e1c42",
+                            "provenanceStreamId": "8c8c9e8c-1c91-5401-97b7-70f442b1e21b",
+                            "streamName": "Local Stream",
+                            "streamUrl": "rtmp://localhost:1935/live/712a18d2-6bc8-5501-ba76-f89b24bcf10c?token=admin123",
+                            "type": "rtmp",
+                            "isActive": true
+                        }
+                    ]
+                }
+            },
+            "StreamRequestResponse": {
+                "title": "Root Type for StreamRequestResponse",
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "format": "int32",
+                        "type": "integer"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "data": {
+                        "type": "object",
+                        "properties": {
+                            "streamId": {
+                                "type": "string"
+                            },
+                            "playbackUrlTemplate": {
+                                "type": "string"
+                            },
+                            "isPublishing": {
+                                "type": "boolean"
+                            },
+                            "message": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "example": {
+                    "type": 200,
+                    "title": "Success",
+                    "data": {
+                        "streamId": "712a18d2-6bc8-5501-ba76-f89b24bcf10c",
+                        "playbackUrlTemplate": "rtmp://localhost:1935/live/712a18d2-6bc8-5501-ba76-f89b24bcf10c?token=<TOKEN>",
+                        "isPublishing": false,
+                        "message": "Stream will be available shortly, please check status API to know the status"
+                    }
+                }
+            },
+            "CameraStreamsResponse": {
+                "title": "Root Type for CameraStreamsResponse",
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "format": "int32",
+                        "type": "integer"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "streamId": {
+                                    "type": "string"
+                                },
+                                "cameraId": {
+                                    "type": "string"
+                                },
+                                "provenanceStreamId": {
+                                    "type": "string"
+                                },
+                                "sourceServerId": {
+                                    "type": "string"
+                                },
+                                "destinationServerId": {
+                                    "type": "string"
+                                },
+                                "streamName": {
+                                    "type": "string"
+                                },
+                                "streamUrl": {
+                                    "type": "string"
+                                },
+                                "streamType": {
+                                    "type": "string"
+                                },
+                                "type": {
+                                    "type": "string"
+                                },
+                                "isPublic": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    }
+                },
+                "example": {
+                    "type": 200,
+                    "title": "Success",
+                    "results": [
+                        {
+                            "streamId": "8c8c9e8c-1c91-5401-97b7-70f442b1e21b",
+                            "cameraId": "63062b40-fafc-59b7-9dbd-eb33cc9e1c42",
+                            "provenanceStreamId": "8c8c9e8c-1c91-5401-97b7-70f442b1e21b",
+                            "sourceServerId": "ee014f48-dbd1-5122-904a-f643b7efe9fa",
+                            "destinationServerId": "ee014f48-dbd1-5122-904a-f643b7efe9fa",
+                            "streamName": "camera stream 1",
+                            "streamUrl": "rtsp://localhost:8554/stream1",
+                            "streamType": "RTSP",
+                            "type": "camera",
+                            "isPublic": false
+                        },
+                        {
+                            "streamId": "712a18d2-6bc8-5501-ba76-f89b24bcf10c",
+                            "cameraId": "63062b40-fafc-59b7-9dbd-eb33cc9e1c42",
+                            "provenanceStreamId": "8c8c9e8c-1c91-5401-97b7-70f442b1e21b",
+                            "sourceServerId": "ee014f48-dbd1-5122-904a-f643b7efe9fa",
+                            "destinationServerId": "ee014f48-dbd1-5122-904a-f643b7efe9fa",
+                            "streamName": "Local Stream",
+                            "streamUrl": "rtmp://localhost:1935/live/8b28b5b9-2891-5624-b561-c834cad0e8ab?token=admin123",
+                            "streamType": "RTMP",
+                            "type": "rtmp",
+                            "isPublic": false
+                        }
+                    ]
+                }
+            },
+            "response_result_object": {
+                "title": "Root Type for ResponseResultObject",
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "format": "int32",
+                        "type": "integer"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "result": {
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "type": 404,
+                    "title": "Not Found",
+                    "result": "Not Found"
+                }
+            },
+            "response_detail_object": {
+                "title": "Root Type for response_detail_object",
+                "description": "",
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "format": "int32",
+                        "type": "integer"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "detail": {
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "type": 200,
+                    "title": "Success",
+                    "detail": "Details"
+                }
+            },
+            "uuid": {
+                "description": "",
+                "maxLength": 36,
+                "minLength": 36,
+                "pattern": "^[0-9a-f]{8}\\b-[0-9a-f]{4}\\b-[0-9a-f]{4}\\b-[0-9a-f]{4}\\b-[0-9a-f]{12}$",
+                "type": "string"
+            }
+        },
+        "responses": {
+            "Forbidden": {
+                "content": {
+                    "text/html": {
+                        "examples": {
+                            "response": {
+                                "value": "Forbidden"
+                            }
+                        }
+                    }
+                },
+                "description": "Forbidden"
+            },
+            "Unauthorized": {
+                "content": {
+                    "text/html": {
+                        "examples": {
+                            "response": {
+                                "value": "Unauthorized"
+                            }
+                        }
+                    }
+                },
+                "description": "Unauthorized"
+            },
+            "UnauthorizedRole": {
+                "content": {
+                    "text/html": {
+                        "schema": {
+                            "type": "string"
+                        },
+                        "examples": {
+                            "response": {
+                                "value": "<message>"
+                            }
+                        }
+                    }
+                },
+                "description": "<ul>\n    <li>Unauthorized </li>\n    <li>Authorization failed, invalid token provided</li>\n<ul/>"
+            },
+            "UnauthorizedStreamAccess": {
+                "content": {
+                    "text/html": {
+                        "schema": {
+                            "type": "string"
+                        },
+                        "examples": {
+                            "response": {
+                                "value": "<message>"
+                            }
+                        }
+                    }
+                },
+                "description": "<ul>\n    <li>Authorization failed</li>\n    <li>Authorization failed, invalid token provided</li>\n    <li>Authorization failed, stream id not provided</li>\n<ul/>"
+            },
+            "UnauthorizedStream": {
+                "content": {
+                    "text/html": {
+                        "schema": {
+                            "type": "string"
+                        },
+                        "examples": {
+                            "response": {
+                                "value": "<message>"
+                            }
+                        }
+                    }
+                },
+                "description": "<ul>\n    <li>Authorization failed</li>\n    <li>Authorization failed, invalid token provided</li>\n    <li>Authorization failed, stream id not provided</li>\n    <li>Authorization failed for requested resource</li>\n<ul/>"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Server APIs",
+            "description": ""
+        },
+        {
+            "name": "Stream APIs",
+            "description": ""
+        },
+        {
+            "name": "Policy APIs",
+            "description": ""
+        },
+        {
+            "name": "Camera APIs",
+            "description": ""
+        },
+        {
+            "name": "Auth APIs",
+            "description": ""
+        }
+    ]
+}
