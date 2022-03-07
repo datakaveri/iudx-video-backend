@@ -112,7 +112,7 @@ describe('Camera Service Testing', () => {
             };
             const userId: string = '1';
             const role: string = 'provider';
-            const page: number = 0;
+            const page: number = 1;
             const size: number = 0;
 
             const response = await cameraService.findAll(userId, role, page, size);

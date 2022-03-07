@@ -75,7 +75,7 @@ describe('Stream Service Testing', () => {
                 totalPages: expect.any(Number),
                 results: expect.any(Array)
             };
-            const page: number = 0;
+            const page: number = 1;
             const size: number = 0;
 
             const response = await streamService.findAll(page, size, null);
