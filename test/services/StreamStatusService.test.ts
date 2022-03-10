@@ -61,7 +61,7 @@ describe('Stream Status Service Testing', () => {
             await expect(streamStatusService.updateStats(streamsStat)).resolves;
         });
 
-        test('Should return if data is empty', async () => {
+        test('Should return nothing if data is empty', async () => {
             const streamsStat = null;
             await expect(streamStatusService.updateStats(streamsStat)).resolves;
         });

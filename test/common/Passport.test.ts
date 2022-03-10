@@ -23,8 +23,10 @@ describe('Passport Strategy Test', () => {
                     name: 'New',
                     email: 'newuser@datakaveri.org',
                     password: 'admin',
-                    role: 'user',
+                    role: 'consumer',
                 },
+                query: {
+                }
             };
             passport.authenticate('signup', (err, code) => {
                 expect(err).toBeFalsy();
@@ -38,7 +40,7 @@ describe('Passport Strategy Test', () => {
                     name: 'Swarup E',
                     email: 'swarup@datakaveri.org',
                     password: 'admin',
-                    role: 'user',
+                    role: 'provider',
                 },
             };
             passport.authenticate('signup', (err, code) => {
@@ -60,7 +62,7 @@ describe('Passport Strategy Test', () => {
             mockRequest = {
                 body: {
                     email: 'newuser@datakaveri.org',
-                    password: 'admin',
+                    password: 'consumer',
                 },
             };
             passport.authenticate('token', (err, token, message) => {

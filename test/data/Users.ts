@@ -7,7 +7,8 @@ export const Users = [
         password: 'admin123',
         verificationCode: 'xkj38jnjnn',
         verified: true,
-        role: 'user',
+        role: 'provider',
+        approved: true
     },
     {
         id: 2,
@@ -16,6 +17,6 @@ export const Users = [
         password: 'admin123',
         verificationCode: '12345',
         verified: false,
-        role: 'user',
+        role: 'consumer',
     },
 ];
