@@ -185,7 +185,6 @@ export default class StreamStatusService {
                 }
             }
         } catch (err) {
-            console.log(err);
             Logger.error(err);
             throw new ServiceError('Error checking stream status');
         }
