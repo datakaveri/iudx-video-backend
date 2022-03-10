@@ -63,22 +63,24 @@ export default class StreamStatusService {
 
     public async updateStats(stream: any) {
         try {
-            await this.streamRepo.updateStream(
-                { streamId: stream.streamId, destinationServerId: config.serverId },
-                {
-                    totalClients: stream.nClients,
-                    activeTime: parseInt(stream.time),
-                    bandwidthIn: BigInt(stream.bwIn),
-                    bandwidthOut: BigInt(stream.bwOut),
-                    bytesIn: BigInt(stream.bytesIn),
-                    bytesOut: BigInt(stream.bytesOut),
-                    ...(stream.active && {
-                        codec: `${stream.metaVideo.codec} ${stream.metaVideo.profile} ${stream.metaVideo.level}`,
-                        resolution: `${stream.metaVideo.width}x${stream.metaVideo.height}`,
-                        frameRate: parseInt(stream.metaVideo.frameRate),
-                    }),
-                }
-            );
+            if (stream) {
+                await this.streamRepo.updateStream(
+                    { streamId: stream.streamId, destinationServerId: config.serverId },
+                    {
+                        totalClients: stream.nClients,
+                        activeTime: parseInt(stream.time),
+                        bandwidthIn: BigInt(stream.bwIn),
+                        bandwidthOut: BigInt(stream.bwOut),
+                        bytesIn: BigInt(stream.bytesIn),
+                        bytesOut: BigInt(stream.bytesOut),
+                        ...(stream.active && {
+                            codec: `${stream.metaVideo.codec} ${stream.metaVideo.profile} ${stream.metaVideo.level}`,
+                            resolution: `${stream.metaVideo.width}x${stream.metaVideo.height}`,
+                            frameRate: parseInt(stream.metaVideo.frameRate),
+                        }),
+                    }
+                );
+            }
         } catch (e) {
             Logger.error(e);
             throw new ServiceError('Error Updating the stream stats');
@@ -183,6 +185,7 @@ export default class StreamStatusService {
                 }
             }
         } catch (err) {
+            console.log(err);
             Logger.error(err);
             throw new ServiceError('Error checking stream status');
         }
