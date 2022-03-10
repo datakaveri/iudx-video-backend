@@ -139,6 +139,10 @@ To bring down Dev setup, run `./stop_dev.sh`.
 
 ## Testing
 
+- At first start test stream server for running all the tests
+- `cd ./setup/scripts`
+- Run the `./start_test_stream.sh` script which will bring up test streaming server
+
 ### Unit tests
 
 1. Run the server.
@@ -163,3 +167,6 @@ sudo apt-get install postgresql-client
 
 1. Run the servers
 2. Execute `test/api_test.sh` command from the root of the project directory
+
+
+- Post running all the tests stop the streaming server using `./stop_test_stream.sh` script

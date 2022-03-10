@@ -1,17 +1,11 @@
 version: "3.8"
 
-networks:
-  vs-net:
-    external: true
-
 services:
 
   testvid:
     build: 
-      dockerfile: ./Dockerfile
-      context: .
+      dockerfile: ${PROJECT_ROOT}/setup/testimage/Dockerfile
+      context: ${PROJECT_ROOT}/setup/testimage/
     container_name: testvid
     ports:
       - "8554:8554"
-    networks: 
-      - vs-net
