@@ -1,6 +1,22 @@
 # IUDX Video Server Backend
 
-Backend Application for IUDX Video Server.
+Backend for IUDX Video Streaming Server. 
+
+
+<p align="center">
+<img src="./docs/diagrams/arch.png">
+</p>
+
+The IUDX Video Server follows a master-slave architecture with the 
+Cloud Media Server (CMS) orchestrating and routing video streams (rtmp or hls) from 
+Local Media Servers (LMS) which could be behind a private network.
+LMSs pull rtsp streams from IP cameras and broadcast it either to 
+local applications or publish it to a CMS for further Content Distribution.
+CMSs either use a local authentication and consent framework or 
+an oAuth service provider to authenticate and authorize access to camera streams 
+(both APIs and rtmp/hls streams).
+
+
 
 ## Get Started
 
