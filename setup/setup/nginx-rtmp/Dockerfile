@@ -17,14 +17,14 @@ RUN apt-get update && \
   rm -rf /var/lib/apt/lists/*
 
 WORKDIR /src
-RUN wget http://nginx.org/download/nginx-1.21.0.tar.gz && \
-  tar zxf nginx-1.21.0.tar.gz && \
-  rm nginx-1.21.0.tar.gz
+RUN wget http://nginx.org/download/nginx-1.23.2.tar.gz && \
+  tar zxf nginx-1.23.2.tar.gz && \
+  rm nginx-1.23.2.tar.gz
 
 RUN git clone https://github.com/sergey-dryabzhinsky/nginx-rtmp-module
 
-WORKDIR /src/nginx-1.21.0
-RUN ./configure --add-module=/src/nginx-rtmp-module \
+WORKDIR /src/nginx-1.23.2
+RUN ./configure --add-dynamic-module=/src/nginx-rtmp-module \
   --with-http_ssl_module \
   --conf-path=/config/nginx.conf \
   --error-log-path=/logs/error.log \
