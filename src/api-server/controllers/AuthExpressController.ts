@@ -118,6 +118,7 @@ export default class AuthExpressController {
     async logout(req: Request, res: Response, next: NextFunction) {
         Logger.debug('Calling Logout endpoint');
         try {
+            // @ts-ignore: arguments 1-2
             req.logOut();
             return res.status(200).send();
         } catch (e) {
