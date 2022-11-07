@@ -12,7 +12,7 @@ RUN apt-get update && \
   apt-get install -y --no-install-recommends build-essential \
   wget software-properties-common && \
   apt-get install -y --no-install-recommends ffmpeg && \
-  apt-get install -y --no-install-recommends libpcre3-dev stunnel git \
+  apt-get install -y --no-install-recommends libpcre3-dev stunnel git ca-certificates openssl \
   zlib1g-dev libssl-dev wget && \
   rm -rf /var/lib/apt/lists/*
 
@@ -25,18 +25,27 @@ RUN git clone https://github.com/sergey-dryabzhinsky/nginx-rtmp-module
 
 WORKDIR /src/nginx-1.23.2
 RUN ./configure --add-dynamic-module=/src/nginx-rtmp-module \
-  --with-http_ssl_module \
-  --conf-path=/config/nginx.conf \
-  --error-log-path=/logs/error.log \
-  --http-log-path=/logs/access.log && \
-  make && \
-  make install
+        --sbin-path=/usr/local/sbin/nginx \
+        --conf-path=/etc/nginx/nginx.conf \
+        --error-log-path=/var/log/nginx/error.log \
+        --pid-path=/var/run/nginx/nginx.pid \
+        --lock-path=/var/lock/nginx/nginx.lock \
+        --http-log-path=/var/log/nginx/access.log \
+        --http-client-body-temp-path=/tmp/nginx-client-body \
+        --with-http_ssl_module \
+        --with-threads \
+        --with-ipv6 && \
+        make && \
+        make install && \
+        mkdir /var/lock/nginx
 
-ADD nginx.conf /config/nginx.conf
-ADD stat.xsl /opt/nginx/html/stat.xsl
+RUN ln -sf /dev/stdout /var/log/nginx/access.log && \
+    ln -sf /dev/stderr /var/log/nginx/error.log
+
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY stat.xsl /opt/nginx/html/stat.xsl
 EXPOSE 1935
 EXPOSE 8080
 EXPOSE 6060
 
-WORKDIR /
 CMD ["nginx", "-g", "daemon off;"]
