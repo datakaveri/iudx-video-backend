@@ -24,7 +24,7 @@ export function PolicyModel(Database: Sequelize) {
             },
             constraints: {
                 type: DataTypes.JSONB,
-                allowNull: false,
+                allowNull: true,
             },
         },
         {

@@ -108,7 +108,7 @@ getPolicyData() {
     cat <<EOF
 {
     "email": "$consumer_email",
-    "streamId": "$stream_id"
+    "cameraId": "$camera_id"
 }
 EOF
 }

@@ -109,7 +109,7 @@ CREATE TABLE IF NOT EXISTS "Policies"
   "userId"              UUID          NOT NULL,
   "cameraId"            UUID,
   "providerId"          UUID,
-  "constraints"         JSONB         NOT NULL,
+  "constraints"         JSONB,
   "createdAt"           TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
   "updatedAt"           TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
   PRIMARY KEY ("policyId"),
