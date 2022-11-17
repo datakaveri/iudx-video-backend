@@ -40,7 +40,8 @@ EOF
 getProviderEmail() {
     cat <<EOF
 {
-    "email": "$provider_email"
+    "email": "$provider_email",
+    "role": "provider"
 }
 EOF
 }
@@ -82,7 +83,7 @@ getCameraData() {
     "cameraUsage" : "RLVD",
     "cameraOrientation" : "NORTH-EAST",
     "city" : "Bangalore",
-    "junction": "IISC"
+    "junction": "IISC",
     "location" : "lat/long"
 }
 EOF
@@ -213,7 +214,7 @@ stream_list=$(
 
 echo $stream_list | python3 -m json.tool
 stream_id=$(echo $stream_list| python3 -c \
-    "import sys, json; print(json.load(sys.stdin)['results']['results'][1]['streamId'])"
+    "import sys, json; print(json.load(sys.stdin)['results']['results'][0]['streamId'])"
 )
 sleep 2
 
