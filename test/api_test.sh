@@ -188,13 +188,13 @@ printf " \u2714 \033[0;32m Successfully registered a test camera\033[0m\n"
 printf "\n \u2022 Camera List\n"
 curl -sS --location --request GET 'http://localhost:4000/api/cameras?size=8&page=1' --header "Authorization: Bearer ${consumer_token}" | python3 -m json.tool
 
-printf "\n \u2022 Creating test streaming server\n"
-docker run --name stream-test -d -p 8554:8554 stream-server
+#printf "\n \u2022 Creating test streaming server\n"
+#docker run --name stream-test -d -p 8554:8554 stream-server
 
-sleep 5
-printf " \u2714 \033[0;32m Streaming server created successfully\033[0m\n"
+#sleep 5
+#printf " \u2714 \033[0;32m Streaming server created successfully\033[0m\n"
 
-# Registering a stream
+Registering a stream
 printf "\n \u2022 Registering a stream\n"
 
 camera_stream_id=$(
