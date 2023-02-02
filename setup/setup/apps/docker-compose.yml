@@ -1,0 +1,24 @@
+version: "3.8"
+
+networks:
+  vs-net:
+    external: true
+
+services:
+
+  kafkainit:
+    build: 
+      dockerfile: ${PROJECT_ROOT}/setup/setup/apps/Dockerfile
+      context: ${PROJECT_ROOT}/setup/setup/apps
+    image: iudx_vs/kafka-init
+    container_name: kafkainit
+    volumes: 
+      - ${TOPICS_FILE}:/usr/share/apps/scripts/topics.json
+    depends_on: 
+      - kafka
+    environment:
+      KAFKA_HOST: "kafka"
+      KAFKA_PORT: 19092
+    networks: 
+      - vs-net
+    command: "python3 create_topics.py"

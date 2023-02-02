@@ -1,0 +1,14 @@
+version: "3.8"
+
+services: 
+  vsnginx:
+    restart: always
+    container_name: vsnginx
+    network_mode: host
+    image: vsnginx
+    build:
+      dockerfile: ${PROJECT_ROOT}/setup/setup/ui/Dockerfile
+      context: ${UI_PROJECT_PATH}
+    volumes:
+      - ${PROJECT_ROOT}/setup/certificates:/certificates
+      - ${PROJECT_ROOT}/setup/setup/nginx/nginx-cms.conf:/etc/nginx/conf.d/default.conf

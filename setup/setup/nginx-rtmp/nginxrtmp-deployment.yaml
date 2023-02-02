@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginxrtmp-deployment
+spec:
+  selector:
+    matchLabels:
+      app: nginxrtmp
+  template:
+    metadata:
+      labels:
+        app: nginxrtmp
+
+    spec:
+
+      volumes:
+        - name: nginxrtmp-storage
+          persistentVolumeClaim:
+            claimName: nginxrtmp-pv-claim
+      containers:
+      - name: nginxrtmp-container
+        image: iudx_vs/nginx-rtmp
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 1935
+          name: port1935
+        - containerPort: 8080
+          name: port8080
+
+        volumeMounts:
+          - mountPath: "/certificates"
+            name: nginxrtmp-storage

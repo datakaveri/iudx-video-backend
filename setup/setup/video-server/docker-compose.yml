@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  videoserver:
+    restart: always
+    build:
+      dockerfile: ${PROJECT_ROOT}/setup/setup/video-server/Dockerfile
+      context: ${PROJECT_ROOT}
+    image: iudx_vs/backend-server
+    container_name: videoserver
+    network_mode: host
+    expose:
+      - "4000"
+    depends_on:
+      - postgres
+    command: "node build/src/app.js"
+
+

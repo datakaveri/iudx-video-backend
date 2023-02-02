@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nginxrtmp-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: ""
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteOnce
+  claimRef:
+     namespace: default
+     name: nginxrtmp-pv-claim
+  hostPath:
+    path: "/mnt/certificates"

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginxrtmp-ip-service
+spec:
+  type: ClusterIP 
+  selector:
+    app: nginxrtmp
+  ports:
+  - name: port1935
+    port: 1935
+    targetPort: port1935
+
+  - name: port8080
+    port: 8080
+    targetPort: port8080

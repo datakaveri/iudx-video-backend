@@ -1,0 +1,27 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "IUDX Video Backend",
+            "outputCapture": "std",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "node",
+            "runtimeArgs": ["--nolazy", "-r", "ts-node/register/transpile-only"],
+            "args": ["src/app.ts"],
+            "cwd": "${workspaceFolder}",
+            "internalConsoleOptions": "openOnSessionStart",
+            "skipFiles": ["<node_internals>/**", "node_modules/**"]
+        },
+        {
+            "type": "node",
+            "outputCapture": "std",
+            "request": "launch",
+            "name": "Test IUDX Video Backend",
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "${workspaceRoot}/node_modules/.bin/jest"
+            ]
+        }
+    ]
+}

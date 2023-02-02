@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: testvideo-deployment
+spec:
+  selector:
+    matchLabels:
+      app: testvideo
+  template:
+    metadata:
+      labels:
+        app: testvideo
+    spec:
+      containers:
+      - name: testvideo-container
+        # image: iudx_vs/testvideo
+        # imagePullPolicy: IfNotPresent
+        image: ubuntu:20.04
+        resources:
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 8554
+
+        command: [ "/bin/sh", "-c", "--" ]
+        args: [ "while true; do sleep 30; done;" ]

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pgadmin-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: ""
+  capacity:
+    storage: 10Mi
+  accessModes:
+    - ReadWriteOnce
+  claimRef:
+     namespace: default
+     name: pgadmin-pv-claim
+  hostPath:
+    path: "/mnt/pgadmin"

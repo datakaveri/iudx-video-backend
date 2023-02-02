@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zookeeper-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: zookeeper
+  template:
+    metadata:
+      labels:
+        component: zookeeper
+    spec:
+      
+      volumes:
+        - name: zk-conf-storage
+          persistentVolumeClaim:
+            claimName: zk-conf-pv-claim
+
+        - name: zk-data-storage
+          persistentVolumeClaim:
+            claimName: zk-data-pv-claim
+
+        - name: zk-datalog-storage
+          persistentVolumeClaim:
+            claimName: zk-datalog-pv-claim
+
+      containers:
+      - name: zookeeper-container
+        image: confluentinc/cp-zookeeper:latest
+        env:
+          - name: ZOOKEEPER_CLIENT_PORT
+            value: "2181"
+          - name: ZOOKEEPER_TICK_TIME
+            value: "2000"
+          - name: KAFKA_OPTS
+            value: -Djava.security.auth.login.config=/etc/kafka/zookeeper_jaas.conf
+                   -Dzookeeper.authProvider.1=org.apache.zookeeper.server.auth.SASLAuthenticationProvider
+                   -DrequireClientAuthScheme=sasl
+                   -Dzookeeper.allowSaslFailedClients=false
+        
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "125m"
+          limits:
+            memory: "128Mi"
+            cpu: "250m"
+        ports:
+          - containerPort: 2181
+
+        volumeMounts:
+          - mountPath: "/etc/kafka/zookeeper_jaas.conf"
+            name: zk-conf-storage
+
+          - mountPath: "/data"
+            name: zk-data-storage
+
+          - mountPath: "/datalog"
+            name: zk-datalog-storage
+        # tty: true
+        # livenessProbe:
+        #   exec:
+        #     command:
+        #       - /opt/check.sh
+        #   initialDelaySeconds: 30
+        #   periodSeconds: 30
+        # readinessProbe:
+        #   exec:
+        #     command:
+        #       - /opt/check.sh
+        #   initialDelaySeconds: 30
+        #   periodSeconds: 5

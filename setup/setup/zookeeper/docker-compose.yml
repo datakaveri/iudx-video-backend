@@ -1,0 +1,31 @@
+version: "3.8"
+
+networks:
+  vs-net:
+    external: true
+
+volumes:
+  zkdata:
+  zkdatalog:
+
+services:
+  zook:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    hostname: zook
+    restart: always
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      KAFKA_OPTS: -Djava.security.auth.login.config=/etc/kafka/zookeeper_jaas.conf
+                  -Dzookeeper.authProvider.1=org.apache.zookeeper.server.auth.SASLAuthenticationProvider
+                  -DrequireClientAuthScheme=sasl
+                  -Dzookeeper.allowSaslFailedClients=false
+    volumes:
+      - zkdata:/data
+      - zkdatalog:/datalog
+      - ${PROJECT_ROOT}/setup/setup/zookeeper/config/zookeeper_jaas.conf:/etc/kafka/zookeeper_jaas.conf
+    networks: 
+      - vs-net

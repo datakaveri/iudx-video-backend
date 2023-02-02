@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+
+  testvid:
+    build: 
+      dockerfile: ${PROJECT_ROOT}/setup/testimage/Dockerfile
+      context: ${PROJECT_ROOT}/setup/testimage/
+    container_name: testvid
+    ports:
+      - "8554:8554"

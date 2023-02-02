@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pgadmin-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: pgadmin
+  template:
+    metadata:
+      labels:
+        component: pgadmin
+    spec:
+      
+      volumes:
+        - name: pgadmin-data-storage
+          persistentVolumeClaim:
+            claimName: pgadmin-pv-claim
+
+        
+      containers:
+      - name: pgadmin-container
+        image: dpage/pgadmin4
+        env:
+          - name: PGADMIN_DEFAULT_EMAIL
+            value: user@datakaveri.org
+          - name: PGADMIN_DEFAULT_PASSWORD
+            value: user123
+          - name: PGADMIN_CONFIG_SERVER_MODE
+            value: "False"
+          
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "125m"
+          limits:
+            memory: "128Mi"
+            cpu: "250m"
+        ports:
+          - containerPort: 80
+
+        volumeMounts:
+          - mountPath: "/root/.pgadmin"
+            name: pgadmin-data-storage
+
+          

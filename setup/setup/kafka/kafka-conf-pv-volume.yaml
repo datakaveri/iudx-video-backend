@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: kafka-conf-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: ""
+  capacity:
+    storage: 50Mi
+  accessModes:
+    - ReadWriteOnce
+  claimRef:
+     namespace: default
+     name: kafka-conf-pv-claim
+  hostPath:
+    path: "/mnt/kafkaconfig/kafka_jaas.conf"
