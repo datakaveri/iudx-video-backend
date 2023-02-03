@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: schema-config
+data:
+  cms-schema.sql: "-- schema.sql\n\n-- Make sure it's `vs_db` database\n\\c vs_db;\n\nCREATE
+    TABLE IF NOT EXISTS \"Users\" \n(\n  \"id\"                 UUID         NOT NULL,\n
+    \ \"name\"               TEXT         NOT NULL,\n  \"email\"              TEXT
+    \        NOT NULL,\n  \"password\"           TEXT         NOT NULL,\n  \"salt\"
+    \              TEXT,\n  \"verificationCode\"   TEXT,\n  \"verified\"           BOOLEAN,\n
+    \ \"role\"               TEXT,\n  \"approved\"           BOOLEAN,\n  \"createdAt\"
+    \         TIMESTAMPTZ  NOT NULL DEFAULT NOW(),\n  \"updatedAt\"          TIMESTAMPTZ
+    \ NOT NULL DEFAULT NOW(),\n  UNIQUE (\"email\"),\n  PRIMARY KEY (\"id\")\n);\n\nCREATE
+    TABLE IF NOT EXISTS \"Servers\" \n(\n  \"serverId\"          UUID,\n  \"serverName\"
+    \       TEXT         NOT NULL,\n  \"serverHost\"        TEXT         NOT NULL,\n
+    \ \"serverRtmpPort\"    INTEGER      NOT NULL,\n  \"serverType\"        TEXT         NOT
+    NULL,\n  \"upstreamTopic\"     TEXT         NOT NULL,\n  \"downstreamTopic\"   TEXT
+    \        NOT NULL,  \n  \"consumerGroupId\"   TEXT         NOT NULL,\n  \"createdAt\"
+    \        TIMESTAMPTZ  NOT NULL DEFAULT NOW(),\n  \"updatedAt\"         TIMESTAMPTZ
+    \ NOT NULL DEFAULT NOW(),\n  \"lastPingTime\"      TIMESTAMPTZ, \n  PRIMARY KEY
+    (\"serverId\")\n);\n\nCREATE TABLE IF NOT EXISTS \"Cameras\" \n(\n  \"cameraId\"
+    \           UUID,\n  \"userId\"              UUID          NOT NULL,\n  \"serverId\"
+    \           UUID          NOT NULL,\n  \"cameraName\"          TEXT          NOT
+    NULL,\n  \"cameraNum\"           TEXT,\n  \"cameraType\"          TEXT,\n  \"cameraUsage\"
+    \        TEXT,\n  \"cameraOrientation\"   TEXT,\n  \"city\"                TEXT,\n
+    \ \"junction\"            TEXT,\n  \"location\"            TEXT,\n  \"createdAt\"
+    \          TIMESTAMPTZ   NOT NULL DEFAULT NOW(),\n  \"updatedAt\"           TIMESTAMPTZ
+    \  NOT NULL DEFAULT NOW(),\n  PRIMARY KEY (\"cameraId\"),\n  CONSTRAINT \"userFK\"\n
+    \     FOREIGN KEY (\"userId\") \n\t  REFERENCES \"Users\" (\"id\"),\n  CONSTRAINT
+    \"serverFK\"\n      FOREIGN KEY (\"serverId\") \n\t  REFERENCES \"Servers\" (\"serverId\")
+    \n);\n\nCREATE TABLE IF NOT EXISTS \"Streams\" \n(\n  \"streamId\"              UUID,\n
+    \ \"userId\"                UUID          NOT NULL,\n  \"cameraId\"              UUID
+    \         NOT NULL,\n  \"provenanceStreamId\"    UUID          NOT NULL,\n  \"sourceServerId\"
+    \       UUID          NOT NULL,\n  \"destinationServerId\"   UUID          NOT
+    NULL,\n  \"processId\"             INTEGER,\n  \"type\"                  TEXT
+    \         NOT NULL,\n  \"streamName\"            TEXT          NOT NULL,\n  \"streamUrl\"
+    \            TEXT          NOT NULL,\n  \"streamType\"            TEXT          NOT
+    NULL,\n  \"isPublic\"              BOOLEAN,\n  \"isActive\"              BOOLEAN,\n
+    \ \"isPublishing\"          BOOLEAN,\n  \"isStable\"              BOOLEAN,\n  \"totalClients\"
+    \         INTEGER,\n  \"codec\"                 TEXT,\n  \"resolution\"            TEXT,\n
+    \ \"frameRate\"             INTEGER,\n  \"bandwidthIn\"           BIGINT,\n  \"bandwidthOut\"
+    \         BIGINT,\n  \"bytesIn\"               BIGINT,\n  \"bytesOut\"              BIGINT,\n
+    \ \"activeTime\"            INTEGER,\n  \"lastAccessed\"          TIMESTAMPTZ,\n
+    \ \"lastActive\"            TIMESTAMPTZ,\n  \"createdAt\"             TIMESTAMPTZ
+    \  NOT NULL DEFAULT NOW(),\n  \"updatedAt\"             TIMESTAMPTZ   NOT NULL
+    DEFAULT NOW(),\n  PRIMARY KEY (\"streamId\", \"destinationServerId\"),\n  CONSTRAINT
+    \"userFK\"\n      FOREIGN KEY (\"userId\") \n\t  REFERENCES \"Users\" (\"id\"),\n
+    \ CONSTRAINT \"cameraFK\"\n      FOREIGN KEY (\"cameraId\") \n\t  REFERENCES \"Cameras\"
+    (\"cameraId\"),\n  CONSTRAINT \"sourceServerFK\"\n      FOREIGN KEY (\"sourceServerId\")
+    \n\t  REFERENCES \"Servers\" (\"serverId\"),\n  CONSTRAINT \"destinationServerFK\"\n
+    \     FOREIGN KEY (\"destinationServerId\") \n\t  REFERENCES \"Servers\" (\"serverId\")
+    \   \n);\n\nCREATE TABLE IF NOT EXISTS \"Archives\" \n(\n  \"fileId\"              UUID,\n
+    \ \"userId\"              UUID          NOT NULL,\n  \"streamId\"            UUID
+    \         NOT NULL,\n  \"serverId\"            UUID          NOT NULL,\n  \"fileName\"
+    \           TEXT          NOT NULL,\n  \"startTime\"           TIMESTAMPTZ,\n
+    \ \"endTime\"             TIMESTAMPTZ,\n  \"codec\"               TEXT,\n  \"resolution\"
+    \         TEXT,\n  \"fileSize\"            TEXT,\n  \"fileDuration\"        INTEGER,\n
+    \ \"createdDate\"         TIMESTAMPTZ,\n  PRIMARY KEY (\"fileId\"),\n  CONSTRAINT
+    \"userFK\"\n      FOREIGN KEY (\"userId\") \n\t  REFERENCES \"Users\" (\"id\"),\n
+    \ CONSTRAINT \"streamServerFK\"\n      FOREIGN KEY(\"streamId\", \"serverId\")
+    \n\t  REFERENCES \"Streams\" (\"streamId\", \"destinationServerId\")\n);\n\nCREATE
+    TABLE IF NOT EXISTS \"Policies\" \n(\n  \"policyId\"            UUID,\n  \"userId\"
+    \             UUID          NOT NULL,\n  \"cameraId\"            UUID,\n  \"providerId\"
+    \         UUID,\n  \"constraints\"         JSONB, \n  \"createdAt\"           TIMESTAMPTZ
+    \  NOT NULL DEFAULT NOW(),\n  \"updatedAt\"           TIMESTAMPTZ   NOT NULL DEFAULT
+    NOW(),\n  PRIMARY KEY (\"policyId\"),\n  CONSTRAINT \"userFK\"\n      FOREIGN
+    KEY (\"userId\") \n\t  REFERENCES \"Users\" (\"id\"),\n  CONSTRAINT \"cameraFK\"\n
+    \     FOREIGN KEY(\"cameraId\") \n\t  REFERENCES \"Cameras\" (\"cameraId\"),\n
+    \ CONSTRAINT \"userFK2\"\n      FOREIGN KEY(\"providerId\") \n\t  REFERENCES \"Users\"
+    (\"id\")\n);"
