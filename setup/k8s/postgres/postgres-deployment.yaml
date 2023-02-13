@@ -13,7 +13,11 @@ spec:
       labels:
         component: postgres
     spec:
-      
+      securityContext:
+        fsGroup: 2000
+        runAsNonRoot: true
+        runAsUser: 1000
+
       volumes:
         - name: pg-data
           persistentVolumeClaim:
@@ -49,7 +53,7 @@ spec:
           - containerPort: 5432
 
         volumeMounts:
-          - mountPath: "/var/lib/postgresql/data/"
+          - mountPath: /var/lib/postgresql/data
             name: pg-data
             subPath: postgres
 
