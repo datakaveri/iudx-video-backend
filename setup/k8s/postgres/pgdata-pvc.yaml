@@ -6,7 +6,6 @@ metadata:
   labels:
     types: postgres-pvc
 spec:
-  storageClassName: standard
   accessModes:
     - ReadWriteOnce
   resources:

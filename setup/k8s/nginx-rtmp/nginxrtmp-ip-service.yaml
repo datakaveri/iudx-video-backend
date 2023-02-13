@@ -4,12 +4,16 @@ metadata:
   name: nginx-rtmp
   namespace: video-server
 spec:
-  type: ClusterIP 
+  type: NodePort 
   selector:
     app: nginxrtmp
   ports:
   - name: rtmp-stream
     port: 1935
+    targetPort: 1935
+    nodePort: 31935
 
   - name: stas-page
     port: 8080
+    targetPort: 8080
+    nodePort: 31880

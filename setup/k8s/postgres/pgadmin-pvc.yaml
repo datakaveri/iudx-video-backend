@@ -6,7 +6,6 @@ metadata:
   labels:
     types: pgadmin-pvc
 spec:
-  storageClassName: standard
   accessModes:
     - ReadWriteOnce
   resources:
