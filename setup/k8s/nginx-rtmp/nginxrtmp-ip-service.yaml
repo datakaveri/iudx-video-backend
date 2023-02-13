@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-rtmp
+  namespace: video-server
+spec:
+  type: ClusterIP 
+  selector:
+    app: nginxrtmp
+  ports:
+  - name: rtmp-stream
+    port: 1935
+
+  - name: stas-page
+    port: 8080

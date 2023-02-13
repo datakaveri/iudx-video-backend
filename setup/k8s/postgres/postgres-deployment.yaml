@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+  namespace: video-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: postgres
+  template:
+    metadata:
+      labels:
+        component: postgres
+    spec:
+      
+      volumes:
+        - name: pg-data
+          persistentVolumeClaim:
+            claimName: postgres-pvc
+
+        - name: schema-storage
+          configMap:
+            name: schema-config
+            items:
+              - key: "cms-schema.sql"
+                path: "schema.sql"
+      containers:
+      - name: postgres-container
+        image: postgres:13
+        env:
+          - name: TZ
+            value: Asia/Kolkata
+          - name: POSTGRES_USER
+            value: user
+          - name: POSTGRES_PASSWORD
+            value: user123
+          - name: POSTGRES_DB
+            value: vs_db
+        
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "125m"
+          limits:
+            memory: "128Mi"
+            cpu: "250m"
+        ports:
+          - containerPort: 5432
+
+        volumeMounts:
+          - mountPath: "/var/lib/postgresql/data/"
+            name: pg-data
+
+          - mountPath: "/docker-entrypoint-initdb.d"
+            name: schema-storage
+
+          

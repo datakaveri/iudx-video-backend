@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: video-server
+data:
+  nginx.conf: |-
+    server {
+        listen 443 ssl;
+        server_name dev.video-server.iudx.io;
+        # ssl_certificate /certificates/live/video-server/fullchain.pem;
+        # ssl_certificate_key /certificates/live/video-server/privkey.pem;
+
+        root /usr/share/nginx/html/ui;
+        index index.html index.htm;
+
+        location / {
+            try_files $uri $uri/ /index.html;
+        }
+
+        location ~* \.(?:jpg|jpeg|gif|png|ico|cur|gz|svg|svgz|mp4|ogg|ogv|webm|htc)$ {
+            expires 1M;
+            access_log off;
+            add_header Cache-Control "public";
+        }
+
+        location ~* \.(?:css|js)$ {
+            try_files $uri =404;
+            expires 1y;
+            access_log off;
+            add_header Cache-Control "public";
+        }
+    }
+
+    server {
+        # listen 4040 ssl;
+        server_name dev.video-server.iudx.io;
+        # ssl_certificate /certificates/live/video-server/fullchain.pem;
+        # ssl_certificate_key /certificates/live/video-server/privkey.pem;
+
+        location / {
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+
+            proxy_pass http://videoserver:4000;
+        }
+    }
+

@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zookeeper
+  namespace: video-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: zookeeper
+  template:
+    metadata:
+      labels:
+        component: zookeeper
+    spec:
+      
+      volumes:
+        - name: zookeeper-jaas
+          secret:
+            secretName: zookeeper-jaas
+
+      containers:
+      - name: zookeeper-container
+        image: confluentinc/cp-zookeeper:latest
+        env:
+          - name: ZOOKEEPER_CLIENT_PORT
+            value: "2181"
+          - name: ZOOKEEPER_TICK_TIME
+            value: "2000"
+          - name: KAFKA_OPTS
+            value: -Djava.security.auth.login.config=/opt/zookeeper/secret/zookeeper_jaas.conf
+                   -Dzookeeper.authProvider.1=org.apache.zookeeper.server.auth.SASLAuthenticationProvider
+                   -DrequireClientAuthScheme=sasl
+                   -Dzookeeper.allowSaslFailedClients=false
+        
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "125m"
+          limits:
+            memory: "128Mi"
+            cpu: "250m"
+        ports:
+          - containerPort: 2181
+
+        volumeMounts:
+          - name: zookeeper-jaas
+            mountPath: /opt/zookeeper/secret
+
+          - mountPath: "/data"
+            name: zookeeper-data
+
+          - mountPath: "/datalog"
+            name: zookeeper-data-log
+
+  volumeClaimTemplates:
+  - metadata:
+      name: zookeeper-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 100Mi
+  - metadata:
+      name: zookeeper-data-log
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 100Mi
+        # tty: true
+        # livenessProbe:
+        #   exec:
+        #     command:
+        #       - /opt/check.sh
+        #   initialDelaySeconds: 30
+        #   periodSeconds: 30
+        # readinessProbe:
+        #   exec:
+        #     command:
+        #       - /opt/check.sh
+        #   initialDelaySeconds: 30
+        #   periodSeconds: 5

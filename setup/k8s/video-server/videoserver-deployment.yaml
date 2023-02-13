@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: videoserver-deployment
+  namespace: video-server
+spec:
+  selector:
+    matchLabels:
+      app: videoserver
+  template:
+    metadata:
+      labels:
+        app: videoserver
+    spec:
+      containers:
+      - name: videoserver-container
+        image: iudx_vs/backend-server:latest
+        imagePullPolicy: IfNotPresent
+
+        # env:
+        #   - name: NODE_ENV
+        #     value: development
+
+        #   - name: HOST_NAME
+        #     value: localhost
+            
+        #   - name: HOST_TYPE
+        #     value: CMS
+
+        #   - name: PORT
+        #     value: "4000"
+
+        #   - name: STANDALONE_LMS
+        #     value: "False"
+
+        #   - name: JWT_SECRET
+        #     value: TOP_SECRET
+
+        #   - name: JWT_PRIVATE_KEY_PATH
+        #     value: /usr/src/app/privateECDSASHA256.pem
+            
+
+        resources:
+          limits:
+            # memory: "128Mi"
+            memory: "1Gi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 4000
+        command: ["node"]
+        args: ["/usr/src/app/build/src/app.js"]
+
+        # command: [ "/bin/sh", "-c", "--" ]
+        # args: [ "while true; do sleep 30; done;" ]
