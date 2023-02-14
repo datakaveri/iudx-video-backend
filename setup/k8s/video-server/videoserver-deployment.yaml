@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: videoserver-container
-        image: iudx_vs/backend-server:latest
+        image: datakaveri/video-server:latest
         imagePullPolicy: IfNotPresent
 
         # env:
