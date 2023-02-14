@@ -14,10 +14,9 @@ spec:
         component: postgres
     spec:
       securityContext:
-        fsGroup: 2000
-        runAsNonRoot: true
-        runAsUser: 1000
-
+        fsGroup: 0
+        runAsUser: 0
+        runAsGroup: 0
       volumes:
         - name: pg-data
           persistentVolumeClaim:
@@ -31,16 +30,18 @@ spec:
                 path: "schema.sql"
       containers:
       - name: postgres-container
-        image: postgres:13
+        image: postgres:15
         env:
           - name: TZ
             value: Asia/Kolkata
           - name: POSTGRES_USER
-            value: user
+            value: postgres
           - name: POSTGRES_PASSWORD
-            value: user123
+            value: vsDBpostgres
           - name: POSTGRES_DB
             value: vs_db
+          - name: PGDATA
+            value: /var/lib/postgresql/data/pgdata
         
         resources:
           requests:
@@ -55,9 +56,6 @@ spec:
         volumeMounts:
           - mountPath: /var/lib/postgresql/data
             name: pg-data
-            subPath: postgres
 
           - mountPath: "/docker-entrypoint-initdb.d"
             name: schema-storage
-
-          
