@@ -4,8 +4,10 @@ metadata:
   name: videoserver
   namespace: video-server
 spec:
+  type: NodePort 
   selector:
     app: videoserver
   ports:
   - port: 4000
     targetPort: 4000
+    nodePort: 31400
