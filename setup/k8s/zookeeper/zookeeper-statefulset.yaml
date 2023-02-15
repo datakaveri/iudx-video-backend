@@ -47,10 +47,10 @@ spec:
           - name: zookeeper-jaas
             mountPath: /opt/zookeeper/secret
 
-          - mountPath: "/data"
+          - mountPath: "/var/lib/zookeeper/data"
             name: zookeeper-data
 
-          - mountPath: "/datalog"
+          - mountPath: "/var/lib/zookeeper/log"
             name: zookeeper-data-log
 
   volumeClaimTemplates:
