@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-config
+data:
+  rtsp-simple-server.yml: |-
+{{ .Files.Get "configuration.yml" | indent 4}}

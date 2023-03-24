@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-service
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    app: {{ .Release.Name }}
+  
+  ports:
+    - name: {{ .Values.ports.name1 }}
+      port: {{ .Values.ports.containerPort1 }}
+      targetPort: {{ .Values.ports.name1 }}
+    - name: {{ .Values.ports.name2 }}
+      port: {{ .Values.ports.containerPort2 }}
+      targetPort: {{ .Values.ports.name2 }}
+    - name: {{ .Values.ports.name3 }}
+      port: {{ .Values.ports.containerPort3 }}
+      targetPort: {{ .Values.ports.name3 }}
+    - name: {{ .Values.ports.name4 }}
+      port: {{ .Values.ports.containerPort4 }}
+      targetPort: {{ .Values.ports.name4 }}
+    - name: {{ .Values.ports.name5 }}
+      port: {{ .Values.ports.containerPort5 }}
+      targetPort: {{ .Values.ports.name5 }}  
+

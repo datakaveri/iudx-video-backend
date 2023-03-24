@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+
+
+    spec:
+
+      volumes:
+        - name: {{ .Values.volumeName }}
+          configMap:
+            name: {{ .Values.mapName }}
+
+      containers:
+        - name: {{ .Values.containerName }}
+          image: "{{ .Values.image.repository }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            # - name: http
+            #   containerPort: {{ .Values.service.port }}
+            #   protocol: TCP
+            - containerPort: {{ .Values.ports.containerPort1 }}
+              name: {{ .Values.ports.name1 }}
+            - containerPort: {{ .Values.ports.containerPort2 }}
+              name: {{ .Values.ports.name2 }}  
+            - containerPort: {{ .Values.ports.containerPort3 }}
+              name: {{ .Values.ports.name3 }}
+            - containerPort: {{ .Values.ports.containerPort4 }}
+              name: {{ .Values.ports.name4 }}
+            - containerPort: {{ .Values.ports.containerPort5 }}
+              name: {{ .Values.ports.name5 }}    
+    
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+            
+          volumeMounts:
+          - mountPath: {{ .Values.mountPath }}
+            subPath: {{ .Values.subPath }}
+            # name: rtsp-storage
+            name: {{ .Values.volumeName }} 
