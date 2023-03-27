@@ -43,7 +43,7 @@ an oAuth service provider to authenticate and authorize access to camera streams
     POSTGRES_INITDB_USERNAME=user
     POSTGRES_INITDB_PASSWORD=user@123
     POSTGRES_INITDB_DATABASE=test_db
-    DB_URL=postgresql://user:user@123@localhost:5555/test_db
+    DB_URL=postgresql://user:user@123@localhost:5432/vs_db
     PGADMIN_DEFAULT_EMAIL=user@datakaveri.org
     PGADMIN_DEFAULT_PASSWORD=user@123
     EMAIL_ID=user@datakaveri.org
