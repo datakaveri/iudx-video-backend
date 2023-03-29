@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-broker
+  namespace: video-server
+spec:
+  type: NodePort
+  selector:
+    component: kafka
+  ports:
+  - name: kafka
+    port: 9093
+    targetPort: 9093
+    nodePort: 31093
+

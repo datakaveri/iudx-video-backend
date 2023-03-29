@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginxrtmp-deployment
+  namespace: video-server
+spec:
+  selector:
+    matchLabels:
+      app: nginxrtmp
+  template:
+    metadata:
+      labels:
+        app: nginxrtmp
+
+    spec:
+      containers:
+      - name: nginxrtmp-container
+        image: datakaveri/iudx-nginx-rtmp:latest
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 1935
+          name: rtmp-stream
+        - containerPort: 8080
+          name: stas-page
+        command: ["nginx", "-g"]
+        args: ["daemon off;"]
+
+      nodeSelector:
+        target.application: video-server
