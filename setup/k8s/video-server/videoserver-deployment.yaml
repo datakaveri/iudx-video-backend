@@ -15,7 +15,7 @@ spec:
       containers:
       - name: videoserver-container
         image: datakaveri/video-server:latest
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
 
         # env:
         #   - name: NODE_ENV
@@ -40,11 +40,6 @@ spec:
         #     value: /usr/src/app/privateECDSASHA256.pem
             
 
-        resources:
-          limits:
-            # memory: "128Mi"
-            memory: "1Gi"
-            cpu: "1000m"
         ports:
         - containerPort: 4000
         command: ["node"]
@@ -52,3 +47,5 @@ spec:
 
         # command: [ "/bin/sh", "-c", "--" ]
         # args: [ "while true; do sleep 30; done;" ]
+      nodeSelector:
+        target.application: video-server 

@@ -28,3 +28,6 @@ spec:
           name: stas-page
         command: ["nginx", "-g"]
         args: ["daemon off;"]
+
+      nodeSelector:
+        target.application: video-server

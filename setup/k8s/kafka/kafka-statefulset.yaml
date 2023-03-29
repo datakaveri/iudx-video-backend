@@ -33,6 +33,9 @@ spec:
       containers:
       - name: kafka 
         image: confluentinc/cp-kafka:latest
+        securityContext:
+          runAsUser: 0
+          runAsGroup: 0
         resources:
           requests:
             memory: "256Mi"
@@ -65,7 +68,7 @@ spec:
           - name: KAFKA_ZOOKEEPER_CONNECT
             value: "zookeeper-service.video-server.svc.cluster.local:2181"
           - name: KAFKA_ADVERTISED_LISTENERS
-            value: SASL_SSL://kafka-broker:9093
+            value: SASL_SSL://15.206.149.39:31093
           - name: KAFKA_LISTENERS
             value: "SASL_SSL://:9093"
           - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
@@ -108,12 +111,16 @@ spec:
             value: INFO
           - name: KAFKA_OPTS
             value: -Djava.security.auth.login.config=/var/lib/kafka/kafka_jaas.conf
-          
+
+      nodeSelector:
+        target.application: video-server    
+
   volumeClaimTemplates:
   - metadata:
       name: kafka-data
     spec:
       accessModes: [ "ReadWriteOnce" ]
+      storageClassName: ebs-csi-storage-class
       resources:
         requests:
           storage: 500Mi
