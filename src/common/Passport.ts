@@ -4,12 +4,14 @@ import { Strategy as JWTStrategy, ExtractJwt } from 'passport-jwt';
 import { Strategy as CustomStrategy } from 'passport-custom';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
+import Logger from './Logger';
 
 import config from '../config';
 import Container from 'typedi';
 import UserRepo from '../repositories/UserRepo';
 import Utility from './Utility';
 import AuthKafkaController from '../kafka/controllers/AuthKafkaController';
+import { request } from 'express';
 
 const UtilityService = Container.get(Utility);
 const privateKey = UtilityService.getPrivateKey();
@@ -118,12 +120,60 @@ passport.use(
     })
 );
 
+passport.use('custom-jwt', 
+    new CustomStrategy(async() => {
+        var jwt;
+        var jwtFromHeader = ExtractJwt.fromAuthHeaderAsBearerToken();
+        if(jwtFromHeader === null)
+        {
+            var jwtFromBody = ExtractJwt.fromBodyField('query');
+            jwt = jwtFromBody;
+        }
+        else{
+            jwt = jwtFromHeader;
+        }
+        
+        new JWTStrategy({
+                secretOrKey: privateKey,
+                algorithms: ['ES256'],
+                jwtFromRequest: jwt,
+                passReqToCallback: true,
+            }, async (req, user, done) => {
+                try {
+                    req.user = user;
+                    return done(null, user);
+                } catch (error) {
+                    done(error);
+                }
+            });   
+        
+    })
+
+);
+
+var customExtractor = (req) =>{
+    var token = null;
+
+    if ((req.headers && req.headers.authorization))
+    {
+        var parts = req.headers.authorization.split(' ');
+        token = parts[1];
+    }
+    else
+    {
+        token = req.body.query;
+    }
+    return token;
+}
+
 passport.use(
+    'jwt',
     new JWTStrategy(
         {
             secretOrKey: privateKey,
             algorithms: ['ES256'],
-            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+            //jwtFromRequest: ,
+            jwtFromRequest: customExtractor,
             passReqToCallback: true,
         },
         async (req, user, done) => {

@@ -15,6 +15,7 @@ import StreamStatusService from './StreamStatusService';
 import ServerRepo from '../repositories/ServerRepo';
 import KafkaManager from '../managers/Kafka';
 
+
 @Service()
 export default class StreamService {
     constructor(
@@ -28,11 +29,13 @@ export default class StreamService {
         private kafkaManager: KafkaManager
     ) {}
 
-    public async publishRegisteredStreams(streamData: any) {
-        const namespace: string = config.host.type + 'Stream';
-        const streamId: string = new UUID().generateUUIDv5(namespace);
-        const rtmpStreamUrl = `${config.rtmpServerConfig.serverUrl}/${streamId}?token=${config.rtmpServerConfig.password}`;
-        const rtmpStreamData: any = {
+    async publishRegisteredStreams(streamData) {
+        const namespace = config.host.type + 'Stream';
+        const streamId= new UUID().generateUUIDv5(namespace);
+        //const streamName = streamData['streamName'];
+        // const rtmpStreamUrl = `${config_1.default.rtmpServerConfig.serverUrl}/${streamId}?token=${config_1.default.rtmpServerConfig.password}`;
+        const rtspStreamUrl = `${config.rtspServerConfig.serverUrl}/${streamId}`;
+        const rtspStreamData = {
             streamId,
             cameraId: streamData['cameraId'],
             userId: streamData['userId'],
@@ -40,15 +43,29 @@ export default class StreamService {
             sourceServerId: config.serverId,
             destinationServerId: config.serverId,
             streamName: 'Local Stream',
-            streamUrl: rtmpStreamUrl,
-            streamType: 'RTMP',
-            type: 'rtmp',
+            //streamUrl: rtmpStreamUrl,
+            streamUrl: rtspStreamUrl,
+            streamType: 'RTSP',
+            type: 'rtsp',
             isPublic: streamData['isPublic'],
         };
 
-        await this.streamRepo.registerStream(rtmpStreamData);
-        this.processService.addStreamProcess(streamData['streamId'], streamId, rtmpStreamData.destinationServerId, rtmpStreamData.destinationServerId, streamData['streamUrl'], rtmpStreamUrl);
-        return rtmpStreamData;
+        
+
+
+        await this.streamRepo.registerLMSStream(rtspStreamData.streamId,
+                                             rtspStreamData.cameraId,
+                                             rtspStreamData.userId,
+                                             rtspStreamData.provenanceStreamId,
+                                             rtspStreamData.sourceServerId, 
+                                             rtspStreamData.destinationServerId,
+                                             rtspStreamData.streamName,
+                                             rtspStreamData.streamUrl,
+                                             rtspStreamData.streamType,
+                                             rtspStreamData.type,
+                                             rtspStreamData.isPublic);
+        this.processService.addStreamProcess(streamData['streamId'], streamId, rtspStreamData.destinationServerId, rtspStreamData.destinationServerId, streamData['streamUrl'], rtspStreamUrl);
+        return rtspStreamData;
     }
 
     public async register(userId: string, streamData: any) {
@@ -71,7 +88,7 @@ export default class StreamService {
                 ...streamData,
             };
 
-            await this.streamRepo.registerStream(streamData);
+            await this.streamRepo.registerOriginalStream(streamData);
             const rtmpStreamData = await this.publishRegisteredStreams(streamData);
             return { streamData, rtmpStreamData };
         } catch (e) {
@@ -95,7 +112,7 @@ export default class StreamService {
         try {
             const fields = ['streamId', 'cameraId', 'sourceServerId', 'destinationServerId', 'streamName', 'streamType', 'isPublic', 'isActive', 'isPublishing'];
             const { limit, offset } = this.utilityService.getPagination(page, size);
-            let streams = await this.streamRepo.listAllStreams(limit, offset, { type: 'rtmp', ...(cameraId && { cameraId }) }, fields);
+            let streams = await this.streamRepo.listAllStreams(limit, offset, { type: 'rtsp', ...(cameraId && { cameraId }) }, fields);
 
             let response = this.utilityService.getPagingData(streams, page, limit);
 
@@ -115,7 +132,7 @@ export default class StreamService {
                 if (stream.isActive && stream.destinationServerId === config.serverId) {
                     return {
                         ...stream,
-                        playbackUrlTemplate: `rtmp://${config.rtmpServerConfig.publicServerIp}:${config.rtmpServerConfig.publicServerPort}/live/${stream.streamId}?token=<TOKEN>`,
+                        playbackUrlTemplate: `rtsp://${config.rtspServerConfig.publicServerIp}:${config.rtspServerConfig.publicServerPort}/${stream.streamId}?token=<TOKEN>`,
                     };
                 }
                 return stream;
@@ -231,17 +248,14 @@ export default class StreamService {
                         },
                     },
                 };
-            } else if (requestType === 'local') {
+            } 
+            else if (requestType === 'local') {
                 const stream = await this.streamRepo.findStream({ streamId });
-                const server = await this.serverRepo.findServer(stream.sourceServerId);
-
+                //const server = await this.serverRepo.findServer(stream.sourceServerId);
+                const playbackUrl = stream['streamUrl']
                 return {
-                    apiResponse: {
-                        streamId,
-                        playbackUrlTemplate: `rtmp://${server.serverHost}:${server.serverRtmpPort}/live/${streamId}?token=<TOKEN>`,
-                        isPublishing: !!stream.isPublishing,
-                        ...(!stream.isPublishing && { message: 'Stream will be available shortly, please check status API to know the status' }),
-                    },
+                    //apiResponse: Object.assign({ streamId, playbackUrlTemplate: `rtmp://${server.serverHost}:${server.serverRtmpPort}/live/${streamId}?token=<TOKEN>`, isPublishing: !!stream.isPublishing }, (!stream.isPublishing && { message: 'Stream will be available shortly, please check status API to know the status' })),
+                      apiResponse: Object.assign({ streamId, playbackUrlTemplate: `${playbackUrl}?token=<TOKEN>`, isPublishing: !!stream.isPublishing }, (!stream.isPublishing && { message: 'Stream will be available shortly, please check status API to know the status' }))
                 };
             }
         } catch (e) {
@@ -280,7 +294,18 @@ export default class StreamService {
             });
 
             if (!isExistingStream && !foundStream) {
-                await this.streamRepo.registerStream(cmsRtmpStreamData);
+                await this.streamRepo.registerCMSStream(cmsRtmpStreamData.streamId,
+                                                     cmsRtmpStreamData.cameraId,
+                                                    cmsRtmpStreamData.userId,
+                                                    cmsRtmpStreamData.provenanceStreamId,
+                                                    cmsRtmpStreamData.sourceServerId,
+                                                    cmsRtmpStreamData.destinationServerId,
+                                                    cmsRtmpStreamData.streamName,
+                                                    cmsRtmpStreamData.streamUrl,
+                                                    cmsRtmpStreamData.streamType,
+                                                    cmsRtmpStreamData.type,
+                                                    cmsRtmpStreamData.isPublic,
+                                                    cmsRtmpStreamData.lastAccessed);
             }
 
             const sourceUrl = lmsStreamData['streamUrl'].replace(/token=.*$/, `token=${token}`);

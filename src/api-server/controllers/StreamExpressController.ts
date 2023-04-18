@@ -15,6 +15,7 @@ export default class StreamExpressController {
     }
 
     async register(req: Request, res: Response, next: NextFunction) {
+
         const userId: string = req.user['userId'];
         let params: any = req.body;
         const serverId: string = (req.query as any)['serverId'];

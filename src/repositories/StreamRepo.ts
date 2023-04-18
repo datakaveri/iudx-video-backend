@@ -4,11 +4,61 @@ import { Op, QueryTypes } from 'sequelize';
 import { Database } from '../managers/Database';
 import config from '../config';
 
+export interface Data {
+    streamId: string;
+    cameraId: any;
+    userId: any;
+    provenanceStreamId: any;
+    sourceServerId: string;
+    destinationServerId: string;
+    streamName: string;
+    streamUrl: string;
+    streamType: string;
+    type: string;
+    isPublic: any;
+}
+
 @Service()
 export default class StreamRepo {
     @Inject('StreamModel') private streamModel;
 
-    async registerStream(streamData: Array<any>) {
+    async registerLMSStream(streamId:string, cameraId:any, userId:any, provenanceStreamId:any, sourceServerId:string, destinationServerId:string, streamName:string, streamUrl:string, streamType:string, type:string, isPublic:any) {
+        var streamData = {
+            streamId,
+            cameraId,
+            userId,
+            provenanceStreamId,
+            sourceServerId,
+            destinationServerId,
+            streamName,
+            streamUrl,
+            streamType,
+            type,
+            isPublic
+        }
+        return await this.streamModel.create(streamData);
+    }
+
+    async registerCMSStream(streamId:string, cameraId:any, userId:any, provenanceStreamId:any, sourceServerId:string, destinationServerId:string, streamName:string, streamUrl:string, streamType:string, type:string, isPublic:any, lastAccessed:any) {
+        var streamData = {
+            streamId,
+            cameraId,
+            userId,
+            provenanceStreamId,
+            sourceServerId,
+            destinationServerId,
+            streamName,
+            streamUrl,
+            streamType,
+            type,
+            isPublic,
+            lastAccessed
+        }
+        return await this.streamModel.create(streamData);
+    }
+
+    async registerOriginalStream(streamData:Array<any>)
+    {
         return await this.streamModel.create(streamData);
     }
 

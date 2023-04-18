@@ -15,6 +15,6 @@ export default (app: Router) => {
     route.post('/token', AuthController.token);
     route.get('/login', AuthController.login);
     route.get('/logout', AuthController.logout);
-    route.get('/rtmp-token-verify', AuthController.rtmpTokenValidate);
-    route.post('/approve', passport.authenticate('jwt', { session: true }), AuthorizeRole(['cms-admin']), (req, res, next) => AuthController.approve(req, res, next));
+    route.post('/rtmp-token-verify', AuthController.rtspTokenValidate);
+    route.post('/approve', passport.authenticate('jwt', { session: true }), AuthorizeRole(['lms-admin']), (req, res, next) => AuthController.approve(req, res, next));
 };

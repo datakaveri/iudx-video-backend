@@ -85,6 +85,14 @@ export default {
         cmsServerPort: process.env.CMS_RTMP_PORT ? parseInt(process.env.CMS_RTMP_PORT): 1935,
     },
 
+    rtspServerConfig: {
+        serverUrl: process.env.RTSP_SERVER,
+        password: process.env.RTSP_SERVER_PUBLISH_PASSWORD,
+        serverPort: process.env.RTSP_SERVER_PUBLIC_PORT,
+        publicServerIp: process.env.RTSP_SERVER_PUBLIC_IP,
+        publicServerPort: process.env.RTSP_SERVER_PUBLIC_PORT,
+    },
+
     schedulerConfig: {
         statusCheck: {
             enable: process.env.ENABLE_STATUS_CHECK === 'true' || false,

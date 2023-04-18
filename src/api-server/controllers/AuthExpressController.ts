@@ -6,6 +6,8 @@ import Logger from '../../common/Logger';
 import AuthService from '../../services/AuthService';
 import AuthKafkaController from '../../kafka/controllers/AuthKafkaController';
 
+import { ExtractJwt } from 'passport-jwt';
+
 export default class AuthExpressController {
     private authService: AuthService;
     private authKafkaController: AuthKafkaController;
@@ -127,8 +129,25 @@ export default class AuthExpressController {
         }
     }
 
-    async rtmpTokenValidate(req: Request, res: Response, next: NextFunction) {
+    
+
+    async rtspTokenValidate(req: Request, res: Response, next: NextFunction) {
         Logger.debug('Calling rtmp token validate endpoint');
+        // var jwt = (req) =>{
+        //     var token = null;
+        
+        //     if ((req.headers && req.headers.authorization))
+        //     {
+        //         var parts = req.headers.authorization.split(' ');
+        //         token = parts[1];
+        //     }
+        //     else
+        //     {
+        //         token = req.body.query;
+        //     }
+        //     return token;
+        // }
+        // Logger.debug(`Request Body: ${jwt(req)}`);
         try {
             passport.authenticate('jwt', (err, user) => {
                 try {

@@ -11,7 +11,7 @@ export default (app: Router) => {
 
     const StreamController = new StreamExpressController();
 
-    app.use('/streams', passport.authenticate('jwt', { session: true }), route);
+    app.use('/streams', passport.authenticate('jwt', { session: false }), route);
 
     route.post('/',
         AuthorizeRole(['cms-admin', 'lms-admin', 'provider']),
