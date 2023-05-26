@@ -7,8 +7,8 @@ const route = Router();
 
 export default (app: Router) => {
     const PolicyController = new PolicyExpressController();
-
-    app.use('/policy', passport.authenticate('jwt', { session: true }), AuthorizeRole(['cms-admin', 'lms-admin', 'provider']), route);
+//session:false due to passport version update
+    app.use('/policy', passport.authenticate('jwt', { session: false }), AuthorizeRole(['cms-admin', 'lms-admin', 'provider']), route);
 
     route.post('/', ValidateCameraAccess, (req, res, next) => PolicyController.addPolicy(req, res, next));
 

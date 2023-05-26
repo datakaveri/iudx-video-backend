@@ -1,7 +1,7 @@
 import { Kafka, Consumer, Producer } from 'kafkajs';
 import { Service } from 'typedi';
 import fs from 'fs';
-
+import Logger from '../common/Logger';
 import config from '../config';
 import UUID from '../common/UUID';
 
@@ -37,6 +37,7 @@ export default class KafkaManager {
         try {
             await this.kafkaConsumer.connect();
             await this.kafkaConsumer.subscribe({ topic });
+            Logger.debug(`${config.host.type} calling subscribe method with topic: ${topic}`);
             await this.kafkaConsumer.run({
                 eachMessage: async ({ topic, partition, message }) => {
                     for (let [key, value] of Object.entries(message.headers)) {
@@ -52,6 +53,11 @@ export default class KafkaManager {
 
     public async publish(topic: string, message: any, messageType: string, messageId?: string) {
         try {
+
+            Logger.debug(`topic: ${topic}`);
+            Logger.debug(`message: ${message}`);
+            Logger.debug(`messageType: ${messageType}`);
+            Logger.debug(`messageId: ${messageId}`);
             if (!messageId) {
                 const namespace: string = config.host.type + 'KafkaMsg';
                 messageId = new UUID().generateUUIDv5(namespace);
@@ -69,6 +75,7 @@ export default class KafkaManager {
                 ],
             });
 
+            Logger.debug(`record: ${record}`);
             return { messageId, record };
         } catch (err) {
             throw err;

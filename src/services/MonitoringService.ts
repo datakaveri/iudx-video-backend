@@ -33,7 +33,7 @@ export default class MonitoringService {
                 this.promRegister
             );
 
-            gateway.push({ jobName: 'lms-metrics' }, (err, resp, body) => {
+            gateway.push({ jobName: 'lms-metrics' }).catch((err) => {
                 if (err) throw err;
             });
         }

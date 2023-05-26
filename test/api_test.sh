@@ -2,7 +2,7 @@
 
 docker build -t stream-server ../setup/testimage
 
-admin_email='admin@datakaveri.org'
+admin_email='lmsadmin@datakaveri.org'
 admin_password='admin123'
 
 provider_email='provider@datakaveri.org'

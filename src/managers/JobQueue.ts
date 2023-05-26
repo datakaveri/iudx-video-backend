@@ -15,7 +15,7 @@ export default class JobQueueManager {
     public async init() {
         try {
             this.runner = await run({
-                connectionString: config.databaseURL,
+                connectionString: config.DatabaseURL,
                 concurrency: 4,
                 noHandleSignals: false,
                 taskList,
@@ -32,6 +32,7 @@ export default class JobQueueManager {
     }
 
     public async add(taskIdentifier: string, payload: any, priority: number = JobPriority.HIGH, maxAttempts: number = 1) {
+        Logger.debug(`TaskIdentifier: ${taskIdentifier}, payload: ${payload}`);
         try {
             await this.runner.addJob(taskIdentifier, payload, { maxAttempts, priority });
         }

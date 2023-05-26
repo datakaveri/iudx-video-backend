@@ -88,7 +88,7 @@ export default class StreamService {
                 ...streamData,
             };
 
-            await this.streamRepo.registerOriginalStream(streamData);
+            await this.streamRepo.registerStream(streamData);
             const rtmpStreamData = await this.publishRegisteredStreams(streamData);
             return { streamData, rtmpStreamData };
         } catch (e) {
@@ -225,7 +225,7 @@ export default class StreamService {
                 return {
                     apiResponse: {
                         streamId,
-                        playbackUrlTemplate: `rtmp://${config.rtmpServerConfig.publicServerIp}:${config.rtmpServerConfig.publicServerPort}/live/${streamId}?token=<TOKEN>`,
+                        playbackUrlTemplate: `rtsp://${config.rtspServerConfig.publicServerIp}:${config.rtspServerConfig.publicServerPort}/${streamId}?token=<TOKEN>`,
                         isPublishing: isPublishing,
                         ...(!isPublishing && { message: 'Stream will be available shortly, please check status API to know the status' }),
                     },
@@ -271,7 +271,7 @@ export default class StreamService {
                 password: config.lmsAdminConfig.password,
             });
             const token = data.token;
-            const rtmpStreamUrl = `rtmp://${config.rtmpServerConfig.cmsServerIp}:${config.rtmpServerConfig.cmsServerPort}/live/${lmsStreamData['streamId']}?token=${config.rtmpServerConfig.password}`;
+            const rtspStreamUrl = `rtsp://${config.rtspServerConfig.cmsServerIp}:${config.rtspServerConfig.cmsServerPort}/${lmsStreamData['streamId']}?token=${config.rtspServerConfig.password}`;
             const cmsRtmpStreamData: any = {
                 streamId: lmsStreamData['streamId'],
                 cameraId: lmsStreamData['cameraId'],
@@ -280,7 +280,7 @@ export default class StreamService {
                 sourceServerId: lmsStreamData['sourceServerId'],
                 destinationServerId: cmsServerId,
                 streamName: lmsStreamData['streamName'],
-                streamUrl: rtmpStreamUrl,
+                streamUrl: rtspStreamUrl,
                 streamType: 'RTMP',
                 type: 'rtmp',
                 isPublic: true,
@@ -309,7 +309,7 @@ export default class StreamService {
             }
 
             const sourceUrl = lmsStreamData['streamUrl'].replace(/token=.*$/, `token=${token}`);
-            this.processService.addStreamProcess(lmsStreamData['streamId'], lmsStreamData['streamId'], lmsStreamData['sourceServerId'], cmsServerId, sourceUrl, rtmpStreamUrl);
+            this.processService.addStreamProcess(lmsStreamData['streamId'], lmsStreamData['streamId'], lmsStreamData['sourceServerId'], cmsServerId, sourceUrl, rtspStreamUrl);
             return cmsRtmpStreamData;
         } catch (e) {
             Logger.error('Failed to publish stream');

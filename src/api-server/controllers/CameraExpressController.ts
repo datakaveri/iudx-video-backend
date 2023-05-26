@@ -21,8 +21,11 @@ export default class CameraExpressController {
         let result: any;
 
         Logger.debug('Calling Register Camera endpoint with body: %o', params);
+
+        Logger.debug(`ServerId: ${serverId}`);
         try {
             if (serverId) {
+                Logger.debug("ServerId recieved");
                 result = await this.cameraKafkaController.register(serverId, userId, params);
             }
             else {

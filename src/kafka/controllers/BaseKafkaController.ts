@@ -19,30 +19,38 @@ export default class BaseKafkaController {
     }
 
     public async subscribe() {
+        Logger.debug(`Topic Name: ${this.topic}`);
         await this.kafkaManager.subscribe(this.topic, (err, message) => this.handleMessage(err, message));
     }
 
     public async handleMessage(err, message) {
         if (!message) return;
+        
+        Logger.debug(`Calling handle Message for ${config.host.type}`);
 
         try {
             if (err) throw err;
             let msg: any;
             const messageId: string = message.headers.messageId;
-
+            
+            Logger.debug(`Message Id on ${config.host.type}: ${messageId}`);
+            Logger.debug(`Message header type: ${message.headers.messageType}`);
             switch (message.headers.messageType) {
                 case KafkaMessageType.HTTP_REQUEST:
                     msg = JSON.parse(message.value.toString());
+                    Logger.debug(`Calling JobQueueManager.add() for ${config.host.type}`);
                     await this.jobQueueManager.add(msg.taskIdentifier, { messageId, data: msg.data }, JobPriority.HIGH);
                     break;
 
                 case KafkaMessageType.HTTP_RESPONSE:
                     msg = JSON.parse(message.value.toString());
+                    Logger.debug(`For ${config.host.type} and HTTP Response, message revieved: ${msg}`);
                     eventEmitter.emit(messageId, msg.data);
                     break;
 
                 case KafkaMessageType.DB_REQUEST:
                     msg = JSON.parse(message.value.toString());
+                    Logger.debug(`For ${config.host.type} and DB request, message revieved: ${msg}`);
                     await this.jobQueueManager.add(msg.taskIdentifier, { messageId, data: msg.data }, JobPriority.LOW);
                     break;
 

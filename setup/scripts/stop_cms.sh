@@ -5,7 +5,8 @@ UI_PROJECT_ROOT="$PWD/../../../"
 
 export PROJECT_ROOT=$PROJECT_ROOT
 export TOPICS_FILE="$PROJECT_ROOT/setup/apps/video/kafka/topics.json"
-export SCHEMA_FILE="$PROJECT_ROOT/setup/apps/video/postgres/cms-schema.sql"
+export SCHEMA_FILE_LMS="$PROJECT_ROOT/setup/apps/video/postgres/lms-schema.sql"
+export SCHEMA_FILE_CMS="$PROJECT_ROOT/setup/apps/video/postgres/cms-schema.sql"
 export UI_PROJECT_PATH="$UI_PROJECT_ROOT/iudx-video-frontend"
 
 
@@ -22,4 +23,4 @@ docker-compose \
     -p iudx_vs \
     down
 
-docker network rm vs-net
+#docker network rm vs-net

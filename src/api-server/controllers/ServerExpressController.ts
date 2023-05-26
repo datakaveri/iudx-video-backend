@@ -13,7 +13,6 @@ export default class ServerExpressController {
 
     async registerServer(req: Request, res: Response, next: NextFunction) {
         let params: any = req.body;
-
         Logger.debug('Calling register server endpoint with body: %o', params);
         try {
             const result = await this.serverService.register(params.serverName, params.serverHost, params.serverRtmpPort, 'LMS');

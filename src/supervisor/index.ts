@@ -21,9 +21,14 @@ export default async () => {
     // Initialize Database connection and load model injector
     try {
         await Database.authenticate();
-        Logger.info('Connection has been established successfully.');
+        Logger.info('Connection with Database has been established successfully.');
         ModelDependencyInjector();
-        Logger.info('Created DI of all models');
+        Logger.info('Created DI of all models in Database');
+
+        // await cmsDatabase.authenticate();
+        // Logger.info('Connection with CMS Database has been established successfully.');
+        // CMSModelDependencyInjector();
+        // Logger.info('Created DI of all models in CMS Database');
     } catch (error) {
         Logger.error(error);
     }
@@ -31,6 +36,7 @@ export default async () => {
     //Initialize Kafka and Topics to listen for new messages
     const kafkaManager: KafkaManager = Container.get(KafkaManager);
     kafkaManager.connect();
+    Logger.debug(`${config.host.type} connected to kafka successfully`);
 
     // Initialize Mail Client
     Container.set(
@@ -58,7 +64,7 @@ export default async () => {
 
     // Start status check scheduler if enabled
     if (config.schedulerConfig.statusCheck.enable) {
-        schedulerManager.startStatusCheck();
+        // schedulerManager.startStatusCheck();
         Logger.info('Status check service started.');
     }
 
@@ -75,11 +81,12 @@ export default async () => {
     // Start Kafka Service
     if (!config.isStandaloneLms) {
         await kafkaService();
-        Logger.info('Connected to Kafka successfully.');
+        Logger.info(`${config.host.type} subscribed to Kafka successfully.`);
     }
 
     // start heartbeat service for LMS
-    if (config.host.type === 'LMS' && !config.isStandaloneLms) {
+    if ((config.host.type === 'LMS') && (!config.isStandaloneLms)) {
+        Logger.debug(`${config.host.type} starting heartbeat service`);
         schedulerManager.startHeartbeatService();
         Logger.info('Heartbeat service started.');
     }
@@ -120,7 +127,7 @@ export default async () => {
         const ServerServiceInstance = Container.get(ServerService);
         const found = await ServerServiceInstance.findServer(config.serverId);
         if (!found) {
-            const server = await ServerServiceInstance.register('cms-server', config.rtmpServerConfig.cmsServerIp, config.rtmpServerConfig.cmsServerPort, 'CMS', config.serverId, config.kafkaConfig.consumerGroupId);
+            const server = await ServerServiceInstance.register('cms-server', config.rtspServerConfig.cmsServerIp, config.rtspServerConfig.cmsServerPort, 'CMS', config.serverId, config.kafkaConfig.consumerGroupId);
         }
     }
 

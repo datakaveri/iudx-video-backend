@@ -90,8 +90,8 @@ export default class KafkaUtilService {
 
         return new Promise((resolve, reject) => {
             eventEmitter.once(messageId, data => {
-                Logger.info("Message Received", messageId);
-                Logger.debug("Message Received data", data);
+                Logger.info(`Message Received, ${messageId}`);
+                Logger.debug(`Message Received data, ${data}`);
                 clearTimeout(timer);
                 return resolve(data);
             });

@@ -3,7 +3,9 @@
 PROJECT_ROOT="$PWD/../../"
 
 export PROJECT_ROOT=$PROJECT_ROOT
-export SCHEMA_FILE="$PROJECT_ROOT/setup/apps/video/postgres/lms-schema.sql"
+# added seperate variables for lms_schema and cms_schema
+export SCHEMA_FILE_LMS="$PROJECT_ROOT/setup/apps/video/postgres/lms-schema.sql"
+export SCHEMA_FILE_CMS="$PROJECT_ROOT/setup/apps/video/postgres/cms-schema.sql"
 
 docker network create vs-net
 
@@ -16,4 +18,4 @@ docker-compose \
     -f $PROJECT_ROOT/setup/setup/nginx/docker-compose-lms.yml \
     --env-file $PROJECT_ROOT/.env \
     -p iudx_vs \
-    up -d nginxrtmp postgres pgadmin videoserver promtail vsnginx
+    up -d nginxrtmp lms_postgres pgadmin lms_videoserver promtail vsnginx

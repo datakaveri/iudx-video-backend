@@ -39,6 +39,10 @@ export default class StreamRepo {
         return await this.streamModel.create(streamData);
     }
 
+    async registerStream(streamData: Array<any>) {
+        return await this.streamModel.create(streamData);
+    }
+
     async registerCMSStream(streamId:string, cameraId:any, userId:any, provenanceStreamId:any, sourceServerId:string, destinationServerId:string, streamName:string, streamUrl:string, streamType:string, type:string, isPublic:any, lastAccessed:any) {
         var streamData = {
             streamId,
@@ -57,10 +61,7 @@ export default class StreamRepo {
         return await this.streamModel.create(streamData);
     }
 
-    async registerOriginalStream(streamData:Array<any>)
-    {
-        return await this.streamModel.create(streamData);
-    }
+    
 
     async findStream(query: any, columns: Array<string> = null): Promise<any> {
         return await this.streamModel.findOne({ where: query, attributes: columns });

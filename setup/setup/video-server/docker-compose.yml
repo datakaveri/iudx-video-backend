@@ -1,18 +1,33 @@
 version: '3.8'
 
 services:
-  videoserver:
+  lms_videoserver:
     restart: always
     build:
       dockerfile: ${PROJECT_ROOT}/setup/setup/video-server/Dockerfile
       context: ${PROJECT_ROOT}
     image: iudx_vs/backend-server
-    container_name: videoserver
+    container_name: lms_videoserver
     network_mode: host
     expose:
       - "4000"
     depends_on:
-      - postgres
-    command: "node build/src/app.js"
+      - lms_postgres
+    command: tail -F anything  
+    # command: "node build/src/app.js"
+
+  # cms_videoserver:
+  #   restart: always
+  #   build:
+  #     dockerfile: ${PROJECT_ROOT}/setup/setup/video-server/Dockerfile
+  #     context: ${PROJECT_ROOT}
+  #   image: iudx_vs/backend-server
+  #   container_name: videoserver
+  #   network_mode: host
+  #   expose:
+  #     - "4001"
+  #   depends_on:
+  #     - postgres
+  #   command: tail -F anything   
 
 

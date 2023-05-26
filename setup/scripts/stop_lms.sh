@@ -3,7 +3,8 @@
 PROJECT_ROOT="$PWD/../../"
 
 export PROJECT_ROOT=$PROJECT_ROOT
-export SCHEMA_FILE="$PROJECT_ROOT/setup/apps/video/postgres/lms-schema.sql"
+export SCHEMA_FILE_LMS="$PROJECT_ROOT/setup/apps/video/postgres/lms-schema.sql"
+export SCHEMA_FILE_CMS="$PROJECT_ROOT/setup/apps/video/postgres/cms-schema.sql"
 
 
 docker-compose \
@@ -16,4 +17,4 @@ docker-compose \
     -p iudx_vs \
     down 
 
-docker network rm vs-net
+#docker network rm vs-net

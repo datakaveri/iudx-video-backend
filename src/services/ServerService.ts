@@ -15,13 +15,15 @@ export default class ServerService {
     public async register(serverName: string, serverHost: string, serverRtmpPort: number, serverType: string, serverId?: string, consumerGroupId?: string) {
         try {
             const newServerId: string = serverId || new UUID().generateUUIDv5(serverName);
-
+            
             // Create upstream and downstream topics for the server
             const upstreamTopicName = `${newServerId}.upstream`;
             const downstreamTopicName = `${newServerId}.downstream`;
             await this.kafkaUtilService.createTopic(upstreamTopicName);
             await this.kafkaUtilService.createTopic(downstreamTopicName);
-
+            
+            Logger.debug(`UpstreamTopicName: ${upstreamTopicName}`);
+            Logger.debug(`DownstreamTopicName: ${downstreamTopicName}`);
             // Subscribe to new topics created
             if (serverType === 'LMS') {
                 const baseKafkaController = new BaseKafkaController();

@@ -8,8 +8,7 @@ import { StreamModel } from '../models/StreamModel';
 import { PolicyModel } from '../models/PolicyModel';
 import { ServerModel } from '../models/ServerModel';
 
-const Database = new Sequelize(config.databaseURL, { dialect: 'postgres' });
-
+const Database = new Sequelize(config.DatabaseURL, { dialect: 'postgres' });
 const ModelDependencyInjector = () => {
     const models = [
         {
@@ -37,4 +36,5 @@ const ModelDependencyInjector = () => {
         Container.set(m.name, m.model);
     });
 };
-export { Database, ModelDependencyInjector };
+
+export { Database,ModelDependencyInjector };

@@ -24,6 +24,7 @@ export default class StreamExpressController {
         Logger.debug('Calling Register Stream endpoint with body: %o', params);
         try {
             if (serverId) {
+                Logger.debug(`serverId recieved: ${serverId}`);
                 result = await this.streamKafkaController.register(serverId, userId, params);
             } else {
                 result = await this.streamService.register(userId, params);

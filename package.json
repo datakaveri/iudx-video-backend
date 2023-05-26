@@ -52,7 +52,7 @@
         "got": "^9.6.0",
         "graphile-worker": "^0.13.0",
         "jsonwebtoken": "^9.0.0",
-        "kafkajs": "^2.2.4",
+        "kafkajs": "^1.15.0",
         "lodash": "^4.17.21",
         "nodemailer": "^6.9.1",
         "nodemailer-smtp-transport": "^2.7.4",

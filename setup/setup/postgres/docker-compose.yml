@@ -6,12 +6,13 @@ networks:
 
 volumes:
   pg_data: {}
+  pg_data_cms: {}
   pgadmin: {}
 
 services:
-  postgres:
+  lms_postgres:
     image: postgres:13
-    container_name: postgres
+    container_name: lms_postgres
     restart: always
     logging:
       options:
@@ -21,14 +22,36 @@ services:
       - "127.0.0.1:5432:5432"
     environment:
       TZ: Asia/Kolkata
-      POSTGRES_USER: ${POSTGRES_INITDB_USERNAME}
-      POSTGRES_PASSWORD: ${POSTGRES_INITDB_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_INITDB_DATABASE}
+      POSTGRES_USER: ${LMS_POSTGRES_INITDB_USERNAME}
+      POSTGRES_PASSWORD: ${LMS_POSTGRES_INITDB_PASSWORD}
+      POSTGRES_DB: ${LMS_POSTGRES_INITDB_DATABASE}
     volumes:
-      - ${SCHEMA_FILE}:/docker-entrypoint-initdb.d/schema.sql
+      - ${SCHEMA_FILE_LMS}:/docker-entrypoint-initdb.d/schema.sql
       - pg_data:/var/lib/postgresql/data/
     networks: 
       - vs-net 
+
+
+  cms_postgres:
+    image: postgres:13
+    container_name: cms_postgres
+    restart: always
+    logging:
+      options:
+        max-size: 10m
+        max-file: "10"
+    ports:
+      - "127.0.0.1:5433:5432"
+    environment:
+      TZ: Asia/Kolkata
+      POSTGRES_USER: ${CMS_POSTGRES_INITDB_USERNAME}
+      POSTGRES_PASSWORD: ${CMS_POSTGRES_INITDB_PASSWORD}
+      POSTGRES_DB: ${CMS_POSTGRES_INITDB_DATABASE}
+    volumes:
+      - ${SCHEMA_FILE_CMS}:/docker-entrypoint-initdb.d/schema.sql
+      - pg_data_cms:/var/lib/postgresql/data/
+    networks: 
+      - vs-net     
 
   pgadmin:
     image: dpage/pgadmin4

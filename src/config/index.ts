@@ -9,16 +9,19 @@ if (envFound.error) {
 }
 
 export default {
+    //Changes done to create seperate env variables for CMS and LMS 
     host: {
-        name: process.env.HOST_NAME,
-        type: process.env.HOST_TYPE,
+        name: process.env.LMS_HOST_NAME,
+        type: process.env.LMS_HOST_TYPE,
     },
 
-    port: parseInt(process.env.PORT, 10),
+    port: parseInt(process.env.LMS_PORT, 10),
 
     serverId: process.env.SERVER_ID,
 
-    databaseURL: process.env.DB_URL,
+    DatabaseURL: process.env.LMS_DB_URL,
+
+
 
     isStandaloneLms: process.env.STANDALONE_LMS === 'true' || false,
 
@@ -81,8 +84,8 @@ export default {
         statUrl: process.env.RTMP_STAT_URL,
         publicServerIp: process.env.RTMP_SERVER_PUBLIC_IP,
         publicServerPort: process.env.RTMP_SERVER_PUBLIC_PORT,
-        cmsServerIp: process.env.CMS_RTMP_HOST,
-        cmsServerPort: process.env.CMS_RTMP_PORT ? parseInt(process.env.CMS_RTMP_PORT): 1935,
+        cmsServerIp: process.env.CMS_RTSP_HOST,
+        cmsServerPort: process.env.CMS_RTSP_PORT ? parseInt(process.env.CMS_RTSP_PORT): 1935,
     },
 
     rtspServerConfig: {
@@ -91,6 +94,9 @@ export default {
         serverPort: process.env.RTSP_SERVER_PUBLIC_PORT,
         publicServerIp: process.env.RTSP_SERVER_PUBLIC_IP,
         publicServerPort: process.env.RTSP_SERVER_PUBLIC_PORT,
+        cmsServerIp: process.env.CMS_RTSP_HOST,
+        cmsServerPort: process.env.CMS_RTSP_PORT ? parseInt(process.env.CMS_RTSP_PORT): 8554,
+        publishURL: 'http://localhost:9997/v1/config/paths/add'
     },
 
     schedulerConfig: {

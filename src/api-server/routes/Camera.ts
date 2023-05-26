@@ -10,8 +10,8 @@ const route = Router();
 export default (app: Router) => {
 
     const CameraController = new CameraExpressController();
-
-    app.use('/cameras', passport.authenticate('jwt', { session: true }), route);
+//session:false due to passport version update
+    app.use('/cameras', passport.authenticate('jwt', { session: false }), route);
 
     route.post('/',
         AuthorizeRole(['cms-admin', 'lms-admin', 'provider']),

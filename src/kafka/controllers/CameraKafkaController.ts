@@ -25,11 +25,16 @@ export default class CameraKafkaController {
 
     public async register(serverId: string, userId: string, cameraData: any) {
         try {
+            Logger.debug(`serverId: ${serverId}`);
+            Logger.debug(`userId: ${userId}`);
+            Logger.debug(`cameraData: ${cameraData}`);
             const topic: string = serverId + '.downstream';
             const message: any = { taskIdentifier: 'registerCamera', data: { userId, cameraData } };
             const { messageId } = await this.kafkaManager.publish(topic, message, KafkaMessageType.HTTP_REQUEST);
+            Logger.debug(`messageId: ${messageId}`);
             const result = await this.kafkaUtilService.getKafkaMessageResponse(messageId);
-
+            // Logger.debug(`messageId_response: ${Object.keys(result)}`);
+            // Logger.debug(`messageId_response: ${Object.values(result)}`);
             if (result) {
                 await this.cameraRepo.registerCamera(result);
             }

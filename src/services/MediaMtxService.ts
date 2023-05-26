@@ -21,17 +21,11 @@ export default class MediaMtxService {
     constructor(private Utility: Utility){}
 
     async createRtspProcess(streamId, streamInputUrl) {
-        const response = await axios.post(`http://localhost:9997/v1/config/paths/add/${streamId}`, {
+        try{
+        const response = await axios.post(`${config.rtspServerConfig.publishURL}/${streamId}`, {
             source: streamInputUrl
           });
-        try{
-            if(response.status != 200)
-            {
-                throw new Error(response.status as unknown as string);
-            }     
-            return 101;
-        }
-        catch (err) {
+        }catch (err) {
             Logger.error(err);
             throw err;
         }
