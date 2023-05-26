@@ -37,33 +37,70 @@ an oAuth service provider to authenticate and authorize access to camera streams
 
     ```sh
     NODE_ENV=development
-    HOST_NAME=localhost
-    HOST_TYPE=LMS
-    PORT=4000
-    POSTGRES_INITDB_USERNAME=user
-    POSTGRES_INITDB_PASSWORD=user@123
-    POSTGRES_INITDB_DATABASE=test_db
-    DB_URL=postgresql://user:user@123@localhost:5555/test_db
+
+    LMS_HOST_NAME=localhost
+    LMS_HOST_TYPE=LMS
+    LMS_PORT=4000
+
+    CMS_HOST_NAME=localhost
+    CMS_HOST_TYPE=CMS
+    CMS_PORT=4001
+
+
+    LMS_POSTGRES_INITDB_USERNAME=user
+    LMS_POSTGRES_INITDB_PASSWORD=user@123
+    LMS_POSTGRES_INITDB_DATABASE=vs_db
+    LMS_DB_URL=postgresql://user:user@123@localhost:5432/vs_db
+
+    CMS_POSTGRES_INITDB_USERNAME=user
+    CMS_POSTGRES_INITDB_PASSWORD=user@123
+    CMS_POSTGRES_INITDB_DATABASE=vs_db
+    CMS_DB_URL=postgresql://user:user@123@localhost:5433/vs_db
+
     PGADMIN_DEFAULT_EMAIL=user@datakaveri.org
     PGADMIN_DEFAULT_PASSWORD=user@123
+
     EMAIL_ID=user@datakaveri.org
     EMAIL_PASSWORD=user@123
+
     JWT_SECRET=NO_SECRET
-    JWT_PRIVATE_KEY_PATH=/path/to/file/sample.key
+    JWT_PRIVATE_KEY_PATH=./privateECDSASHA256.pem
+
     RTMP_SERVER=rtmp://localhost:6001/live
     RTMP_SERVER_PUBLISH_PASSWORD=user123
-    RTMP_STAT_URL=http://localhost:6002/stat
+    RTMP_STAT_URL=http://localhost:8080/stat
     RTMP_SERVER_PUBLIC_IP=localhost
     RTMP_SERVER_PUBLIC_PORT=1935
+
     ENABLE_STATUS_CHECK=true
-    SERVER_ID=54d6f331-6a8f-5362-9932-00609b42902f # UUID
+    SERVER_ID=54d6f331-6a8f-5362-9932-00609b42902f
+    # SERVER_ID=44ed29ad-f1f9-558c-bde5-896ec036d10b
     ENABLE_METRICS_MONITOR=true
     PROM_PUSHGATEWAY_URL=http://localhost:9091
-    CMS_ADMIN_EMAIL=admin@datakaveri.org
-    CMS_ADMIN_PASSWORD=admin123
-    STANDALONE_LMS=false
-    LMS_ADMIN_EMAIL=admin@datakaveri.org
+    STANDALONE_LMS=true
+
+    # LMS_ADMIN_ID=f8424b0c-2dfd-4ee3-a4b0-3fdb477d046f
+    LMS_ADMIN_EMAIL=lmsadmin@datakaveri.org
     LMS_ADMIN_PASSWORD=admin123
+
+    CMS_ADMIN_EMAIL=cmsadmin@datakaveri.org
+    CMS_ADMIN_PASSWORD=admin123
+
+    CMS_RTSP_HOST=localhost
+    CMS_RTSP_PORT=8554
+
+    RTSP_SERVER_PUBLIC_IP=localhost
+    RTSP_SERVER=rtsp://localhost:8554
+    RTSP_SERVER_PUBLISH_PASSWORD=user123
+    RTSP_SERVER_PUBLIC_PORT=8554
+
+    KAFKA_CLIENT_ID='iuvdx'
+    # KAFKA_CLIENT_ID='44ed29ad-f1f9-558c-bde5-896ec036d10b-group'
+    KAFKA_BROKER='localhost:9092'
+    KAFKA_CLIENT_USERNAME='client'
+    KAFKA_CLIENT_PASSWORD='client-secret'
+    KAFKA_SSL_CA_FILEPATH=/usr/src/app/kafka_certs/ca-cert
+    KAFKA_SSL_CERT_FILEPATH=/usr/src/app/kafka_certs/cert-signed
     ```
 
 ### Setup
